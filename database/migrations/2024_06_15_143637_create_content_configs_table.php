@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('content_configs', function (Blueprint $table) {
             $table->id();
-            $table->json('media')->nullable();
+            $table->string('media')->nullable();
             $table->json('buttons')->nullable();
             $table->longText('content')->nullable();
             $table->string('type')->nullable();

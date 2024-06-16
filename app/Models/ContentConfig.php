@@ -15,4 +15,12 @@ class ContentConfig extends Model
         'content',
         'type'
     ];
+    const TYPE_TEXT = 'text';
+    const TYPE_PHOTO = 'photo';
+    const TYPE_VIDEO = 'video';
+    const MAP_TYPE = [
+        self::TYPE_TEXT,
+        self::TYPE_PHOTO,
+        self::TYPE_VIDEO,
+    ];
 }

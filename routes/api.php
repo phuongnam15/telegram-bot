@@ -17,7 +17,3 @@ use App\Http\Controllers\Api\Admin\BotController;
 
 Route::post('/webhook', [BotController::class, 'webhook']);
 
-Route::get('logs', function () {
-    logger('test');
-    return 1;
-});
