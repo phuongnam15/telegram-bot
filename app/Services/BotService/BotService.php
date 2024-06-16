@@ -63,10 +63,10 @@ class BotService extends BaseService
             return 1;
         });
     }
-    public function send($request)
+    public function send($telegramId, $configId)
     {
-        $user = User::where('telegram_id', $request->telegram_id)->first();
-        $config = ContentConfig::where('id', $request->config_id)->first();
+        $user = User::where('telegram_id', $telegramId)->first();
+        $config = ContentConfig::where('id', $configId)->first();
 
         if ($user && $config) {
             $type = $config->type;
@@ -92,8 +92,8 @@ class BotService extends BaseService
             }
 
             if($media) {
-                // $parameter[$type] = fopen($media, 'r');
-                $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
+                $parameter[$type] = fopen($media, 'r');
+                // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
             }
 
 
