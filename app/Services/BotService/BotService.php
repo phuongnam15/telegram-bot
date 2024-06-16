@@ -92,12 +92,14 @@ class BotService extends BaseService
             }
 
             if($media) {
+                // $parameter[$type] = fopen($media, 'r');
                 $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
             }
 
 
             switch ($type) {
                 case 'text':
+                    $parameter['text'] = $content;
                     return Telegram::sendMessage($parameter);
                 case 'photo':
                     return Telegram::sendPhoto($parameter);
