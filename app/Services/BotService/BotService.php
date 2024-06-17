@@ -86,11 +86,45 @@ class BotService extends BaseService
 
                 $configIntro = ContentConfig::where('kind', 'introduce')->orderBy('updated_at', 'desc')->first();
 
-                Telegram::sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => "Chào mừng <strong>{$name}</strong> đến với group!\n\n" . $configIntro->content,
-                    "parse_mode" => "HTML"
-                ]);
+                if ($configIntro) {
+                    $type = $configIntro->type;
+                    $keyboard = [];
+                    $media = $configIntro->media;
+                    $content = str_replace('\n', "\n", $configIntro->content);
+                    $buttons = json_decode($configIntro->buttons, true);
+
+                    $parameter = [
+                        "chat_id" => $chatId,
+                        "caption" => $content,
+                        "parse_mode" => "HTML"
+                    ];
+
+                    $buttons = json_encode($buttons);
+
+                    if ($buttons) {
+                        $parameter['reply_markup'] = $buttons;
+                    }
+
+                    if ($media) {
+                        // $parameter[$type] = fopen($media, 'r');
+                        $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
+                    }
+
+
+                    switch ($type) {
+                        case 'text':
+                            $parameter['text'] = $content;
+                            return Telegram::sendMessage($parameter);
+                        case 'photo':
+                            return Telegram::sendPhoto($parameter);
+                        case 'video':
+                            return Telegram::sendVideo($parameter);
+                        default:
+                            throw new AppServiceException('Type not found');
+                    }
+                } else {
+                    throw new AppServiceException('User or config not found');
+                }
             }
             return 1;
         });
