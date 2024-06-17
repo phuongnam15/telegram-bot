@@ -50,11 +50,11 @@ class BotService extends BaseService
 
                 $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
 
-                $configIntro = ContentConfig::where('kind', 'introduce')->first();
+                $configIntro = ContentConfig::where('kind', 'introduce')->orderBy('updated_at', 'desc')->first();
 
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
-                    'text' => $text . $configIntro->content,
+                    'text' => $text . str_replace('</p>', "</p>\n", $configIntro->content),
                     "parse_mode" => "HTML"
                 ]);
 
@@ -90,7 +90,7 @@ class BotService extends BaseService
                     $type = $configIntro->type;
                     $keyboard = [];
                     $media = $configIntro->media;
-                    $content = str_replace('\n', "\n", $configIntro->content);
+                    $content = str_replace('</p>', "</p>\n", $configIntro->content);
                     $buttons = json_decode($configIntro->buttons, true);
 
                     $parameter = [
