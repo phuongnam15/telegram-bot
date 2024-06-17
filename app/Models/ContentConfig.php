@@ -13,8 +13,10 @@ class ContentConfig extends Model
         'media',
         'buttons',
         'content',
-        'type'
+        'type',
+        'kind'
     ];
+    const KIND_INTRO = 'introduce';
     const TYPE_TEXT = 'text';
     const TYPE_PHOTO = 'photo';
     const TYPE_VIDEO = 'video';

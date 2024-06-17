@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('buttons')->nullable();
             $table->longText('content')->nullable();
             $table->string('type')->nullable();
+            $table->string('kind')->nullable();
             $table->timestamps();
         });
     }

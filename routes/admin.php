@@ -14,6 +14,6 @@ Route::prefix('auth')->group(function () {
     });
 });
 Route::middleware('auth:admin')->group(function () {
-    Route::post('/config', [ContentConfigController::class, 'store']);
-    Route::post('/send', [BotController::class, 'send']);
 });
+Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');
+Route::post('/send', [BotController::class, 'send']);

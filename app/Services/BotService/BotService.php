@@ -31,31 +31,55 @@ class BotService extends BaseService
             $update = json_decode($updates, true);
             $message = $update['message'];
 
+            $name = "";
+
             //new chat member
-            if (isset($update['message']['new_chat_members'])) {
-                $firstName = $message['new_chat_member']['first_name'];
-                $lastName = $message['new_chat_member']['last_name'];
+            if (isset($message['new_chat_members'])) {
+
+                if (isset($message['new_chat_member']['first_name'])) {
+                    $name .= $message['new_chat_member']['first_name'] . " ";
+                }
+                if (isset($message['new_chat_member']['last_name'])) {
+                    $name .= $message['new_chat_member']['last_name'];
+                }
+                if ($name === '') {
+                    $name = $message['new_chat_member']['username'];
+                }
+
                 $chatId = $message['chat']['id'];
 
-                $text = "Chào mừng <strong>{$firstName} {$lastName}</strong> đến với group!";
+                $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
+
+                $configIntro = ContentConfig::where('kind', 'introduce')->first();
 
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
-                    'text' => $text,
+                    'text' => $text . $configIntro->content,
                     "parse_mode" => "HTML"
                 ]);
+
+                $name = '';
             }
             //start bot
-            if (isset($update['message']) && $update['message']['text'] == '/start') {
-                $firstName = $message['from']['first_name'];
-                $lastName = $message['from']['last_name'];
+            if (isset($message['text']) && $message['text'] == '/start') {
+
+                if (isset($message['from']['first_name'])) {
+                    $name .= $message['from']['first_name'] . " ";
+                }
+                if (isset($message['from']['last_name'])) {
+                    $name .= $message['from']['last_name'];
+                }
+                if ($name === '') {
+                    $name = $message['from']['username'];
+                }
+
                 $chatId = $message['chat']['id'];
 
                 User::firstOrCreate(
                     ['telegram_id' => $chatId],
                     [
                         'status' => 'new_chat_member',
-                        'name' => $firstName . ' ' . $lastName,
+                        'name' => $name,
                         'telegram_id' => $chatId
                     ]
                 );
@@ -83,15 +107,66 @@ class BotService extends BaseService
             ];
 
             if ($buttons) {
-                $buttons = json_decode($buttons);
-                foreach ($buttons as $key => $link) {
-                    $keyboard[] = [['text' => $key, 'url' => $link]];
-                }
+                // $buttons = json_decode($buttons);
+                // foreach ($buttons as $key => $link) {
+                //     $keyboard[] = [['text' => $key, 'url' => $link]];
+                // }
 
-                $parameter['reply_markup'] = json_encode(['inline_keyboard' => $keyboard]);
+                $parameter['reply_markup'] = $buttons;
+                // $parameter['reply_markup'] = json_encode([
+                //     "inline_keyboard" => [
+                //         [
+                //             [
+                //                 "text" => "Visit Website",
+                //                 "url" => "https://www.example.com"
+                //             ],
+                //         ],
+                //         [
+                //             [
+                //                 "text" => "Reply",
+                //                 "callback_data" => "reply_action"
+                //             ]
+
+                //         ],
+                //         [
+                //             [
+                //                 "text" => "Alert",
+                //                 "callback_data" => "alert_action"
+                //             ],
+                //         ],
+                //         [
+                //             [
+                //                 "text" => "Switch to inline",
+                //                 "switch_inline_query" => "query_data"
+                //             ]
+                //         ],
+                //     ],
+                //     "keyboard" => [
+                //         [
+                //             [
+                //                 "text" => "Simple Button"
+                //             ],
+                //         ],
+                //         [
+                //             [
+                //                 "text" => "Contact",
+                //                 "request_contact" => true
+                //             ]
+
+                //         ],
+                //         [
+                //             [
+                //                 "text" => "Location",
+                //                 "request_location" => true
+                //             ]
+                //         ]
+                //     ],
+                //     "resize_keyboard" => true
+                // ]);
+                // logger($parameter['reply_markup']);
             }
 
-            if($media) {
+            if ($media) {
                 $parameter[$type] = fopen($media, 'r');
                 // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
             }
@@ -108,7 +183,6 @@ class BotService extends BaseService
                 default:
                     throw new AppServiceException('Type not found');
             }
-
         } else {
             throw new AppServiceException('User or config not found');
         }

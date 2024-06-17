@@ -15,15 +15,17 @@ class ContentConfigService extends BaseService
 
             if ($request->hasFile('media')) {
                 $input['media'] = $this->saveImage($input['media'], PATH_MEDIA, SOURCE_MEDIA);
-            } else {
-                $input['media'] = json_encode([]);
             }
 
-            if($request->has('buttons')) {
-                $input['buttons'] = json_encode($input['buttons']);
-            } else {
-                $input['buttons'] = json_encode([]);
+            if ($request->has('content')) {
+                $input['content'] = sanitizeHtml(html_entity_decode($input['content'], ENT_QUOTES, 'UTF-8'));
             }
+
+            // if($request->has('buttons')) {
+            //     $input['buttons'] = json_encode($input['buttons']);
+            // } else {
+            //     $input['buttons'] = json_encode([]);
+            // }
 
             return ContentConfig::create($input);
         });
