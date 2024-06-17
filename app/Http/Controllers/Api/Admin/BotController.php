@@ -19,7 +19,6 @@ class BotController extends Controller
 
   public function webhook()
   {
-    logger(123123);
     return $this->botService->webhook();
   }
   public function send(Request $request)

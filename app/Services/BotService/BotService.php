@@ -83,6 +83,14 @@ class BotService extends BaseService
                         'telegram_id' => $chatId
                     ]
                 );
+
+                $configIntro = ContentConfig::where('kind', 'introduce')->first();
+
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Chào mừng <strong>{$name}</strong> đến với group!\n\n" . $configIntro->content,
+                    "parse_mode" => "HTML"
+                ]);
             }
             return 1;
         });
