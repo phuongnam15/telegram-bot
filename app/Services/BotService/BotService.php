@@ -84,7 +84,7 @@ class BotService extends BaseService
                     ]
                 );
 
-                $configIntro = ContentConfig::where('kind', 'introduce')->first();
+                $configIntro = ContentConfig::where('kind', 'introduce')->orderBy('updated_at', 'desc')->first();
 
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
