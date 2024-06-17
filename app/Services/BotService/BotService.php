@@ -29,6 +29,7 @@ class BotService extends BaseService
         return DbTransactions()->addCallBackJson(function () {
             $updates = Telegram::getWebhookUpdates();
             $update = json_decode($updates, true);
+            logger($update);
             $message = $update['message'];
 
             $name = "";
