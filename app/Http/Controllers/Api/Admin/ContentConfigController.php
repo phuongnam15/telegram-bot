@@ -33,4 +33,16 @@ class ContentConfigController extends Controller
   {
     return $this->service->list($request);
   }
+  public function delete($id)
+  {
+    return $this->service->delete($id);
+  }
+  public function detail($id)
+  {
+    return $this->service->detail($id);
+  }
+  public function update($id, Request $request)
+  {
+    return $this->service->update($id, $request);
+  }
 }

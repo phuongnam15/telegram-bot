@@ -50,6 +50,7 @@
             <div class="mb-3">
                 <label for="media" class="form-label">Media (Ảnh/Video)</label>
                 <input type="file" class="form-control" id="media" name="media">
+                <img id="preview" src="#" alt="Media preview" class="img-thumbnail mt-2 hidden" style="max-width: 200px; max-height: 200px;">
             </div>
 
             <div class="mb-3">
@@ -76,6 +77,19 @@
             shiftEnterMode: CKEDITOR.ENTER_P
         });
 
+        //show image
+        document.getElementById('media').addEventListener('change', function(event) {
+            var file = event.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('preview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden'); // Hiển thị ảnh
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
         $(document).ready(function() {
             $('#type').change(function() {
@@ -186,8 +200,6 @@
             } : {
                 keyboard: keyboard
             };
-
-            console.log('Data to send:', dataToSend);
 
             for (instance in CKEDITOR.instances) {
                 CKEDITOR.instances[instance].updateElement();

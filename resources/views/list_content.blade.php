@@ -48,9 +48,29 @@
                 .then(response => response.json())
                 .then(data => {
                     // console.log(data);
-                    let contentHTML = '<table class="table"><thead><tr><th>ID</th><th>Name</th><th>Content</th><th>Actions</th></tr></thead><tbody>';
+                    let contentHTML = `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Content</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
                     data.forEach(content => {
-                        contentHTML += `<tr><td>${content.id}</td><td>${content.name}</td><td>${content.content}</td><td><button class="btn btn-primary" onclick="showUsers(${content.id})">Send</button></td></tr>`;
+                        contentHTML += `
+                        <tr>
+                            <td>${content.id}</td>
+                            <td>${content.name}</td>
+                            <td>${content.content}</td>
+                            <td>
+                            <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
+                            <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
+                            <button class="btn btn-warning" onclick="updateConfig(${content.id})">Sửa</button>
+                            </td>
+                        </tr>`;
                     });
                     contentHTML += '</tbody></table>';
                     document.getElementById('contentData').innerHTML = contentHTML;
@@ -70,6 +90,27 @@
                     document.getElementById('userList').innerHTML = userListHTML;
                     $('#userModal').modal('show');
                 });
+        }
+
+        function deleteConfig(contentId) {
+            const confirm = window.confirm('Are you sure to delete this config?');
+            if (confirm) {
+                fetch(`/api/admin/delete/${contentId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+        function updateConfig(contentId) {
+            location.href = `/update/${contentId}`;
         }
 
         //send

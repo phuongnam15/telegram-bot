@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Base\BaseAuth;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendBotMessage;
 use App\Services\BotService\BotService;
 use Illuminate\Http\Request;
 
@@ -23,6 +24,8 @@ class BotController extends Controller
   }
   public function send(Request $request)
   {
-    return $this->botService->send($request->telegramIds, $request->configId);
+    SendBotMessage::dispatch($request->telegramIds, $request->configId);
+    return response()->json(['message' => 'Request received and will be processed.']);
+    // return $this->botService->send($request->telegramIds, $request->configId);
   }
 }

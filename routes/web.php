@@ -20,5 +20,8 @@ Route::get('/config', function () {
     return view('config_content');
 });
 Route::get('/list', function () {
-    return view('list_config');
+    return view('list_content');
+});
+Route::get('/update/{id}', function () {
+    return view('update_content');
 });
