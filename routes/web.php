@@ -13,13 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::get('/config', function () {
     return view('config_content');
 });
-Route::get('/list', function () {
+Route::get('/', function () {
     return view('list_content');
 });
 Route::get('/update/{id}', function () {

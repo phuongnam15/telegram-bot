@@ -12,7 +12,18 @@
 </head>
 
 <body>
-    <div class="container mt-5">
+    <div class="mt-5 mx-5" style="position: relative;">
+        <div style="position: absolute; right: 0px" class="d-flex">
+            <div class="filter" style="width: 200px;">
+                <select id="typeFilter" class="form-control">
+                    <option value="">Tất cả</option>
+                    <option value="text">Text</option>
+                    <option value="photo">Ảnh</option>
+                    <option value="video">Video</option>
+                </select>
+            </div>
+            <button class="btn btn-success ml-2" id="createNew">Tạo mới</button>
+        </div>
         <h1>Content List</h1>
         <div id="contentData" class="mt-3"></div>
     </div>
@@ -31,6 +42,9 @@
                     <div class="modal-body">
                         @csrf
                         <input type="hidden" name="content_id" id="contentId">
+                        <div>
+                            <label><input type="checkbox" id="selectAllUsers" /> Chọn tất cả</label>
+                        </div>
                         <div id="userList"></div>
                     </div>
                     <div class="modal-footer">
@@ -44,6 +58,21 @@
     <script>
         //list content
         $(document).ready(function() {
+
+            //FILTER TYPE
+            $('#typeFilter').change(function() {
+                var selectedType = $(this).val();
+                $('tbody tr').each(function() {
+                    var rowType = $(this).find('td:nth-child(4)').text(); // Giả sử cột 'Hình thức' là cột thứ 4
+                    if (selectedType === "" || rowType === selectedType) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            //GET LIST CONTENT
             fetch('api/admin/list')
                 .then(response => response.json())
                 .then(data => {
@@ -53,9 +82,12 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Content</th>
-                                    <th>Actions</th>
+                                    <th>Tên</th>
+                                    <th>Nội dung</th>
+                                    <th>Hình thữc</th>
+                                    <th>Loại</th>
+                                    <th>Media</th>
+                                    <th>Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>`;
@@ -65,6 +97,11 @@
                             <td>${content.id}</td>
                             <td>${content.name}</td>
                             <td>${content.content}</td>
+                            <td>${content.type}</td>
+                            <td>${content.kind}</td>
+                            <td>
+                                <img src="${content.media}" style="max-width: 200px; max-height: 200px;">
+                            </td>
                             <td>
                             <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
                             <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
@@ -77,7 +114,7 @@
                 });
         });
 
-        //list user
+        //LIST USER
         function showUsers(contentId) {
             document.getElementById('contentId').value = contentId;
             fetch('/api/admin/users')
@@ -85,11 +122,22 @@
                 .then(data => {
                     let userListHTML = '';
                     data.forEach(user => {
-                        userListHTML += `<label><input type="checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name}</label><br>`;
+                        userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name}</label><br>`;
                     });
                     document.getElementById('userList').innerHTML = userListHTML;
                     $('#userModal').modal('show');
+                    attachSelectAllHandler();
                 });
+        }
+        //CHECK ALL USER
+        function attachSelectAllHandler() {
+            document.getElementById('selectAllUsers').addEventListener('click', function() {
+                const isChecked = this.checked;
+                const checkboxes = document.querySelectorAll('.user-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+            });
         }
 
         function deleteConfig(contentId) {
@@ -138,6 +186,9 @@
                     console.error('Error:', error);
                 });
         };
+        $('#createNew').click(() => {
+            location.href = '/config';
+        });
     </script>
 </body>
 
