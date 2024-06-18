@@ -19,3 +19,6 @@ Route::get('/', function () {
 Route::get('/config', function () {
     return view('config_content');
 });
+Route::get('/list', function () {
+    return view('list_config');
+});

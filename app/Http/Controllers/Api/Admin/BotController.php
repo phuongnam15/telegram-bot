@@ -23,6 +23,6 @@ class BotController extends Controller
   }
   public function send(Request $request)
   {
-    return $this->botService->send($request->telegram_id, $request->config_id);
+    return $this->botService->send($request->telegramIds, $request->configId);
   }
 }

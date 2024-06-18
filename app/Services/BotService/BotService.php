@@ -129,104 +129,56 @@ class BotService extends BaseService
             return 1;
         });
     }
-    public function send($telegramId, $configId)
+    public function send($telegramIds, $configId)
     {
-        $user = User::where('telegram_id', $telegramId)->first();
         $config = ContentConfig::where('id', $configId)->first();
 
-        if ($user && $config) {
-            $type = $config->type;
-            $telegramId = $user->telegram_id;
-            $keyboard = [];
-            $media = $config->media;
-            $content = str_replace('\n', "\n", $config->content);
-            $buttons = $config->buttons;
+        if (!$config) {
+            throw new AppServiceException('Config not found');
+        }
 
-            $parameter = [
-                "chat_id" => $telegramId,
-                "caption" => $content,
-                "parse_mode" => "HTML"
-            ];
+        foreach ($telegramIds as $telegramId) {
+            $user = User::where('telegram_id', $telegramId)->first();
 
-            if ($buttons) {
-                // $buttons = json_decode($buttons);
-                // foreach ($buttons as $key => $link) {
-                //     $keyboard[] = [['text' => $key, 'url' => $link]];
-                // }
+            if ($user) {
+                $type = $config->type;
+                $telegramId = $user->telegram_id;
+                $keyboard = [];
+                $media = $config->media;
+                $content = str_replace('\n', "\n", $config->content);
+                $content = str_replace('<br>', "\n", $config->content);
+                $buttons = $config->buttons;
 
-                $parameter['reply_markup'] = $buttons;
-                // $parameter['reply_markup'] = json_encode([
-                //     "inline_keyboard" => [
-                //         [
-                //             [
-                //                 "text" => "Visit Website",
-                //                 "url" => "https://www.example.com"
-                //             ],
-                //         ],
-                //         [
-                //             [
-                //                 "text" => "Reply",
-                //                 "callback_data" => "reply_action"
-                //             ]
+                $parameter = [
+                    "chat_id" => $telegramId,
+                    "caption" => $content,
+                    "parse_mode" => "HTML"
+                ];
 
-                //         ],
-                //         [
-                //             [
-                //                 "text" => "Alert",
-                //                 "callback_data" => "alert_action"
-                //             ],
-                //         ],
-                //         [
-                //             [
-                //                 "text" => "Switch to inline",
-                //                 "switch_inline_query" => "query_data"
-                //             ]
-                //         ],
-                //     ],
-                //     "keyboard" => [
-                //         [
-                //             [
-                //                 "text" => "Simple Button"
-                //             ],
-                //         ],
-                //         [
-                //             [
-                //                 "text" => "Contact",
-                //                 "request_contact" => true
-                //             ]
+                if ($buttons) {
+                    $parameter['reply_markup'] = $buttons;
+                }
 
-                //         ],
-                //         [
-                //             [
-                //                 "text" => "Location",
-                //                 "request_location" => true
-                //             ]
-                //         ]
-                //     ],
-                //     "resize_keyboard" => true
-                // ]);
-                // logger($parameter['reply_markup']);
+                if ($media) {
+                    $parameter[$type] = fopen($media, 'r');
+                    // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
+                }
+
+
+                switch ($type) {
+                    case 'text':
+                        $parameter['text'] = $content;
+                        return Telegram::sendMessage($parameter);
+                    case 'photo':
+                        return Telegram::sendPhoto($parameter);
+                    case 'video':
+                        return Telegram::sendVideo($parameter);
+                    default:
+                        throw new AppServiceException('Type not found');
+                }
+            } else {
+                throw new AppServiceException('User or config not found');
             }
-
-            if ($media) {
-                $parameter[$type] = fopen($media, 'r');
-                // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
-            }
-
-
-            switch ($type) {
-                case 'text':
-                    $parameter['text'] = $content;
-                    return Telegram::sendMessage($parameter);
-                case 'photo':
-                    return Telegram::sendPhoto($parameter);
-                case 'video':
-                    return Telegram::sendVideo($parameter);
-                default:
-                    throw new AppServiceException('Type not found');
-            }
-        } else {
-            throw new AppServiceException('User or config not found');
         }
     }
 }

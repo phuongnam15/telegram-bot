@@ -25,7 +25,7 @@ class TransactionService extends ApiResponseProvider
         }catch (AppServiceException|Exception $exception) {
             DB::rollBack();
             Log::info($exception->getMessage());
-            return responseError($exception->getMessage());
+            return $this->sendErrorResponse($exception->getMessage());
         }
     }
 
@@ -54,7 +54,7 @@ class TransactionService extends ApiResponseProvider
             DB::beginTransaction();
             $result = $callback();
             DB::commit();
-            return $result;
+            return $this->sendSuccessResponse($result);
         }catch (AppServiceException|Exception $exception) {
             DB::rollBack();
             Log::info($exception->getMessage());

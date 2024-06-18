@@ -29,4 +29,8 @@ class ContentConfigController extends Controller
     // return 1;
     return $this->service->create($request);
   }
+  public function list(Request $request)
+  {
+    return $this->service->list($request);
+  }
 }
