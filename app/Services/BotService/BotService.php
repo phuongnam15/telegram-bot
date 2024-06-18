@@ -145,8 +145,7 @@ class BotService extends BaseService
                 $telegramId = $user->telegram_id;
                 $keyboard = [];
                 $media = $config->media;
-                $content = str_replace('\n', "\n", $config->content);
-                $content = str_replace('<br>', "\n", $config->content);
+                $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
                 $buttons = $config->buttons;
 
                 $parameter = [

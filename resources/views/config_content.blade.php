@@ -67,7 +67,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        CKEDITOR.replace('content');
+        CKEDITOR.replace('content', {
+            enterMode: CKEDITOR.ENTER_BR,
+            shiftEnterMode: CKEDITOR.ENTER_P
+        });
+
 
         $(document).ready(function() {
             $('#keyboardType').change(function() {
@@ -172,7 +176,6 @@
             }
 
             const formData = new FormData();
-            
             formData.append('type', document.querySelector('select[name="type"]').value);
             formData.append('kind', document.querySelector('select[name="kind"]').value);
             formData.append('content', document.querySelector('textarea[name="content"]').value);
@@ -181,32 +184,25 @@
 
             // Thêm buttons đã định dạng
             formData.append('buttons', JSON.stringify(dataToSend));
-            // let formValues = {};
-            // formData.forEach((value, key) => {
-            //     formValues[key] = value;
-            // });
-
-            // // In ra console
-            // console.log(formValues);
-            const url = "{{ url('/api/admin/config') }}";  // Đường dẫn tới API endpoint
+            const url = "{{ url('/api/admin/config') }}"; // Đường dẫn tới API endpoint
 
             fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')  // CSRF token để bảo mật
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert('Post created successfully!');
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Error creating post');
-            });
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')  // CSRF token để bảo mật
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Post created successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Error creating post');
+                });
         });
     </script>
 </body>

@@ -31,12 +31,6 @@ class ContentConfigService extends BaseService
                 $input['content'] = sanitizeHtml(html_entity_decode($input['content'], ENT_QUOTES, 'UTF-8'));
             }
 
-            // if($request->has('buttons')) {
-            //     $input['buttons'] = json_encode($input['buttons']);
-            // } else {
-            //     $input['buttons'] = json_encode([]);
-            // }
-
             return ContentConfig::create($input);
         });
     }

@@ -168,14 +168,14 @@ if (!function_exists('sanitizeHtml')) {
         libxml_clear_errors();
 
         // Danh sách các thẻ được phép
-        $allowedTags = ['b', 'i', 'u', 's', 'code', 'pre', 'a'];
+        $allowedTags = ['b', 'i', 'u', 's', 'code', 'pre', 'a', 'br'];
         // Mapping các thẻ tương đương
         $tagMapping = [
             'strong' => 'b',
             'em' => 'i',
             'ins' => 'u',
             'del' => 's',
-            'br' => "\n" // Giữ nguyên chuyển đổi <br> thành xuống dòng
+            // 'br' => "\n" // Giữ nguyên chuyển đổi <br> thành xuống dòng
         ];
 
         // Duyệt qua tất cả các thẻ trong tài liệu
