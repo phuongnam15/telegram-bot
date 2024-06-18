@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post</title>
+    <title>Tạo bài viết</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
     <style>
@@ -16,51 +16,55 @@
 
 <body>
     <div class="container my-5">
-        <h2>Create a New Post</h2>
+        <h2>Tạo bài viết mới</h2>
         <form action="{{ url('/api/posts') }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
             @csrf
             <div class="mb-3">
-                <label for="type" class="form-label">Type of Post</label>
+                <label for="name" class="form-label">Tên bài viết</label>
+                <input type="text" class="form-control" id="name" name="name" required placeholder="vd: tuyen_nguoi_yeu">
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Hình thức bài viết</label>
                 <select class="form-select" id="type" name="type" required>
-                    <option value="">-- Select Type --</option>
+                    <option value="">-- Chọn hình thức bài viết --</option>
                     <option value="text">Text</option>
-                    <option value="photo">Photo</option>
+                    <option value="photo">Ảnh</option>
                     <option value="video">Video</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="kind" class="form-label">Kind of Post</label>
+                <label for="kind" class="form-label">Loại nội dung</label>
                 <select class="form-select" id="kind" name="kind" required>
-                    <option value="">-- Select Kind --</option>
-                    <option value="introduce">Introduce</option>
-                    <option value="other">Other</option>
+                    <option value="">-- Chọn loại nội dung --</option>
+                    <option value="introduce">Tin nhắn Chào Mừng</option>
+                    <option value="other">Khác</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="content" class="form-label">Content</label>
+                <label for="content" class="form-label">Nội dung</label>
                 <textarea class="form-control" id="content" name="content"></textarea>
             </div>
 
             <div class="mb-3">
-                <label for="media" class="form-label">Media (Photo/Video)</label>
+                <label for="media" class="form-label">Media (Ảnh/Video)</label>
                 <input type="file" class="form-control" id="media" name="media">
             </div>
 
             <div class="mb-3">
-                <label for="keyboardType" class="form-label">Keyboard Type</label>
+                <label for="keyboardType" class="form-label">Loại Button</label>
                 <select class="form-select" id="keyboardType" name="keyboardType">
-                    <option value="">-- Select Keyboard Type --</option>
-                    <option value="inline_keyboard">Inline Keyboard</option>
-                    <option value="keyboard">Keyboard</option>
+                    <option value="">-- Chọn loại Button --</option>
+                    <option value="inline_keyboard">Đi kèm bài viết</option>
+                    <option value="keyboard">Dưới bàn phím</option>
                 </select>
             </div>
             <div id="buttonsContainer" class="mb-3">
                 <!-- Dynamic buttons will be added here -->
             </div>
-            <button type="button" id="addButton" class="btn btn-primary">Add Button</button>
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="button" id="addButton" class="btn btn-primary">Thêm Button</button>
+            <button type="submit" class="btn btn-success">Tạo</button>
         </form>
     </div>
 
@@ -74,6 +78,19 @@
 
 
         $(document).ready(function() {
+            $('#type').change(function() {
+                var selectedType = $(this).val();
+                if (selectedType === 'text') {
+                    $('#media').closest('.mb-3').hide(); // Ẩn input media
+                } else {
+                    $('#media').closest('.mb-3').show(); // Hiện input media nếu không phải là 'text'
+                }
+            });
+
+            // Trigger change event on page load in case the 'text' is pre-selected
+            $('#type').trigger('change');
+
+            //handle keyboard
             $('#keyboardType').change(function() {
                 updateButtonOptions();
             });
@@ -95,21 +112,22 @@
                 if (type === 'inline_keyboard') {
                     $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex">
-                            <input type="text" name="buttons[][text]" placeholder="Button Text" class="form-control mb-1">
-                            <input type="text" name="buttons[][url]" placeholder="URL (optional)" class="form-control mb-1">
-                            <input type="text" name="buttons[][callback_data]" placeholder="Callback Data (optional)" class="form-control mb-1">
-                            <input type="text" name="buttons[][switch_inline_query]" placeholder="Switch Inline Query (optional)" class="form-control mb-1">
+                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-control mb-1">
+                            <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-control mb-1">
+                            <input type="text" name="buttons[][callback_data]" placeholder="Dữ liệu gửi đi (tuỳ chọn)" class="form-control mb-1">
+                            <button type="button" class="btn btn-danger btn-sm remove-button">Xóa</button>
                         </div>
                     `);
                 } else if (type === 'keyboard') {
                     $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex">
-                            <input type="text" name="buttons[][text]" placeholder="Button Text" class="form-control mb-1">
+                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-control mb-1">
                             <select name="buttons[][action]" class="form-select mb-1">
-                                <option value="">Select Action</option>
-                                <option value="contact">Request Contact</option>
-                                <option value="location">Request Location</option>
+                                <option value="">Chọn hành động</option>
+                                <option value="contact">Yêu cầu liên hệ</option>
+                                <option value="location">Yêu cầu vị trí</option>
                             </select>
+                            <button type="button" class="btn btn-danger btn-sm remove-button">Xóa</button>
                         </div>
                     `);
                 }
@@ -176,15 +194,20 @@
             }
 
             const formData = new FormData();
+            formData.append('name', document.querySelector('input[name="name"]').value);
             formData.append('type', document.querySelector('select[name="type"]').value);
             formData.append('kind', document.querySelector('select[name="kind"]').value);
             formData.append('content', document.querySelector('textarea[name="content"]').value);
-            if (document.querySelector('input[name="media"]').files[0])
-                formData.append('media', document.querySelector('input[name="media"]').files[0]);
-
-            // Thêm buttons đã định dạng
             formData.append('buttons', JSON.stringify(dataToSend));
-            const url = "{{ url('/api/admin/config') }}"; // Đường dẫn tới API endpoint
+            if (document.querySelector('input[name="media"]').files[0]) {
+                formData.append('media', document.querySelector('input[name="media"]').files[0]);
+            }
+
+            // const formValues = {};
+            // formData.forEach((value, key) => formValues[key] = value);
+            // console.log('Form values:', formValues);
+
+            const url = "{{ url('/api/admin/config') }}";
 
             fetch(url, {
                     method: 'POST',
@@ -203,6 +226,11 @@
                     console.error('Error:', error);
                     alert('Error creating post');
                 });
+        });
+
+        //remove button
+        $(document).on('click', '.remove-button', function() {
+            $(this).closest('.button-group').remove(); // Remove the button group from DOM
         });
     </script>
 </body>

@@ -14,7 +14,8 @@ class ContentConfig extends Model
         'buttons',
         'content',
         'type',
-        'kind'
+        'kind',
+        'name'
     ];
     const KIND_INTRO = 'introduce';
     const TYPE_TEXT = 'text';
