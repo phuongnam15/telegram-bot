@@ -54,7 +54,7 @@ class BotService extends BaseService
 
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
-                    'text' => $text . str_replace('</p>', "</p>\n", $configIntro->content),
+                    'text' => $text . $configIntro->content,
                     "parse_mode" => "HTML"
                 ]);
 
