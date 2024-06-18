@@ -159,8 +159,8 @@ class BotService extends BaseService
                 }
 
                 if ($media) {
-                    $parameter[$type] = fopen($media, 'r');
-                    // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
+                    // $parameter[$type] = fopen($media, 'r');
+                    $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
                 }
 
 
