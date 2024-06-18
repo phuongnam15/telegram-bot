@@ -54,7 +54,7 @@ class BotService extends BaseService
 
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
-                    'text' => $text . $configIntro->content,
+                    'text' => $text . preg_replace('/\s*<br>\s*/', "\n", $configIntro->content),
                     "parse_mode" => "HTML"
                 ]);
 
@@ -90,7 +90,7 @@ class BotService extends BaseService
                     $type = $configIntro->type;
                     $keyboard = [];
                     $media = $configIntro->media;
-                    $content = str_replace('</p>', "</p>\n", $configIntro->content);
+                    $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
                     $buttons = json_decode($configIntro->buttons, true);
 
                     $parameter = [
