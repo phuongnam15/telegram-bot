@@ -9,22 +9,51 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
     <div class="mt-5 mx-5" style="position: relative;">
+        <div class="mb-3">
+            <form id="scheduleForm" class="d-flex" style="gap: 5px;">
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="status">Trạng thái</label>
+                    <select id="status" class="form-control" name="status">
+                        <option value="on">Bật</option>
+                        <option value="off">Tắt</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="time">Thời gian chạy (phút)</label>
+                    <input type="number" id="time" class="form-control" name="time">
+                </div>
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="lastime">Lần cuối chạy</label>
+                    <input type="text" id="lastime" class="form-control" name="lastime" readonly>
+                </div>
+                <button type="button" class="btn btn-primary" style="align-self: flex-end;" onclick="updateSchedule()">Cập nhật lịch chạy</button>
+            </form>
+        </div>
+
         <div style="position: absolute; right: 0px" class="d-flex">
             <div class="filter" style="width: 200px;">
                 <select id="typeFilter" class="form-control">
-                    <option value="">Tất cả</option>
+                    <option value="">-- Hình thức --</option>
                     <option value="text">Text</option>
                     <option value="photo">Ảnh</option>
                     <option value="video">Video</option>
                 </select>
             </div>
+            <div class="filter ml-2" style="width: 200px;">
+                <select id="kindFilter" class="form-control">
+                    <option value="">-- Loại --</option>
+                    <option value="introduce">Giới thiệu</option>
+                    <option value="other">Khác</option>
+                </select>
+            </div>
             <button class="btn btn-success ml-2" id="createNew">Tạo mới</button>
         </div>
-        <h1>Content List</h1>
+        <h2>Content List</h2>
         <div id="contentData" class="mt-3"></div>
     </div>
 
@@ -56,8 +85,23 @@
     </div>
 
     <script>
-        //list content
         $(document).ready(function() {
+
+
+            //GET SCHEDULE CONFIG
+            fetch('/api/admin/schedule')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        document.getElementById('status').value = data.status;
+                        document.getElementById('time').value = data.time;
+                        document.getElementById('lastime').value = data.lastime;
+                    }
+                })
+                .catch(error => console.error('Error fetching schedule config:', error));
 
             //FILTER TYPE
             $('#typeFilter').change(function() {
@@ -72,25 +116,38 @@
                 });
             });
 
+            //KIND TYPE
+            $('#kindFilter').change(function() {
+                var selectedType = $(this).val();
+                $('tbody tr').each(function() {
+                    var rowType = $(this).find('td:nth-child(5)').text(); // Giả sử cột 'Loại' là cột thứ 5
+                    if (selectedType === "" || rowType === selectedType) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
             //GET LIST CONTENT
             fetch('api/admin/list')
                 .then(response => response.json())
                 .then(data => {
                     // console.log(data);
                     let contentHTML = `
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tên</th>
-                                    <th>Nội dung</th>
-                                    <th>Hình thữc</th>
-                                    <th>Loại</th>
+                    <table class="table">
+                    <thead>
+                    <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Nội dung</th>
+                    <th>Hình thữc</th>
+                    <th>Loại</th>
                                     <th>Media</th>
                                     <th>Thao tác</th>
                                 </tr>
-                            </thead>
-                            <tbody>`;
+                                </thead>
+                                <tbody>`;
                     data.forEach(content => {
                         contentHTML += `
                         <tr>
@@ -100,19 +157,42 @@
                             <td>${content.type}</td>
                             <td>${content.kind}</td>
                             <td>
-                                <img src="${content.media}" style="max-width: 200px; max-height: 200px;">
+                            <img src="${content.media}" style="max-width: 200px; max-height: 200px;">
                             </td>
                             <td>
                             <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
                             <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
                             <button class="btn btn-warning" onclick="updateConfig(${content.id})">Sửa</button>
                             </td>
-                        </tr>`;
+                            </tr>`;
                     });
                     contentHTML += '</tbody></table>';
                     document.getElementById('contentData').innerHTML = contentHTML;
                 });
         });
+
+        //UPDATE SCHEDULE
+        function updateSchedule() {
+            const status = document.getElementById('status').value;
+            const time = document.getElementById('time').value;
+
+            const formData = new FormData();
+            formData.append('status', status);
+            formData.append('time', time);
+
+            fetch('/api/admin/schedule', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Schedule updated successfully');
+                })
+                .catch(error => console.error('Error updating schedule config:', error));
+        }
 
         //LIST USER
         function showUsers(contentId) {
