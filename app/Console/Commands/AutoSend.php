@@ -46,11 +46,13 @@ class AutoSend extends Command
 
             if (now() > $lastDateTime) {
                 $userTelegramId = User::all()->pluck('telegram_id')->toArray();
-                $configIds = ContentConfig::all()->pluck('id')->toArray();
+                $configIds = ContentConfig::where('kind', ContentConfig::KIND_OTHER)->pluck('id')->toArray();
                 $id = Arr::random($configIds);
     
-                // $this->botService->send($userTelegramId, $id);
                 SendBotMessage::dispatch($userTelegramId, $id);
+
+                $scheduleConfig->lastime = now();
+                $scheduleConfig->save();
             }
 
         }

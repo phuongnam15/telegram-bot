@@ -48,6 +48,7 @@
                 <select id="kindFilter" class="form-control">
                     <option value="">-- Loại --</option>
                     <option value="introduce">Giới thiệu</option>
+                    <option value="button">Click Button</option>
                     <option value="other">Khác</option>
                 </select>
             </div>
@@ -91,12 +92,10 @@
     <script>
         $(document).ready(function() {
 
-
             //GET SCHEDULE CONFIG
             fetch('/api/admin/schedule')
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.message) {
                         alert(data.message);
                     } else {
@@ -107,31 +106,26 @@
                 })
                 .catch(error => console.error('Error fetching schedule config:', error));
 
-            //FILTER TYPE
-            $('#typeFilter').change(function() {
-                var selectedType = $(this).val();
+            //FILTER TYPE or KIND
+            function filterTable() {
+                var selectedType = $('#typeFilter').val();
+                var selectedKind = $('#kindFilter').val();
+
                 $('tbody tr').each(function() {
                     var rowType = $(this).find('td:nth-child(4)').text(); // Giả sử cột 'Hình thức' là cột thứ 4
-                    if (selectedType === "" || rowType === selectedType) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            });
+                    var rowKind = $(this).find('td:nth-child(5)').text(); // Giả sử cột 'Loại' là cột thứ 5
 
-            //KIND TYPE
-            $('#kindFilter').change(function() {
-                var selectedType = $(this).val();
-                $('tbody tr').each(function() {
-                    var rowType = $(this).find('td:nth-child(5)').text(); // Giả sử cột 'Loại' là cột thứ 5
-                    if (selectedType === "" || rowType === selectedType) {
+                    var typeMatch = (selectedType === "" || rowType === selectedType);
+                    var kindMatch = (selectedKind === "" || rowKind === selectedKind);
+
+                    if (typeMatch && kindMatch) {
                         $(this).show();
                     } else {
                         $(this).hide();
                     }
                 });
-            });
+            }
+            $('#typeFilter, #kindFilter').change(filterTable);
 
             //GET LIST CONTENT
             fetch('api/admin/list')
@@ -156,6 +150,20 @@
                             </thead>
                             <tbody>`;
                 data.data.forEach(content => {
+                    let mediaHTML = '';
+
+                    if (content.type === 'photo') {
+
+                        mediaHTML = `<img src="${content.media}" style="max-width: 200px; max-height: 200px;">`;
+
+                    } else if (content.type === 'video') {
+
+                        mediaHTML = `<video controls style="max-width: 200px; max-height: 200px;">
+                                        <source src="${content.media}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>`;
+                    }
+
                     contentHTML += `
                     <tr>
                         <td>${content.id}</td>
@@ -163,9 +171,7 @@
                         <td>${content.content}</td>
                         <td>${content.type}</td>
                         <td>${content.kind}</td>
-                        <td>
-                        <img src="${content.media}" style="max-width: 200px; max-height: 200px;">
-                        </td>
+                        <td>${mediaHTML}</td>
                         <td>
                         <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
                         <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>

@@ -18,6 +18,8 @@ class ContentConfig extends Model
         'name'
     ];
     const KIND_INTRO = 'introduce';
+    const KIND_BUTTON = 'button';
+    const KIND_OTHER = 'other';
     const TYPE_TEXT = 'text';
     const TYPE_PHOTO = 'photo';
     const TYPE_VIDEO = 'video';

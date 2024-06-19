@@ -38,6 +38,7 @@
                 <select class="form-select" id="kind" name="kind" required>
                     <option value="">-- Chọn loại nội dung --</option>
                     <option value="introduce">Tin nhắn Chào Mừng</option>
+                    <option value="button">Click Button</option>
                     <option value="other">Khác</option>
                 </select>
             </div>
@@ -51,6 +52,10 @@
                 <label for="media" class="form-label">Media (Ảnh/Video)</label>
                 <input type="file" class="form-control" id="media" name="media">
                 <img id="preview" src="#" alt="Media preview" class="img-thumbnail mt-2 hidden" style="max-width: 200px; max-height: 200px;">
+                <video id="previewVideo" controls class="img-thumbnail mt-2 hidden" style="max-width: 200px; max-height: 200px;">
+                    <source id="videoSource" src="#" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
 
             <div class="mb-3">
@@ -76,19 +81,33 @@
             shiftEnterMode: CKEDITOR.ENTER_P
         });
 
-        //show image
+        //SHOW IMAGE OR VIDEO
         document.getElementById('media').addEventListener('change', function(event) {
             var file = event.target.files[0];
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     var preview = document.getElementById('preview');
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden'); // Hiển thị ảnh
+                    var previewVideo = document.getElementById('previewVideo');
+                    var videoSource = document.getElementById('videoSource');
+
+                    if (file.type.startsWith('image/')) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                        previewVideo.classList.add('hidden');
+                    } else if (file.type.startsWith('video/')) {
+                        videoSource.src = e.target.result;
+                        previewVideo.load(); // Nạp lại video sau khi thay đổi source
+                        previewVideo.classList.remove('hidden');
+                        preview.classList.add('hidden');
+                    }
+
+
                 };
                 reader.readAsDataURL(file);
             }
         });
+
 
         $(document).ready(function() {
 
