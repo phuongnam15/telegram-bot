@@ -49,13 +49,41 @@ class BotService extends BaseService
 
                     $configIntro = ContentConfig::where(['kind' => 'introduce', 'is_default' => true])->first();
 
-                    Telegram::sendMessage([
-                        'chat_id' => $chatId,
-                        'text' => $text . preg_replace('/\s*<br>\s*/', "\n", $configIntro->content),
-                        "parse_mode" => "HTML"
-                    ]);
+                    if ($configIntro) {
+                        $type = $configIntro->type;
+                        $media = $configIntro->media;
+                        $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
+                        $buttons = json_decode($configIntro->buttons, true);
 
-                    $name = '';
+                        $parameter = [
+                            "chat_id" => $chatId,
+                            "caption" => $text + $content,
+                            "parse_mode" => "HTML"
+                        ];
+
+                        $buttons = json_encode($buttons);
+
+                        if ($buttons) {
+                            $parameter['reply_markup'] = $buttons;
+                        }
+
+                        if ($media) {
+                            $parameter[$type] = fopen($media, 'r');
+                            // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
+                        }
+
+                        switch ($type) {
+                            case 'text':
+                                $parameter['text'] = $text + $content;
+                                return Telegram::sendMessage($parameter);
+                            case 'photo':
+                                return Telegram::sendPhoto($parameter);
+                            case 'video':
+                                return Telegram::sendVideo($parameter);
+                            default:
+                                throw new AppServiceException('Type not found');
+                        }
+                    }
                 }
                 //start bot
                 if (isset($message['text']) && $message['text'] == '/start') {
@@ -133,58 +161,63 @@ class BotService extends BaseService
     }
     public function send($telegramIds, $configId)
     {
-        return DbTransactions()->addCallBackJson(function () use ($telegramIds, $configId) {
-            $config = ContentConfig::where('id', $configId)->first();
+        // return DbTransactions()->addCallBackJson(function () use ($telegramIds, $configId) {
+        $config = ContentConfig::where('id', $configId)->first();
 
-            if (!$config) {
-                throw new AppServiceException('Config not found');
-            }
-            foreach ($telegramIds as $telegramId) {
-                $user = User::where('telegram_id', $telegramId)->first();
+        if (!$config) {
+            throw new AppServiceException('Config not found');
+        }
 
-                if ($user) {
-                    $type = $config->type;
-                    $telegramId = $user->telegram_id;
-                    $media = $config->media;
-                    $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
-                    $buttons = $config->buttons;
+        $type = $config->type;
+        $media = $config->media;
+        $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
+        $buttons = $config->buttons;
 
-                    $parameter = [
-                        "chat_id" => $telegramId,
-                        "caption" => $content,
-                        "parse_mode" => "HTML"
-                    ];
+        $parameter = [
+            "caption" => $content,
+            "parse_mode" => "HTML"
+        ];
 
-                    if ($buttons) {
-                        $parameter['reply_markup'] = $buttons;
-                    }
+        if ($buttons) {
+            $parameter['reply_markup'] = $buttons;
+        }
 
-                    if ($media) {
-                        $parameter[$type] = fopen($media, 'r');
-                        // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
-                    }
+        if ($media) {
+            $parameter[$type] = fopen($media, 'r');
+            // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
+        }
 
+        foreach ($telegramIds as $telegramId) {
 
-                    switch ($type) {
-                        case 'text':
-                            $parameter['text'] = $content;
-                            Telegram::sendMessage($parameter);
-                            break;
-                        case 'photo':
-                            Telegram::sendPhoto($parameter);
-                            break;
-                        case 'video':
-                            Telegram::sendVideo($parameter);
-                            break;
-                        default:
-                            throw new AppServiceException('Type not found');
-                    }
-                } else {
-                    throw new AppServiceException('User or config not found');
+            $user = User::where('telegram_id', $telegramId)->first();
+
+            if ($user) {
+                $parameter['chat_id'] = $telegramId;
+
+                switch ($type) {
+                    case 'text':
+                        $parameter['text'] = $content;
+                        Telegram::sendMessage($parameter);
+                        break;
+                    case 'photo':
+                        Telegram::sendPhoto($parameter);
+                        break;
+                    case 'video':
+                        Telegram::sendVideo($parameter);
+                        break;
+                    default:
+                        return response()->json([
+                            'message' => 'Type not found'
+                        ]);
                 }
+            } else {
+                return response()->json([
+                    'message' => 'User not found'
+                ]);
             }
-            return 1;
-        });
+        }
+        return 1;
+        // });
     }
     public function replyCallback($chatId, $data)
     {
