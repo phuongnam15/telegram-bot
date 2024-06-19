@@ -75,7 +75,10 @@
                         <div>
                             <label><input type="checkbox" id="selectAllUsers" /> Chọn tất cả</label>
                         </div>
-                        <div id="userList"></div>
+                        <div class="form-group">
+                            <input type="text" id="userSearch" class="form-control" placeholder="Tìm kiếm Telegram ID">
+                        </div>
+                        <div id="userList" style="font-size: 14px;"></div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Send to Selected Users</button>
@@ -221,13 +224,27 @@
                     .then(data => {
                         let userListHTML = '';
                         data.forEach(user => {
-                            userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name}</label><br>`;
+                            userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name} - ${user.telegram_id}</label><br>`;
                         });
                         document.getElementById('userList').innerHTML = userListHTML;
                         $('#userModal').modal('show');
                         attachSelectAllHandler();
                     });
             }
+
+            // Add search functionality
+            document.getElementById('userSearch').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                document.querySelectorAll('#userList label').forEach(label => {
+                    const telegramId = label.textContent.toLowerCase();
+                    if (telegramId.includes(searchTerm)) {
+                        label.style.display = 'block';
+                    } else {
+                        label.style.display = 'none';
+                    }
+                });
+            });
+
             // CHECK ALL USER
             function attachSelectAllHandler() {
                 document.getElementById('selectAllUsers').addEventListener('click', function() {
