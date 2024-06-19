@@ -331,8 +331,8 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Success:', data);
                         $('#userModal').modal('hide'); // Ẩn modal sau khi gửi thành công
+                        alert(data.message);
                     })
                     .catch((error) => {
                         console.error('Error:', error);

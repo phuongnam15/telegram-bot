@@ -25,7 +25,6 @@ class BotController extends Controller
   public function send(Request $request)
   {
     SendBotMessage::dispatch($request->telegramIds, $request->configId);
-    return response()->json(['message' => 'Request received and will be processed.']);
-    // return $this->botService->send($request->telegramIds, $request->configId);
+    return response()->json(['message' => 'Đã nhận yêu cầu, chờ gửi ...']);
   }
 }
