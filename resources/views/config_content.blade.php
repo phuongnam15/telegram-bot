@@ -63,7 +63,7 @@
                 <select class="form-select" id="keyboardType" name="keyboardType">
                     <option value="">-- Chọn loại Button --</option>
                     <option value="inline_keyboard">Đi kèm bài viết</option>
-                    <option value="keyboard">Dưới bàn phím</option>
+                    <!-- <option value="keyboard">Dưới bàn phím</option> -->
                 </select>
             </div>
             <div id="buttonsContainer" class="mb-3">

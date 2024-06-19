@@ -191,7 +191,7 @@
                     <tr>
                         <td>${content.id}</td>
                         <td>${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
-                        <td class="max-width: 600px; word-wrap: break-word; white-space: normal;">${content.content}</td>
+                        <td style="max-width: 600px; word-wrap: break-word; white-space: normal;">${content.content}</td>
                         <td>${typeBadge}</td>
                         <td>${kindBadge}</td>
                         <td>${mediaHTML}</td>
