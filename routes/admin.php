@@ -27,6 +27,7 @@ Route::get('/list', [ContentConfigController::class, 'list']);
 Route::delete('/delete/{id}', [ContentConfigController::class, 'delete']);
 Route::post('/update/{id}', [ContentConfigController::class, 'update']);
 Route::get('/detail/{id}', [ContentConfigController::class, 'detail']);
+Route::post('/set-default/{id}', [ContentConfigController::class, 'setDefault']);
 
 Route::get('/users', [UserController::class, 'list']);
 Route::post('/send', [BotController::class, 'send']);

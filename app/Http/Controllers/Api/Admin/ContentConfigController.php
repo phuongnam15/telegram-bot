@@ -45,4 +45,8 @@ class ContentConfigController extends Controller
   {
     return $this->service->update($id, $request);
   }
+  public function setDefault($id)
+  {
+    return $this->service->setDefault($id);
+  }
 }

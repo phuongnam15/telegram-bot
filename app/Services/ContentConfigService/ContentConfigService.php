@@ -90,4 +90,24 @@ class ContentConfigService extends BaseService
 
         });
     }
+    public function setDefault($id) {
+
+        $content = ContentConfig::where('id', $id)->first();
+        
+        if(!$content){
+            return response()->json([
+                'message' => 'Content not found'
+            ]);
+        }
+
+        $content->update([
+            'is_default' => true
+        ]);
+
+        ContentConfig::where('kind', $content->kind)->where('id', '!=', $id)->update([
+            'is_default' => false
+        ]);
+
+        return response()->json($content);
+    }
 }

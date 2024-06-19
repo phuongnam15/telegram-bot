@@ -47,7 +47,7 @@ class BotService extends BaseService
 
                     $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
 
-                    $configIntro = ContentConfig::where('kind', 'introduce')->orderBy('updated_at', 'desc')->first();
+                    $configIntro = ContentConfig::where(['kind' => 'introduce', 'is_default' => true])->first();
 
                     Telegram::sendMessage([
                         'chat_id' => $chatId,
@@ -81,7 +81,7 @@ class BotService extends BaseService
                         ]
                     );
 
-                    $configIntro = ContentConfig::where('kind', 'introduce')->orderBy('updated_at', 'desc')->first();
+                    $configIntro = ContentConfig::where(['kind' => 'introduce', 'is_default' => true])->first();
 
                     if ($configIntro) {
                         $type = $configIntro->type;

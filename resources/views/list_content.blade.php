@@ -136,21 +136,23 @@
 
             function renderContentList(data) {
                 let contentHTML = `
-                <table class="table">
-                <thead>
-                <tr>
-                <th>ID</th>
-                <th>Tên</th>
-                <th>Nội dung</th>
-                <th>Hình thữc</th>
-                <th>Loại</th>
-                                <th>Media</th>
-                                <th>Thao tác</th>
-                            </tr>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên</th>
+                                    <th>Nội dung</th>
+                                    <th>Hình thữc</th>
+                                    <th>Loại</th>
+                                    <th>Media</th>
+                                    <th>Mặc định</th>
+                                    <th>Thao tác</th>
+                                </tr>
                             </thead>
                             <tbody>`;
                 data.data.forEach(content => {
                     let mediaHTML = '';
+                    let buttonSetDefault = '';
 
                     if (content.type === 'photo') {
 
@@ -164,6 +166,10 @@
                                     </video>`;
                     }
 
+                    if(content.kind === 'introduce' && !content.is_default) {
+                        buttonSetDefault = `<button class="btn btn-info" onclick="setDefault(${content.id})">Set Default</button>`;
+                    }
+
                     contentHTML += `
                     <tr>
                         <td>${content.id}</td>
@@ -172,10 +178,12 @@
                         <td>${content.type}</td>
                         <td>${content.kind}</td>
                         <td>${mediaHTML}</td>
+                        <td>${content.is_default ? "mặc định" : "không"}</td>
                         <td>
                         <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
                         <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
                         <button class="btn btn-warning" onclick="updateConfig(${content.id})">Sửa</button>
+                        ${buttonSetDefault}
                         </td>
                         </tr>`;
                 });
@@ -314,6 +322,25 @@
                         console.error('Error:', error);
                     });
             };
+
+            //SET DEFAULT
+            window.setDefault = function(contentId) {
+                fetch(`/api/admin/set-default/${contentId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            }
+
             $('#createNew').click(() => {
                 location.href = '/config';
             });
