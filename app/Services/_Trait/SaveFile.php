@@ -16,7 +16,7 @@ trait SaveFile
         $fileName = Str::random(4) . '_' . preg_replace('/\s+/', '', $file->getClientOriginalName());
         Storage::putFileAs($source, $file, $fileName);
 
-        return $fileName;
+        return asset("storage/$path"). "/" . $fileName;
     }
 
     function saveMultiImages($files, $path = "", $source = "")
