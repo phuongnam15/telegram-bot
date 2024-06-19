@@ -37,7 +37,7 @@ class ContentConfigService extends BaseService
     }
     public function list($request)
     {
-        $contents = ContentConfig::all();
+        $contents = ContentConfig::paginate(3);
 
         return response()->json($contents);
     }

@@ -55,6 +55,7 @@
         </div>
         <h2>Content List</h2>
         <div id="contentData" class="mt-3"></div>
+        <div id="pagination" class="mt-3"></div>
     </div>
 
     <!-- Modal -->
@@ -133,141 +134,166 @@
             fetch('api/admin/list')
                 .then(response => response.json())
                 .then(data => {
-                    // console.log(data);
-                    let contentHTML = `
-                    <table class="table">
-                    <thead>
+                    renderContentList(data);
+                });
+
+            function renderContentList(data) {
+                let contentHTML = `
+                <table class="table">
+                <thead>
+                <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Nội dung</th>
+                <th>Hình thữc</th>
+                <th>Loại</th>
+                                <th>Media</th>
+                                <th>Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>`;
+                data.data.forEach(content => {
+                    contentHTML += `
                     <tr>
-                    <th>ID</th>
-                    <th>Tên</th>
-                    <th>Nội dung</th>
-                    <th>Hình thữc</th>
-                    <th>Loại</th>
-                                    <th>Media</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                                </thead>
-                                <tbody>`;
-                    data.forEach(content => {
-                        contentHTML += `
-                        <tr>
-                            <td>${content.id}</td>
-                            <td>${content.name}</td>
-                            <td>${content.content}</td>
-                            <td>${content.type}</td>
-                            <td>${content.kind}</td>
-                            <td>
-                            <img src="${content.media}" style="max-width: 200px; max-height: 200px;">
-                            </td>
-                            <td>
-                            <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
-                            <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
-                            <button class="btn btn-warning" onclick="updateConfig(${content.id})">Sửa</button>
-                            </td>
-                            </tr>`;
+                        <td>${content.id}</td>
+                        <td>${content.name}</td>
+                        <td>${content.content}</td>
+                        <td>${content.type}</td>
+                        <td>${content.kind}</td>
+                        <td>
+                        <img src="${content.media}" style="max-width: 200px; max-height: 200px;">
+                        </td>
+                        <td>
+                        <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
+                        <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
+                        <button class="btn btn-warning" onclick="updateConfig(${content.id})">Sửa</button>
+                        </td>
+                        </tr>`;
+                });
+                contentHTML += '</tbody></table>';
+                document.getElementById('contentData').innerHTML = contentHTML;
+
+                // Render pagination
+                let paginationHTML = '';
+                for (let i = 1; i <= data.last_page; i++) {
+                    paginationHTML += `<button class="btn btn-link" onclick="fetchPage(${i})">${i}</button>`;
+                }
+                document.getElementById('pagination').innerHTML = paginationHTML;
+            }
+
+            // Fetch specific page
+            window.fetchPage = function(page) {
+                fetch(`/api/admin/list?page=${page}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        renderContentList(data);
                     });
-                    contentHTML += '</tbody></table>';
-                    document.getElementById('contentData').innerHTML = contentHTML;
-                });
-        });
+            };
 
-        //UPDATE SCHEDULE
-        function updateSchedule() {
-            const status = document.getElementById('status').value;
-            const time = document.getElementById('time').value;
+            // UPDATE SCHEDULE
+            window.updateSchedule = function() {
+                const status = document.getElementById('status').value;
+                const time = document.getElementById('time').value;
 
-            const formData = new FormData();
-            formData.append('status', status);
-            formData.append('time', time);
+                const formData = new FormData();
+                formData.append('status', status);
+                formData.append('time', time);
 
-            fetch('/api/admin/schedule', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert('Schedule updated successfully');
-                })
-                .catch(error => console.error('Error updating schedule config:', error));
-        }
+                fetch('/api/admin/schedule', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Schedule updated successfully');
+                    })
+                    .catch(error => console.error('Error updating schedule config:', error));
+            }
 
-        //LIST USER
-        function showUsers(contentId) {
-            document.getElementById('contentId').value = contentId;
-            fetch('/api/admin/users')
-                .then(response => response.json())
-                .then(data => {
-                    let userListHTML = '';
-                    data.forEach(user => {
-                        userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name}</label><br>`;
+            // LIST USER
+            window.showUsers = function(contentId) {
+                document.getElementById('contentId').value = contentId;
+                fetch('/api/admin/users')
+                    .then(response => response.json())
+                    .then(data => {
+                        let userListHTML = '';
+                        data.forEach(user => {
+                            userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name}</label><br>`;
+                        });
+                        document.getElementById('userList').innerHTML = userListHTML;
+                        $('#userModal').modal('show');
+                        attachSelectAllHandler();
                     });
-                    document.getElementById('userList').innerHTML = userListHTML;
-                    $('#userModal').modal('show');
-                    attachSelectAllHandler();
+            }
+            // CHECK ALL USER
+            function attachSelectAllHandler() {
+                document.getElementById('selectAllUsers').addEventListener('click', function() {
+                    const isChecked = this.checked;
+                    const checkboxes = document.querySelectorAll('.user-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
                 });
-        }
-        //CHECK ALL USER
-        function attachSelectAllHandler() {
-            document.getElementById('selectAllUsers').addEventListener('click', function() {
-                const isChecked = this.checked;
-                const checkboxes = document.querySelectorAll('.user-checkbox');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = isChecked;
-                });
-            });
-        }
+            }
 
-        function deleteConfig(contentId) {
-            const confirm = window.confirm('Are you sure to delete this config?');
-            if (confirm) {
-                fetch(`/api/admin/delete/${contentId}`, {
-                        method: 'DELETE'
+            window.deleteConfig = function(contentId) {
+                const confirm = window.confirm('Are you sure to delete this config?');
+                if (confirm) {
+                    fetch(`/api/admin/delete/${contentId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Success:', data);
+                            location.reload();
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                }
+            }
+
+            window.updateConfig = function(contentId) {
+                location.href = `/update/${contentId}`;
+            }
+
+            //SEND
+            document.getElementById('sendUsersForm').onsubmit = function(event) {
+                event.preventDefault(); // Ngăn không cho form submit theo cách thông thường
+
+                let contentId = document.getElementById('contentId').value;
+                let checkboxes = document.querySelectorAll('#userList input[type="checkbox"]:checked');
+                let telegramIds = Array.from(checkboxes).map(cb => cb.value);
+
+                let formData = new FormData();
+                formData.append('configId', contentId);
+                telegramIds.forEach(id => formData.append('telegramIds[]', id));
+
+                fetch('/api/admin/send', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
                     })
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
-                        location.reload();
+                        $('#userModal').modal('hide'); // Ẩn modal sau khi gửi thành công
                     })
                     .catch((error) => {
                         console.error('Error:', error);
                     });
-            }
-        }
-
-        function updateConfig(contentId) {
-            location.href = `/update/${contentId}`;
-        }
-
-        //send
-        document.getElementById('sendUsersForm').onsubmit = function(event) {
-            event.preventDefault(); // Ngăn không cho form submit theo cách thông thường
-
-            let contentId = document.getElementById('contentId').value;
-            let checkboxes = document.querySelectorAll('#userList input[type="checkbox"]:checked');
-            let telegramIds = Array.from(checkboxes).map(cb => cb.value);
-
-            let formData = new FormData();
-            formData.append('configId', contentId);
-            telegramIds.forEach(id => formData.append('telegramIds[]', id));
-
-            fetch('/api/admin/send', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    $('#userModal').modal('hide'); // Ẩn modal sau khi gửi thành công
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-        };
-        $('#createNew').click(() => {
-            location.href = '/config';
+            };
+            $('#createNew').click(() => {
+                location.href = '/config';
+            });
         });
     </script>
 </body>
