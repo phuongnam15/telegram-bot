@@ -45,16 +45,21 @@ class AutoSend extends Command
             $timeToCompare = $lastDateTime->addMinutes($scheduleConfig->time);
 
             if (now() > $timeToCompare) {
-                $userTelegramId = User::all()->pluck('telegram_id')->toArray();
-                $configIds = ContentConfig::where('kind', ContentConfig::KIND_OTHER)->pluck('id')->toArray();
-                $id = Arr::random($configIds);
-    
-                SendBotMessage::dispatch($userTelegramId, $id);
-
                 $scheduleConfig->lastime = now();
                 $scheduleConfig->save();
-            }
 
+                $userTelegramId = User::all()->pluck('telegram_id')->toArray();
+                $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
+                ->where('kind', '!=', ContentConfig::KIND_BUTTON)->pluck('id')->toArray();
+
+                if(count($configIds) == 0) {
+                    return;
+                }
+
+                $id = Arr::random($configIds);
+
+                SendBotMessage::dispatch($userTelegramId, $id);
+            }
         }
     }
 }
