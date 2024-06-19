@@ -15,7 +15,8 @@
 </head>
 
 <body>
-    <div class="container my-5">
+    <div class="container my-5" style="position: relative;">
+        <button class="btn btn-primary" style="position: absolute; right: 10px;" id="watchList">Xem danh sách</button>
         <h2>Tạo bài viết mới</h2>
         <form action="{{ url('/api/posts') }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
             @csrf
@@ -261,6 +262,11 @@
         //remove button
         $(document).on('click', '.remove-button', function() {
             $(this).closest('.button-group').remove(); // Remove the button group from DOM
+        });
+
+        //watch list
+        $('#watchList').click(function() {
+            window.location.href = "{{ url('/') }}";
         });
     </script>
 </body>
