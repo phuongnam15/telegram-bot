@@ -57,7 +57,7 @@ class BotService extends BaseService
 
                         $parameter = [
                             "chat_id" => $chatId,
-                            "caption" => $text + $content,
+                            "caption" => $text . $content,
                             "parse_mode" => "HTML"
                         ];
 
@@ -74,7 +74,7 @@ class BotService extends BaseService
 
                         switch ($type) {
                             case 'text':
-                                $parameter['text'] = $text + $content;
+                                $parameter['text'] = $text . $content;
                                 return Telegram::sendMessage($parameter);
                             case 'photo':
                                 return Telegram::sendPhoto($parameter);
