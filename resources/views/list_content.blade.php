@@ -137,7 +137,7 @@
             function renderContentList(data) {
                 let contentHTML = `
                         <table class="table">
-                            <thead>
+                            <thead style="color: white; background-color: #28a745;">
                                 <tr>
                                     <th>ID</th>
                                     <th>Tên</th>
@@ -145,7 +145,6 @@
                                     <th>Hình thữc</th>
                                     <th>Loại</th>
                                     <th>Media</th>
-                                    <th>Mặc định</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -166,19 +165,36 @@
                                     </video>`;
                     }
 
-                    if(content.kind === 'introduce' && !content.is_default) {
-                        buttonSetDefault = `<button class="btn btn-info" onclick="setDefault(${content.id})">Set Default</button>`;
+                    if (content.kind === 'introduce' && !content.is_default) {
+                        buttonSetDefault = `<button class="btn btn-info" onclick="setDefault(${content.id})">Mặc định</button>`;
+                    }
+
+                    let typeBadge = '';
+                    if (content.type === 'photo') {
+                        typeBadge = '<span class="badge badge-primary">Photo</span>';
+                    } else if (content.type === 'video') {
+                        typeBadge = '<span class="badge badge-warning">Video</span>';
+                    } else if (content.type === 'text') {
+                        typeBadge = '<span class="badge badge-secondary">Text</span>';
+                    }
+
+                    let kindBadge = '';
+                    if (content.kind === 'introduce') {
+                        kindBadge = '<span class="badge badge-success">Giới thiệu</span>';
+                    } else if (content.kind === 'button') {
+                        kindBadge = '<span class="badge badge-info">Click Button</span>';
+                    } else {
+                        kindBadge = '<span class="badge badge-warning">Khác</span>';
                     }
 
                     contentHTML += `
                     <tr>
                         <td>${content.id}</td>
-                        <td>${content.name}</td>
+                        <td>${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
                         <td>${content.content}</td>
-                        <td>${content.type}</td>
-                        <td>${content.kind}</td>
+                        <td>${typeBadge}</td>
+                        <td>${kindBadge}</td>
                         <td>${mediaHTML}</td>
-                        <td>${content.is_default ? "mặc định" : "không"}</td>
                         <td>
                         <button class="btn btn-primary" onclick="showUsers(${content.id})">Gửi</button>
                         <button class="btn btn-danger" onclick="deleteConfig(${content.id})">Xoá</button>
