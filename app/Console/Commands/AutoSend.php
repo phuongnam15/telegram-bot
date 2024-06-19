@@ -41,10 +41,10 @@ class AutoSend extends Command
         $scheduleConfig = ScheduleConfig::first();
         if ($scheduleConfig->status == ScheduleConfig::STATUS_ON) {
 
-            $lastDateTime = new Carbon($scheduleConfig->lastime);
-            $lastDateTime->addMinutes($scheduleConfig->time);
+            $lastDateTime = Carbon::parse($scheduleConfig->lastime);
+            $timeToCompare = $lastDateTime->addMinutes($scheduleConfig->time);
 
-            if (now() > $lastDateTime) {
+            if (now() > $timeToCompare) {
                 $userTelegramId = User::all()->pluck('telegram_id')->toArray();
                 $configIds = ContentConfig::where('kind', ContentConfig::KIND_OTHER)->pluck('id')->toArray();
                 $id = Arr::random($configIds);
