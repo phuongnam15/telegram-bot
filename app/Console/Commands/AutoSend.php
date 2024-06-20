@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SendBotMessage;
 use App\Models\ContentConfig;
 use App\Models\ScheduleConfig;
+use App\Models\TelegramGroup;
 use App\Models\User;
 use App\Services\BotService\BotService;
 use Illuminate\Console\Command;
@@ -49,6 +50,8 @@ class AutoSend extends Command
                 $scheduleConfig->save();
 
                 $userTelegramId = User::all()->pluck('telegram_id')->toArray();
+                $groupTelegramId = TelegramGroup::all()->pluck('telegram_id')->toArray();
+
                 $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
                 ->where('kind', '!=', ContentConfig::KIND_BUTTON)->pluck('id')->toArray();
 
@@ -58,7 +61,7 @@ class AutoSend extends Command
 
                 $id = Arr::random($configIds);
 
-                SendBotMessage::dispatch($userTelegramId, $id);
+                SendBotMessage::dispatch(array_merge($userTelegramId, $groupTelegramId), $id);
             }
         }
     }

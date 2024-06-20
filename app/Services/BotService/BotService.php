@@ -26,6 +26,7 @@ class BotService extends BaseService
         return DbTransactions()->addCallBackJson(function () {
             $updates = Telegram::getWebhookUpdates();
             $update = json_decode($updates, true);
+            logger($update);
 
             if (array_key_exists('message', $update) == 1) {
                 $message = $update['message'];
@@ -113,7 +114,6 @@ class BotService extends BaseService
 
                     if ($configIntro) {
                         $type = $configIntro->type;
-                        $keyboard = [];
                         $media = $configIntro->media;
                         $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
                         $buttons = json_decode($configIntro->buttons, true);
