@@ -61,7 +61,9 @@ class AutoSend extends Command
 
                 $id = Arr::random($configIds);
 
-                SendBotMessage::dispatch(array_merge($userTelegramId, $groupTelegramId), $id);
+                $arrayId = array_merge($userTelegramId, $groupTelegramId);
+
+                SendBotMessage::dispatch($arrayId, $id);
             }
         }
     }

@@ -3,6 +3,7 @@
 namespace App\Services\BotService;
 
 use App\Models\ContentConfig;
+use App\Models\TelegramGroup;
 use App\Models\User;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
@@ -26,7 +27,6 @@ class BotService extends BaseService
         return DbTransactions()->addCallBackJson(function () {
             $updates = Telegram::getWebhookUpdates();
             $update = json_decode($updates, true);
-            logger($update);
 
             if (array_key_exists('message', $update) == 1) {
                 $message = $update['message'];
@@ -54,7 +54,7 @@ class BotService extends BaseService
                         $type = $configIntro->type;
                         $media = $configIntro->media;
                         $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
-                        $buttons = json_decode($configIntro->buttons, true);
+                        $buttons = $configIntro->buttons;
 
                         $parameter = [
                             "chat_id" => $chatId,
@@ -62,15 +62,12 @@ class BotService extends BaseService
                             "parse_mode" => "HTML"
                         ];
 
-                        $buttons = json_encode($buttons);
-
                         if ($buttons) {
                             $parameter['reply_markup'] = $buttons;
                         }
 
                         if ($media) {
                             $parameter[$type] = fopen($media, 'r');
-                            // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
                         }
 
                         switch ($type) {
@@ -182,17 +179,17 @@ class BotService extends BaseService
             $parameter['reply_markup'] = $buttons;
         }
 
-        if ($media) {
-            $parameter[$type] = fopen($media, 'r');
-            // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
-        }
 
         foreach ($telegramIds as $telegramId) {
-
             $user = User::where('telegram_id', $telegramId)->first();
+            $group = TelegramGroup::where('telegram_id', $telegramId)->first();
 
-            if ($user) {
+            if ($user || $group) {
                 $parameter['chat_id'] = $telegramId;
+
+                if ($media) {
+                    $parameter[$type] = fopen($media, 'r');
+                }
 
                 switch ($type) {
                     case 'text':
