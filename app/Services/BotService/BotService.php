@@ -2,6 +2,7 @@
 
 namespace App\Services\BotService;
 
+use App\Jobs\SendBotMessage;
 use App\Models\ContentConfig;
 use App\Models\TelegramGroup;
 use App\Models\User;
@@ -158,7 +159,6 @@ class BotService extends BaseService
     }
     public function send($telegramIds, $configId)
     {
-        // return DbTransactions()->addCallBackJson(function () use ($telegramIds, $configId) {
         $config = ContentConfig::where('id', $configId)->first();
 
         if (!$config) {
@@ -187,34 +187,21 @@ class BotService extends BaseService
             if ($user || $group) {
                 $parameter['chat_id'] = $telegramId;
 
-                if ($media) {
-                    $parameter[$type] = fopen($media, 'r');
-                }
+                // if ($media) {
+                //     $parameter[$type] = fopen($media, 'r');
+                // }
 
-                switch ($type) {
-                    case 'text':
-                        $parameter['text'] = $content;
-                        Telegram::sendMessage($parameter);
-                        break;
-                    case 'photo':
-                        Telegram::sendPhoto($parameter);
-                        break;
-                    case 'video':
-                        Telegram::sendVideo($parameter);
-                        break;
-                    default:
-                        return response()->json([
-                            'message' => 'Type not found'
-                        ]);
-                }
+                SendBotMessage::dispatch($parameter, $type, $content, $media);
+
             } else {
                 return response()->json([
                     'message' => 'User not found'
                 ]);
             }
         }
-        return 1;
-        // });
+        return response()->json([
+            'message' => 'Đã nhận yêu cầu, chờ gửi ...'
+        ]);
     }
     public function replyCallback($chatId, $data)
     {

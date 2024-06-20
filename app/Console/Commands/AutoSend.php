@@ -60,10 +60,37 @@ class AutoSend extends Command
                 }
 
                 $id = Arr::random($configIds);
-
                 $arrayId = array_merge($userTelegramId, $groupTelegramId);
 
-                SendBotMessage::dispatch($arrayId, $id);
+                $config = ContentConfig::find($id);
+
+                $type = $config->type;
+                $media = $config->media;
+                $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
+                $buttons = $config->buttons;
+
+                $parameter = [
+                    "caption" => $content,
+                    "parse_mode" => "HTML"
+                ];
+
+                if ($buttons) {
+                    $parameter['reply_markup'] = $buttons;
+                }
+
+                foreach ($arrayId as $telegramId) {
+                    $user = User::where('telegram_id', $telegramId)->first();
+                    $group = TelegramGroup::where('telegram_id', $telegramId)->first();
+
+                    if ($user || $group) {
+
+                        $parameter['chat_id'] = $telegramId;
+
+                        SendBotMessage::dispatch($parameter, $type, $content, $media);
+                    } else {
+                        logger('User or group not found');
+                    }
+                }
             }
         }
     }
