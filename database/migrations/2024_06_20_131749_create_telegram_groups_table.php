@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('telegram_groups', function (Blueprint $table) {
-            $table->string('telegram_id');            
+            $table->id();
+            $table->string('telegram_id');          
+            $table->string('name');       
             $table->timestamps();
         });
     }

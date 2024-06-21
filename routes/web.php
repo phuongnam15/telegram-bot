@@ -22,3 +22,6 @@ Route::get('/', function () {
 Route::get('/update/{id}', function () {
     return view('update_content');
 });
+Route::get('/group', function () {
+    return view('group');
+});

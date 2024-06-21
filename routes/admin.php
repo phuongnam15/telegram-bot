@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\BotController;
 use App\Http\Controllers\Api\Admin\ScheduleConfigController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\ContentConfigController;
+use App\Http\Controllers\Api\Admin\GroupController;
 use App\Http\Controllers\Api\Admin\UserController;
 
 Route::prefix('auth')->group(function () {
@@ -28,6 +29,14 @@ Route::delete('/delete/{id}', [ContentConfigController::class, 'delete']);
 Route::post('/update/{id}', [ContentConfigController::class, 'update']);
 Route::get('/detail/{id}', [ContentConfigController::class, 'detail']);
 Route::post('/set-default/{id}', [ContentConfigController::class, 'setDefault']);
+
+Route::prefix('group')->group(function () {
+    Route::get('/', [GroupController::class, 'list']);
+    Route::get('/{id}', [GroupController::class, 'detail']);
+    Route::post('/', [GroupController::class, 'create']);
+    Route::put('/{id}', [GroupController::class, 'update']);
+    Route::delete('/{id}', [GroupController::class, 'delete']);
+});
 
 Route::get('/users', [UserController::class, 'list']);
 Route::post('/send', [BotController::class, 'send']);

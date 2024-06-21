@@ -31,7 +31,7 @@
                     <label style="font-size: 13px;" for="lastime">Lần cuối chạy</label>
                     <input type="text" id="lastime" class="form-control" name="lastime" readonly>
                 </div>
-                <button type="button" class="btn btn-primary" style="align-self: flex-end;" onclick="updateSchedule()">Cập nhật lịch chạy</button>
+                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateSchedule()">Cập nhật lịch chạy</button>
             </form>
         </div>
 
@@ -52,6 +52,7 @@
                     <option value="other">Khác</option>
                 </select>
             </div>
+            <button class="btn btn-info ml-2" id="manageGroup">Quản lí Group</button>
             <button class="btn btn-success ml-2" id="createNew">Tạo mới</button>
         </div>
         <h2>Content List</h2>
@@ -246,15 +247,29 @@
                     .catch(error => console.error('Error updating schedule config:', error));
             }
 
-            // LIST USER
+            // LIST USER & GROUP
             window.showUsers = function(contentId) {
                 document.getElementById('contentId').value = contentId;
+                let userListHTML = '';
+                //USER
                 fetch('/api/admin/users')
                     .then(response => response.json())
                     .then(data => {
-                        let userListHTML = '';
                         data.forEach(user => {
                             userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name} - ${user.telegram_id}</label><br>`;
+                        });
+                        document.getElementById('userList').innerHTML = userListHTML;
+                        $('#userModal').modal('show');
+                        attachSelectAllHandler();
+                    });
+
+                //GROUP
+                fetch('/api/admin/group')
+                    .then(response => response.json())
+                    .then(data => {
+                        // let userListHTML = '';
+                        data.data.forEach(user => {
+                            userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
                         });
                         document.getElementById('userList').innerHTML = userListHTML;
                         $('#userModal').modal('show');
@@ -359,6 +374,9 @@
 
             $('#createNew').click(() => {
                 location.href = '/config';
+            });
+            $('#manageGroup').click(() => {
+                location.href = '/group';
             });
         });
     </script>

@@ -30,7 +30,23 @@ class BotService extends BaseService
 
             if (array_key_exists('message', $update) == 1) {
                 $message = $update['message'];
+
+                //check group info
+                if (array_key_exists('chat', $message) == 1) {
+                    $chatId = $message['chat']['id'];
+                    $name = $message['chat']['title'] ?? "";
+    
+                    TelegramGroup::firstOrCreate(
+                        ['telegram_id' => $chatId],
+                        [
+                            'name' => $name,
+                            'telegram_id' => $chatId
+                        ]
+                    );
+                }
+
                 $name = "";
+
                 //new chat member
                 if (isset($message['new_chat_members'])) {
 
@@ -45,6 +61,14 @@ class BotService extends BaseService
                     }
 
                     $chatId = $message['chat']['id'];
+
+                    // TelegramGroup::firstOrCreate(
+                    //     ['telegram_id' => $chatId],
+                    //     [
+                    //         'name' => $name,
+                    //         'telegram_id' => $chatId
+                    //     ]
+                    // );
 
                     $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
 
