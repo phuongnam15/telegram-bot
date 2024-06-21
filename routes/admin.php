@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BotController;
 use App\Http\Controllers\Api\Admin\ScheduleConfigController;
+use App\Http\Controllers\Api\Admin\ScheduleGroupConfigController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\ContentConfigController;
 use App\Http\Controllers\Api\Admin\GroupController;
@@ -22,6 +23,9 @@ Route::middleware('auth:admin')->group(function () {
 
 Route::post('/schedule', [ScheduleConfigController::class, 'configShedule']);
 Route::get('/schedule', [ScheduleConfigController::class, 'getSchedule']);
+
+Route::post('/schedule-group', [ScheduleGroupConfigController::class, 'configShedule']);
+Route::get('/schedule-group', [ScheduleGroupConfigController::class, 'getSchedule']);
 
 Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');
 Route::get('/list', [ContentConfigController::class, 'list']);

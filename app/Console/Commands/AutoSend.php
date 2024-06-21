@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SendBotMessage;
 use App\Models\ContentConfig;
 use App\Models\ScheduleConfig;
+use App\Models\ScheduleGroupConfig;
 use App\Models\TelegramGroup;
 use App\Models\User;
 use App\Services\BotService\BotService;
@@ -40,6 +41,15 @@ class AutoSend extends Command
     public function handle()
     {
         $scheduleConfig = ScheduleConfig::first();
+        $schduleGroupConfig = ScheduleGroupConfig::first();
+
+        $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
+        ->where('kind', '!=', ContentConfig::KIND_BUTTON)->pluck('id')->toArray();
+
+        if(count($configIds) == 0) {
+            return;
+        }
+
         if ($scheduleConfig->status == ScheduleConfig::STATUS_ON) {
 
             $lastDateTime = Carbon::parse($scheduleConfig->lastime);
@@ -49,21 +59,28 @@ class AutoSend extends Command
                 $scheduleConfig->lastime = now();
                 $scheduleConfig->save();
 
-                $userTelegramId = User::all()->pluck('telegram_id')->toArray();
-                $groupTelegramId = TelegramGroup::all()->pluck('telegram_id')->toArray();
-
-                $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
-                ->where('kind', '!=', ContentConfig::KIND_BUTTON)->pluck('id')->toArray();
-
-                if(count($configIds) == 0) {
-                    return;
-                }
+                $userTelegramIds = User::all()->pluck('telegram_id')->toArray();
 
                 $id = Arr::random($configIds);
 
-                $arrayId = array_merge($userTelegramId, $groupTelegramId);
+                SendBotMessage::dispatch($userTelegramIds, $id);
+            }
+        }
 
-                SendBotMessage::dispatch($arrayId, $id);
+        if ($schduleGroupConfig->status == ScheduleGroupConfig::STATUS_ON) {
+
+            $lastDateTimeGroup = Carbon::parse($schduleGroupConfig->lastime);
+            $timeToCompareGroup = $lastDateTimeGroup->addMinutes($schduleGroupConfig->time);
+
+            if (now() > $timeToCompareGroup) {
+                $schduleGroupConfig->lastime = now();
+                $schduleGroupConfig->save();
+
+                $groupTelegramIds = TelegramGroup::all()->pluck('telegram_id')->toArray();
+
+                $id = Arr::random($configIds);
+
+                SendBotMessage::dispatch($groupTelegramIds, $id);
             }
         }
     }

@@ -14,7 +14,9 @@
 
 <body>
     <div class="mt-5 mx-5" style="position: relative;">
+        <!-- schedule config -->
         <div class="mb-3">
+            <h5>Lịch chạy của User</h5>
             <form id="scheduleForm" class="d-flex" style="gap: 5px;">
                 <div class="form-group" style="margin-bottom: 0px;">
                     <label style="font-size: 13px;" for="status">Trạng thái</label>
@@ -31,7 +33,30 @@
                     <label style="font-size: 13px;" for="lastime">Lần cuối chạy</label>
                     <input type="text" id="lastime" class="form-control" name="lastime" readonly>
                 </div>
-                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateSchedule()">Cập nhật lịch chạy</button>
+                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateSchedule()">Cập nhật</button>
+            </form>
+        </div>
+
+        <!-- schedule group config -->
+        <div class="mb-3">
+            <h5>Lịch chạy của Group</h5>
+            <form id="scheduleGroupForm" class="d-flex" style="gap: 5px;">
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="status">Trạng thái</label>
+                    <select id="status-group" class="form-control" name="status">
+                        <option value="on">Bật</option>
+                        <option value="off">Tắt</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="time">Thời gian chạy (phút)</label>
+                    <input type="number" id="time-group" class="form-control" name="time">
+                </div>
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="lastime">Lần cuối chạy</label>
+                    <input type="text" id="lastime-group" class="form-control" name="lastime" readonly>
+                </div>
+                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateScheduleGroup()">Cập nhật</button>
             </form>
         </div>
 
@@ -103,6 +128,20 @@
                         document.getElementById('status').value = data.status;
                         document.getElementById('time').value = data.time;
                         document.getElementById('lastime').value = data.lastime;
+                    }
+                })
+                .catch(error => console.error('Error fetching schedule config:', error));
+
+            //GET SCHEDULE GROUP CONFIG
+            fetch('/api/admin/schedule-group')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        document.getElementById('status-group').value = data.status;
+                        document.getElementById('time-group').value = data.time;
+                        document.getElementById('lastime-group').value = data.lastime;
                     }
                 })
                 .catch(error => console.error('Error fetching schedule config:', error));
@@ -234,6 +273,29 @@
                 formData.append('time', time);
 
                 fetch('/api/admin/schedule', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Schedule updated successfully');
+                    })
+                    .catch(error => console.error('Error updating schedule config:', error));
+            }
+
+            // UPDATE SCHEDULE GROUP
+            window.updateScheduleGroup = function() {
+                const status = document.getElementById('status-group').value;
+                const time = document.getElementById('time-group').value;
+
+                const formData = new FormData();
+                formData.append('status', status);
+                formData.append('time', time);
+
+                fetch('/api/admin/schedule-group', {
                         method: 'POST',
                         body: formData,
                         headers: {

@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call(AdminSeeder::class);
         $this->call(ScheduleConfigSeeder::class);
+        $this->call(ScheduleGroupConfigSeeder::class);
     }
 }
