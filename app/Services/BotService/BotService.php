@@ -2,9 +2,11 @@
 
 namespace App\Services\BotService;
 
+use App\Jobs\DeleteTelegramMessage;
 use App\Models\Bot;
 use App\Models\ContentConfig;
 use App\Models\TelegramGroup;
+use App\Models\TelegramMessage;
 use App\Models\User;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
@@ -12,6 +14,7 @@ use App\Services\_Trait\EntryServiceTrait;
 use GuzzleHttp\Client;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 class BotService extends BaseService
@@ -27,7 +30,7 @@ class BotService extends BaseService
 
     public function webhook()
     {
-        return DbTransactions()->addCallBackJson(function () {
+        try {
             $updates = Telegram::getWebhookUpdates();
             $update = json_decode($updates, true);
 
@@ -156,23 +159,36 @@ class BotService extends BaseService
 
                         if ($media) {
                             $parameter[$type] = fopen($media, 'r');
-                            // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
                         }
-
 
                         switch ($type) {
                             case 'text':
                                 $parameter['text'] = $content;
-                                return Telegram::sendMessage($parameter);
+                                $response = Telegram::sendMessage($parameter);
+                                break;
                             case 'photo':
-                                return Telegram::sendPhoto($parameter);
+                                $response = Telegram::sendPhoto($parameter);
+                                break;
                             case 'video':
-                                return Telegram::sendVideo($parameter);
+                                $response = Telegram::sendVideo($parameter);
+                                break;
                             default:
-                                throw new AppServiceException('Type not found');
+                                logger('Type not found');
+                                $response = [];
+                                break;
+                        }
+                        if ($response !== []) {
+
+                            $telegramMessage = TelegramMessage::create([
+                                'chat_id' => $chatId,
+                                'message_id' => $response->getMessageId(),
+                                'sent_at' => Carbon::now()
+                            ]);
+
+                            DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinute());
                         }
                     } else {
-                        throw new AppServiceException('User or config not found');
+                        logger('Config not found');
                     }
                 }
             }
@@ -181,7 +197,9 @@ class BotService extends BaseService
                 return $this->replyCallback($updates['callback_query']['from']['id'], $updates['callback_query']['data']);
             }
             return 1;
-        });
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+        }
     }
     public function send($telegramIds, $configId)
     {
@@ -268,7 +286,6 @@ class BotService extends BaseService
 
             if ($media) {
                 $parameter[$type] = fopen($media, 'r');
-                // $parameter[$type] = fopen(asset("storage/media/" . $media), 'r');
             }
 
 
