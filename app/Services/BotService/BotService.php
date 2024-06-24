@@ -300,7 +300,6 @@ class BotService extends BaseService
                 $bot = Bot::create([
                     'token' => $request->token,
                     "name" => $data['result']['username'],
-                    'status' => Bot::STATUS_ACTIVE
                 ]);
 
                 return response()->json($bot);

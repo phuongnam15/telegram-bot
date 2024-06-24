@@ -49,4 +49,5 @@ Route::prefix('bot')->group(function () {
     Route::get('/', [BotController::class, 'list']);
     Route::post('/{id}', [BotController::class, 'activeBot']);
     Route::post('/', [BotController::class, 'saveBot']);
+    Route::delete('/{id}', [BotController::class, 'delete']);
 });

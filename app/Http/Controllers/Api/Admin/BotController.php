@@ -36,4 +36,7 @@ class BotController extends Controller
   public function activeBot($id){
     return $this->botService->activeBot($id);
   }
+  public function delete($id){
+    return $this->botService->delete($id);
+  }
 }

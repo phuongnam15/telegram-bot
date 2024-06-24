@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\_Transaction\TransactionService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\App;
+use App\Models\Bot;
+use App\Observers\BotObserver;
+use Illuminate\Support\Facades\Artisan;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +28,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Bot::observe(BotObserver::class);
+        
+        App::booted(function () {
+            $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->first();
+            if ($activeBot) {
+                Cache::put('active_bot_token', $activeBot->token);
+                config(['telegram.bots.mybot.token' => $activeBot->token]);
+
+                Artisan::call('telegram:set-webhook');
+            }
+        });
     }
 }
