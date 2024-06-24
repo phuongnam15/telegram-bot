@@ -176,14 +176,7 @@ class BotService extends BaseService
                                 break;
                         }
                         if ($response !== []) {
-
-                            $telegramMessage = TelegramMessage::create([
-                                'chat_id' => $chatId,
-                                'message_id' => $response->getMessageId(),
-                                'sent_at' => Carbon::now()
-                            ]);
-
-                            DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinute());
+                            $this->saveMessageAndScheduleDeletion($chatId, $response);
                         }
                     } else {
                         logger('Config not found');
