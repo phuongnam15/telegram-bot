@@ -5,6 +5,7 @@ namespace App\Services\BotService;
 use App\Jobs\DeleteTelegramMessage;
 use App\Models\Bot;
 use App\Models\ContentConfig;
+use App\Models\ScheduleDeleteMessage;
 use App\Models\TelegramGroup;
 use App\Models\TelegramMessage;
 use App\Models\User;
@@ -68,14 +69,6 @@ class BotService extends BaseService
 
                     $chatId = $message['chat']['id'];
 
-                    // TelegramGroup::firstOrCreate(
-                    //     ['telegram_id' => $chatId],
-                    //     [
-                    //         'name' => $name,
-                    //         'telegram_id' => $chatId
-                    //     ]
-                    // );
-
                     $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
 
                     $configIntro = ContentConfig::where(['kind' => 'introduce', 'is_default' => true])->first();
@@ -103,14 +96,19 @@ class BotService extends BaseService
                         switch ($type) {
                             case 'text':
                                 $parameter['text'] = $text . $content;
-                                return Telegram::sendMessage($parameter);
+                                $response = Telegram::sendMessage($parameter);
+                                break;
                             case 'photo':
-                                return Telegram::sendPhoto($parameter);
+                                $response = Telegram::sendPhoto($parameter);
+                                break;
                             case 'video':
-                                return Telegram::sendVideo($parameter);
+                                $response = Telegram::sendVideo($parameter);
+                                break;
                             default:
-                                throw new AppServiceException('Type not found');
+                                throw new \Exception('Type not found');
                         }
+
+                        $this->saveMessageAndScheduleDeletion($chatId, $response);
                     }
                 }
                 //start bot
@@ -203,7 +201,6 @@ class BotService extends BaseService
     }
     public function send($telegramIds, $configId)
     {
-        // return DbTransactions()->addCallBackJson(function () use ($telegramIds, $configId) {
         $config = ContentConfig::where('id', $configId)->first();
 
         if (!$config) {
@@ -239,19 +236,21 @@ class BotService extends BaseService
                 switch ($type) {
                     case 'text':
                         $parameter['text'] = $content;
-                        Telegram::sendMessage($parameter);
+                        $response = Telegram::sendMessage($parameter);
                         break;
                     case 'photo':
-                        Telegram::sendPhoto($parameter);
+                        $response = Telegram::sendPhoto($parameter);
                         break;
                     case 'video':
-                        Telegram::sendVideo($parameter);
+                        $response = Telegram::sendVideo($parameter);
                         break;
                     default:
                         return response()->json([
                             'message' => 'Type not found'
                         ]);
                 }
+
+                $this->saveMessageAndScheduleDeletion($telegramId, $response);
             } else {
                 return response()->json([
                     'message' => 'User not found'
@@ -259,7 +258,6 @@ class BotService extends BaseService
             }
         }
         return 1;
-        // });
     }
     public function replyCallback($chatId, $data)
     {
@@ -357,7 +355,7 @@ class BotService extends BaseService
             return response()->json(['error' => 'Failed to update bot status', 'details' => $e->getMessage()], 500);
         }
     }
-    public function delete($id) 
+    public function delete($id)
     {
         $bot = Bot::find($id);
 
@@ -368,5 +366,17 @@ class BotService extends BaseService
         $bot->delete();
 
         return response()->json(['message' => 'Deleted bot']);
+    }
+    public function saveMessageAndScheduleDeletion($chatId, $response)
+    {
+        $scheduleDelay = ScheduleDeleteMessage::first();
+
+        $telegramMessage = TelegramMessage::create([
+            'chat_id' => $chatId,
+            'message_id' => $response->getMessageId(),
+            'sent_at' => Carbon::now()
+        ]);
+
+        DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinutes($scheduleDelay->delay_time));
     }
 }

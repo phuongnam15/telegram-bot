@@ -14,6 +14,18 @@
 
 <body>
     <div class="mt-5 mx-5" style="position: relative;">
+        <!-- schedule delete message -->
+        <div class="mb-3">
+            <h5>Độ trễ xoá tin nhắn</h5>
+            <form id="scheduleForm" class="d-flex" style="gap: 5px;">
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <label style="font-size: 13px;" for="delay_time">Độ trễ (phút)</label>
+                    <input type="number" id="delay_time" class="form-control" name="delay_time">
+                </div>
+                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateScheduleDeleteMesesage()">Cập nhật</button>
+            </form>
+        </div>
+
         <!-- schedule config -->
         <div class="mb-3">
             <h5>Lịch chạy của User</h5>
@@ -129,6 +141,18 @@
                         document.getElementById('status').value = data.status;
                         document.getElementById('time').value = data.time;
                         document.getElementById('lastime').value = data.lastime;
+                    }
+                })
+                .catch(error => console.error('Error fetching schedule config:', error));
+
+            //GET SCHEDULE DELETE
+            fetch('/api/admin/schedule-delete')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        document.getElementById('delay_time').value = data.delay_time;
                     }
                 })
                 .catch(error => console.error('Error fetching schedule config:', error));
@@ -263,6 +287,27 @@
                         renderContentList(data);
                     });
             };
+
+            // UPDATE SCHEDULE DELETE
+            window.updateScheduleDeleteMesesage = function() {
+                const delayTime = document.getElementById('delay_time').value;
+
+                const formData = new FormData();
+                formData.append('delay_time', delayTime);
+
+                fetch('/api/admin/schedule-delete', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Schedule updated successfully');
+                    })
+                    .catch(error => console.error('Error updating schedule config:', error));
+            }
 
             // UPDATE SCHEDULE
             window.updateSchedule = function() {

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\ScheduleGroupConfigController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\ContentConfigController;
 use App\Http\Controllers\Api\Admin\GroupController;
+use App\Http\Controllers\Api\Admin\ScheduleDeleteMessageController;
 use App\Http\Controllers\Api\Admin\UserController;
 
 Route::prefix('auth')->group(function () {
@@ -26,6 +27,9 @@ Route::get('/schedule', [ScheduleConfigController::class, 'getSchedule']);
 
 Route::post('/schedule-group', [ScheduleGroupConfigController::class, 'configShedule']);
 Route::get('/schedule-group', [ScheduleGroupConfigController::class, 'getSchedule']);
+
+Route::post('/schedule-delete', [ScheduleDeleteMessageController::class, 'configShedule']);
+Route::get('/schedule-delete', [ScheduleDeleteMessageController::class, 'getSchedule']);
 
 Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');
 Route::get('/list', [ContentConfigController::class, 'list']);
