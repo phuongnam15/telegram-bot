@@ -2,13 +2,16 @@
 
 namespace App\Services\BotService;
 
+use App\Models\Bot;
 use App\Models\ContentConfig;
 use App\Models\TelegramGroup;
 use App\Models\User;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use App\Services\_Trait\EntryServiceTrait;
+use GuzzleHttp\Client;
 use Telegram\Bot\Laravel\Facades\Telegram;
+use Illuminate\Support\Facades\DB;
 
 
 class BotService extends BaseService
@@ -35,7 +38,7 @@ class BotService extends BaseService
                 if (array_key_exists('chat', $message) == 1) {
                     $chatId = $message['chat']['id'];
                     $name = $message['chat']['title'] ?? "";
-    
+
                     TelegramGroup::firstOrCreate(
                         ['telegram_id' => $chatId],
                         [
@@ -281,5 +284,73 @@ class BotService extends BaseService
                     throw new AppServiceException('Type not found');
             }
         }
+    }
+    public function saveBot($request)
+    {
+        try {
+            $token = $request->token;
+
+            $client = new Client();
+
+            $response = $client->get("https://api.telegram.org/bot{$token}/getMe");
+
+            $data = json_decode($response->getBody(), true);
+
+            if ($data['ok']) {
+                $bot = Bot::create([
+                    'token' => $request->token,
+                    "name" => $data['result']['username'],
+                    'status' => Bot::STATUS_ACTIVE
+                ]);
+
+                return response()->json($bot);
+            } else {
+                return response()->json(['error' => $data['description']], $data['error_code']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function list()
+    {
+        $bots = Bot::paginate(DEFAULT_PAGINATE);
+
+        return response()->json($bots);
+    }
+    public function activeBot($id)
+    {
+        $bot = Bot::find($id);
+
+        if (!$bot) {
+            return response()->json(['error' => 'Bot not found'], 404);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $bot->update(['status' => Bot::STATUS_ACTIVE]);
+
+            Bot::where('id', '!=', $id)->update(['status' => Bot::STATUS_INACTIVE]);
+
+            DB::commit();
+
+            return response()->json($bot, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['error' => 'Failed to update bot status', 'details' => $e->getMessage()], 500);
+        }
+    }
+    public function delete($id) 
+    {
+        $bot = Bot::find($id);
+
+        if (!$bot) {
+            return response()->json(['error' => 'Bot not found'], 404);
+        }
+
+        $bot->delete();
+
+        return response()->json(['message' => 'Deleted bot']);
     }
 }

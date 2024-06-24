@@ -44,3 +44,9 @@ Route::prefix('group')->group(function () {
 
 Route::get('/users', [UserController::class, 'list']);
 Route::post('/send', [BotController::class, 'send']);
+
+Route::prefix('bot')->group(function () {
+    Route::get('/', [BotController::class, 'list']);
+    Route::post('/{id}', [BotController::class, 'activeBot']);
+    Route::post('/', [BotController::class, 'saveBot']);
+});

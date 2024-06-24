@@ -27,4 +27,13 @@ class BotController extends Controller
     SendBotMessage::dispatch($request->telegramIds, $request->configId);
     return response()->json(['message' => 'Đã nhận yêu cầu, chờ gửi ...']);
   }
+  public function saveBot(Request $request) {
+    return $this->botService->saveBot($request);
+  }
+  public function list(){
+    return $this->botService->list();
+  }
+  public function activeBot($id){
+    return $this->botService->activeBot($id);
+  }
 }
