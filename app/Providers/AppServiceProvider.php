@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\App;
 use App\Models\Bot;
 use App\Observers\BotObserver;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,16 +29,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Bot::observe(BotObserver::class);
-        
-        App::booted(function () {
-            $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->first();
-            if ($activeBot) {
-                Cache::put('active_bot_token', $activeBot->token);
-                config(['telegram.bots.mybot.token' => $activeBot->token]);
+        if (Schema::hasTable('bots')) {
 
-                Artisan::call('telegram:set-webhook');
-            }
-        });
+            Bot::observe(BotObserver::class);
+
+            App::booted(function () {
+
+                $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->first();
+
+                if ($activeBot) {
+
+                    Cache::put('active_bot_token', $activeBot->token);
+
+                    config(['telegram.bots.mybot.token' => $activeBot->token]);
+
+                    Artisan::call('telegram:set-webhook');
+                }
+            });
+        }
     }
 }
