@@ -25,3 +25,6 @@ Route::get('/update/{id}', function () {
 Route::get('/group', function () {
     return view('group');
 });
+Route::get('/bot', function () {
+    return view('bot');
+});
