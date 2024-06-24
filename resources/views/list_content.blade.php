@@ -78,6 +78,7 @@
                 </select>
             </div>
             <button class="btn btn-info ml-2" id="manageGroup">Quản lí Group</button>
+            <button class="btn btn-warning ml-2" id="manageBot">Quản lí Bot</button>
             <button class="btn btn-success ml-2" id="createNew">Tạo mới</button>
         </div>
         <h2>Content List</h2>
@@ -439,6 +440,9 @@
             });
             $('#manageGroup').click(() => {
                 location.href = '/group';
+            });
+            $('#manageBot').click(() => {
+                location.href = '/bot';
             });
         });
     </script>
