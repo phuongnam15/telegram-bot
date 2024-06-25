@@ -370,6 +370,6 @@ class BotService extends BaseService
             'sent_at' => Carbon::now()
         ]);
 
-        DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinutes($scheduleDelay->delay_time));
+        DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinutes($scheduleDelay->delay_time))->onQueue('deleteBotMessage');
     }
 }

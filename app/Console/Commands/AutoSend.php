@@ -63,7 +63,7 @@ class AutoSend extends Command
 
                 $id = Arr::random($configIds);
 
-                SendBotMessage::dispatch($userTelegramIds, $id);
+                SendBotMessage::dispatch($userTelegramIds, $id)->onQueue('botSendMessage');
             }
         }
 
@@ -80,7 +80,7 @@ class AutoSend extends Command
 
                 $id = Arr::random($configIds);
 
-                SendBotMessage::dispatch($groupTelegramIds, $id);
+                SendBotMessage::dispatch($groupTelegramIds, $id)->onQueue('botSendMessage');
             }
         }
     }
