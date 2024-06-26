@@ -331,13 +331,18 @@ class BotService extends BaseService
         if (!$bot) {
             return response()->json(['error' => 'Bot not found'], 404);
         }
-
+        
         DB::beginTransaction();
-
+        
         try {
             $bot->update(['status' => Bot::STATUS_ACTIVE]);
-
-            Bot::where('id', '!=', $id)->update(['status' => Bot::STATUS_INACTIVE]);
+            
+            $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->where('id', '!=', $id)->first();
+    
+            if ($activeBot) {
+                $this->disableWebhook($activeBot->token);
+                $activeBot->update(['status' => Bot::STATUS_INACTIVE]);
+            }
 
             DB::commit();
 
@@ -371,5 +376,24 @@ class BotService extends BaseService
         ]);
 
         DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinutes($scheduleDelay->delay_time))->onQueue('deleteBotMessage');
+    }
+    public function disableWebhook($token)
+    {
+        $client = new Client();
+        $url = "https://api.telegram.org/bot{$token}/deleteWebhook";
+
+        try {
+            $response = $client->post($url);
+
+            $data = json_decode($response->getBody(), true);
+
+            if ($data['ok']) {
+                return response()->json(['message' => 'Webhook deleted successfully']);
+            } else {
+                return response()->json(['error' => 'Failed to delete webhook', 'details' => $data['description']], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete webhook', 'details' => $e->getMessage()], 500);
+        }
     }
 }
