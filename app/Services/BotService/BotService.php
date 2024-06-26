@@ -41,7 +41,7 @@ class BotService extends BaseService
                 //check group info
                 if (array_key_exists('chat', $message) == 1) {
                     $chatId = $message['chat']['id'];
-                    $name = $message['chat']['title'] ?? "";
+                    $name = $message['chat']['title'] ?? $message['chat']['username'] ?? "";
 
                     TelegramGroup::firstOrCreate(
                         ['telegram_id' => $chatId],

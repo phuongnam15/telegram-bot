@@ -45,10 +45,6 @@
                             <label for="telegram_id">Telegram ID</label>
                             <input type="text" class="form-control" id="telegram_id" name="telegram_id" required>
                         </div>
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
                         <input type="hidden" id="group_id">
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>
