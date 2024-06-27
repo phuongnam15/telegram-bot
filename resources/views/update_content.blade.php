@@ -39,6 +39,7 @@
                     <option value="">-- Chọn loại nội dung --</option>
                     <option value="introduce">Tin nhắn Chào Mừng</option>
                     <option value="button">Click Button</option>
+                    <option value="start">Start</option>
                     <option value="other">Khác</option>
                 </select>
             </div>
