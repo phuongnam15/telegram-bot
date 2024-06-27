@@ -5,15 +5,17 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use GuzzleHttp\Client;
 use App\Models\Bot;
+use App\Services\BotService\BotService;
 
 class SetTelegramWebhook extends Command
 {
     protected $signature = 'telegram:set-webhook';
     protected $description = 'Set the Telegram bot webhook';
-
-    public function __construct()
+    protected $botService;
+    public function __construct(BotService $botService)
     {
         parent::__construct();
+        $this->botService = $botService;
     }
 
     public function handle()
@@ -34,10 +36,23 @@ class SetTelegramWebhook extends Command
         }
 
         $client = new Client();
-        $url = "https://api.telegram.org/bot{$token}/setWebhook";
+        $getUrl = "https://api.telegram.org/bot{$token}/getWebhookInfo";
 
         try {
-            $response = $client->post($url, [
+            $response = $client->get($getUrl);
+            $webhookInfo = json_decode($response->getBody(), true);
+
+            if ($webhookInfo['ok'] && $webhookInfo['result']['url'] === $webhookUrl) {
+                $this->info('Webhook is already set with the same URL.');
+                return;
+            }
+
+            // If different, remove old webhook first
+            $this->botService->disableWebhook($token); // Assuming botService->disableWebhook() method handles webhook deletion
+
+            // Set new webhook
+            $setUrl = "https://api.telegram.org/bot{$token}/setWebhook";
+            $response = $client->post($setUrl, [
                 'form_params' => [
                     'url' => $webhookUrl
                 ]
@@ -51,7 +66,7 @@ class SetTelegramWebhook extends Command
                 $this->error('Failed to set webhook: ' . $data['description']);
             }
         } catch (\Exception $e) {
-            $this->error('Failed to set webhook: ' . $e->getMessage());
+            $this->error('Failed to check or set webhook: ' . $e->getMessage());
         }
     }
 }

@@ -35,21 +35,26 @@ class BotService extends BaseService
             $updates = Telegram::getWebhookUpdates();
             $update = json_decode($updates, true);
 
-            if (array_key_exists('message', $update) == 1) {
+            if (array_key_exists('message', $update)) {
                 $message = $update['message'];
 
                 //check group info
-                if (array_key_exists('chat', $message) == 1) {
-                    $chatId = $message['chat']['id'];
-                    $name = $message['chat']['title'] ?? $message['chat']['username'] ?? "";
+                if (array_key_exists('chat', $message)) {
+                    $chat = $message['chat'];
+                    $chatType = $chat['type'] ?? null;
 
-                    TelegramGroup::firstOrCreate(
-                        ['telegram_id' => $chatId],
-                        [
-                            'name' => $name,
-                            'telegram_id' => $chatId
-                        ]
-                    );
+                    if (in_array($chatType, ['group', 'supergroup', 'channel'])) {
+                        $chatId = $chat['id'];
+                        $name = $chat['title'] ?? $chat['username'] ?? "";
+
+                        TelegramGroup::firstOrCreate(
+                            ['telegram_id' => $chatId],
+                            [
+                                'name' => $name,
+                                'telegram_id' => $chatId
+                            ]
+                        );
+                    }
                 }
 
                 $name = "";
@@ -135,7 +140,7 @@ class BotService extends BaseService
                         ]
                     );
 
-                    $configIntro = ContentConfig::where(['kind' => 'introduce', 'is_default' => true])->first();
+                    $configIntro = ContentConfig::where(['kind' => ContentConfig::KIND_START, 'is_default' => true])->first();
 
                     if ($configIntro) {
                         $type = $configIntro->type;
@@ -331,14 +336,14 @@ class BotService extends BaseService
         if (!$bot) {
             return response()->json(['error' => 'Bot not found'], 404);
         }
-        
+
         DB::beginTransaction();
-        
+
         try {
             $bot->update(['status' => Bot::STATUS_ACTIVE]);
-            
+
             $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->where('id', '!=', $id)->first();
-    
+
             if ($activeBot) {
                 $this->disableWebhook($activeBot->token);
                 $activeBot->update(['status' => Bot::STATUS_INACTIVE]);

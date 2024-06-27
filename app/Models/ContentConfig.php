@@ -20,6 +20,7 @@ class ContentConfig extends Model
     ];
     const KIND_INTRO = 'introduce';
     const KIND_BUTTON = 'button';
+    const KIND_START = 'start';
     const KIND_OTHER = 'other';
     const TYPE_TEXT = 'text';
     const TYPE_PHOTO = 'photo';

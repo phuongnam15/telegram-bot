@@ -16,10 +16,10 @@
     <div class="mt-5 mx-5" style="position: relative;">
         <!-- schedule delete message -->
         <div class="mb-3">
-            <h5>Độ trễ xoá tin nhắn</h5>
+            <!-- <h5>Độ trễ xoá tin nhắn</h5> -->
             <form id="scheduleForm" class="d-flex" style="gap: 5px;">
                 <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="delay_time">Độ trễ (phút)</label>
+                    <label style="font-size: 13px;" for="delay_time">Độ trễ xoá tin (phút)</label>
                     <input type="number" id="delay_time" class="form-control" name="delay_time">
                 </div>
                 <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateScheduleDeleteMesesage()">Cập nhật</button>
@@ -28,7 +28,7 @@
 
         <!-- schedule config -->
         <div class="mb-3">
-            <h5>Lịch chạy của User</h5>
+            <!-- <h5>Lịch chạy của User</h5> -->
             <form id="scheduleForm" class="d-flex" style="gap: 5px;">
                 <div class="form-group" style="margin-bottom: 0px;">
                     <label style="font-size: 13px;" for="status">Trạng thái</label>
@@ -38,7 +38,7 @@
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="time">Thời gian chạy (phút)</label>
+                    <label style="font-size: 13px;" for="time">Auto gửi User (phút)</label>
                     <input type="number" id="time" class="form-control" name="time">
                 </div>
                 <div class="form-group" style="margin-bottom: 0px;">
@@ -51,7 +51,7 @@
 
         <!-- schedule group config -->
         <div class="mb-3">
-            <h5>Lịch chạy của Group</h5>
+            <!-- <h5>Lịch chạy của Group</h5> -->
             <form id="scheduleGroupForm" class="d-flex" style="gap: 5px;">
                 <div class="form-group" style="margin-bottom: 0px;">
                     <label style="font-size: 13px;" for="status">Trạng thái</label>
@@ -61,7 +61,7 @@
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="time">Thời gian chạy (phút)</label>
+                    <label style="font-size: 13px;" for="time">Auto gửi Group (phút)</label>
                     <input type="number" id="time-group" class="form-control" name="time">
                 </div>
                 <div class="form-group" style="margin-bottom: 0px;">
@@ -230,7 +230,7 @@
                                     </video>`;
                     }
 
-                    if (content.kind === 'introduce' && !content.is_default) {
+                    if ((content.kind === 'introduce' || content.kind === 'start') && !content.is_default) {
                         buttonSetDefault = `<button class="btn btn-info" onclick="setDefault(${content.id})">Mặc định</button>`;
                     }
 
@@ -248,6 +248,8 @@
                         kindBadge = '<span class="badge badge-success">Giới thiệu</span>';
                     } else if (content.kind === 'button') {
                         kindBadge = '<span class="badge badge-info">Click Button</span>';
+                    } else if (content.kind === 'start') {
+                        kindBadge = '<span class="badge badge-primary">Start</span>';
                     } else {
                         kindBadge = '<span class="badge badge-warning">Khác</span>';
                     }
