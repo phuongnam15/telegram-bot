@@ -44,7 +44,9 @@ class AutoSend extends Command
         $schduleGroupConfig = ScheduleGroupConfig::first();
 
         $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
-        ->where('kind', '!=', ContentConfig::KIND_BUTTON)->pluck('id')->toArray();
+        ->where('kind', '!=', ContentConfig::KIND_BUTTON)
+        ->where('kind', '!=', ContentConfig::KIND_START) 
+        ->pluck('id')->toArray();
 
         if(count($configIds) == 0) {
             return;
