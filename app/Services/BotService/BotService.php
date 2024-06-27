@@ -199,63 +199,69 @@ class BotService extends BaseService
     }
     public function send($telegramIds, $configId)
     {
-        $config = ContentConfig::where('id', $configId)->first();
+        try {
+            $config = ContentConfig::where('id', $configId)->first();
 
-        if (!$config) {
-            throw new AppServiceException('Config not found');
-        }
-
-        $type = $config->type;
-        $media = $config->media;
-        $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
-        $buttons = $config->buttons;
-
-        $parameter = [
-            "caption" => $content,
-            "parse_mode" => "HTML"
-        ];
-
-        if ($buttons) {
-            $parameter['reply_markup'] = $buttons;
-        }
-
-
-        foreach ($telegramIds as $telegramId) {
-            $user = User::where('telegram_id', $telegramId)->first();
-            $group = TelegramGroup::where('telegram_id', $telegramId)->first();
-
-            if ($user || $group) {
-                $parameter['chat_id'] = $telegramId;
-
-                if ($media) {
-                    $parameter[$type] = fopen($media, 'r');
-                }
-
-                switch ($type) {
-                    case 'text':
-                        $parameter['text'] = $content;
-                        $response = Telegram::sendMessage($parameter);
-                        break;
-                    case 'photo':
-                        $response = Telegram::sendPhoto($parameter);
-                        break;
-                    case 'video':
-                        $response = Telegram::sendVideo($parameter);
-                        break;
-                    default:
-                        return response()->json([
-                            'message' => 'Type not found'
-                        ]);
-                }
-
-                $this->saveMessageAndScheduleDeletion($telegramId, $response);
-            } else {
+            if (!$config) {
                 return response()->json([
-                    'message' => 'User not found'
+                    'message' => 'Config not found'
                 ]);
             }
+
+            $type = $config->type;
+            $media = $config->media;
+            $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
+            $buttons = $config->buttons;
+
+            $parameter = [
+                "caption" => $content,
+                "parse_mode" => "HTML"
+            ];
+
+            if ($buttons) {
+                $parameter['reply_markup'] = $buttons;
+            }
+
+
+            foreach ($telegramIds as $telegramId) {
+                $user = User::where('telegram_id', $telegramId)->first();
+                $group = TelegramGroup::where('telegram_id', $telegramId)->first();
+
+                if ($user || $group) {
+                    $parameter['chat_id'] = $telegramId;
+
+                    if ($media) {
+                        $parameter[$type] = fopen($media, 'r');
+                    }
+
+                    switch ($type) {
+                        case 'text':
+                            $parameter['text'] = $content;
+                            $response = Telegram::sendMessage($parameter);
+                            break;
+                        case 'photo':
+                            $response = Telegram::sendPhoto($parameter);
+                            break;
+                        case 'video':
+                            $response = Telegram::sendVideo($parameter);
+                            break;
+                        default:
+                            return response()->json([
+                                'message' => 'Type not found'
+                            ]);
+                    }
+
+                    $this->saveMessageAndScheduleDeletion($telegramId, $response);
+                } else {
+                    return response()->json([
+                        'message' => 'User not found'
+                    ]);
+                }
+            }
+            return 1;
+        } catch (\Exception $error) {
+            logger($error->getMessage());
         }
-        return 1;
     }
     public function replyCallback($chatId, $data)
     {
