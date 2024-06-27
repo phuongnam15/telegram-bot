@@ -84,9 +84,10 @@
             <div class="filter ml-2" style="width: 200px;">
                 <select id="kindFilter" class="form-control">
                     <option value="">-- Loại --</option>
-                    <option value="introduce">Giới thiệu</option>
-                    <option value="button">Click Button</option>
-                    <option value="other">Khác</option>
+                    <option value="Giới thiệu">Giới thiệu</option>
+                    <option value="Click button">Click Button</option>
+                    <option value="Start">Start</option>
+                    <option value="Other">Khác</option>
                 </select>
             </div>
             <button class="btn btn-info ml-2" id="manageGroup">Quản lí Group</button>
@@ -236,22 +237,22 @@
 
                     let typeBadge = '';
                     if (content.type === 'photo') {
-                        typeBadge = '<span class="badge badge-primary">Photo</span>';
+                        typeBadge = '<span class="badge badge-primary">photo</span>';
                     } else if (content.type === 'video') {
-                        typeBadge = '<span class="badge badge-warning">Video</span>';
+                        typeBadge = '<span class="badge badge-warning">video</span>';
                     } else if (content.type === 'text') {
-                        typeBadge = '<span class="badge badge-secondary">Text</span>';
+                        typeBadge = '<span class="badge badge-secondary">text</span>';
                     }
 
                     let kindBadge = '';
                     if (content.kind === 'introduce') {
                         kindBadge = '<span class="badge badge-success">Giới thiệu</span>';
                     } else if (content.kind === 'button') {
-                        kindBadge = '<span class="badge badge-info">Click Button</span>';
+                        kindBadge = '<span class="badge badge-info">Click button</span>';
                     } else if (content.kind === 'start') {
                         kindBadge = '<span class="badge badge-primary">Start</span>';
                     } else {
-                        kindBadge = '<span class="badge badge-warning">Khác</span>';
+                        kindBadge = '<span class="badge badge-warning">Other</span>';
                     }
 
                     contentHTML += `
