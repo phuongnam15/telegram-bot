@@ -263,6 +263,118 @@ class BotService extends BaseService
             logger($error->getMessage());
         }
     }
+    public function send1($telegramIds, $configId)
+    {
+        try {
+            $config = ContentConfig::where('id', $configId)->first();
+
+            if (!$config) {
+                return response()->json([
+                    'message' => 'Config not found'
+                ]);
+            }
+
+            $type = $config->type;
+            $media = $config->media;
+            $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
+            $buttons = $config->buttons;
+
+            $parameter = [
+                "caption" => $content,
+                "parse_mode" => "HTML"
+            ];
+
+            if ($buttons) {
+                $parameter['reply_markup'] = $buttons;
+            }
+
+            $client = new Client();
+            $telegramApiUrl = 'https://api.telegram.org/bot' . '6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc' . '/';
+
+            foreach ($telegramIds as $telegramId) {
+                $user = User::where('telegram_id', $telegramId)->first();
+                $group = TelegramGroup::where('telegram_id', $telegramId)->first();
+
+                if ($user || $group) {
+                    $parameter['chat_id'] = $telegramId;
+
+                    switch ($type) {
+                        case 'text':
+                            $parameter['text'] = $content;
+                            $response = $client->post($telegramApiUrl . 'sendMessage', [
+                                'json' => $parameter
+                            ]);
+                            break;
+                        case 'photo':
+                            // $parameter['photo'] = fopen($media, 'r');
+                            $response = $client->post($telegramApiUrl . 'sendPhoto', [
+                                'multipart' => [
+                                    [
+                                        'name' => 'photo',
+                                        'contents' => fopen($media, 'r')
+                                    ],
+                                    [
+                                        'name' => 'caption',
+                                        'contents' => $content
+                                    ],
+                                    [
+                                        'name' => 'chat_id',
+                                        'contents' => $telegramId
+                                    ],
+                                    [
+                                        'name' => 'parse_mode',
+                                        'contents' => 'HTML'
+                                    ]
+                                ]
+                            ]);
+                            break;
+                        case 'video':
+                            // $parameter['video'] = fopen($media, 'r');
+                            $response = $client->post($telegramApiUrl . 'sendVideo', [
+                                'multipart' => [
+                                    [
+                                        'name' => 'video',
+                                        'contents' => fopen($media, 'r')
+                                    ],
+                                    [
+                                        'name' => 'caption',
+                                        'contents' => $content
+                                    ],
+                                    [
+                                        'name' => 'chat_id',
+                                        'contents' => $telegramId
+                                    ],
+                                    [
+                                        'name' => 'parse_mode',
+                                        'contents' => 'HTML'
+                                    ]
+                                ]
+                            ]);
+                            break;
+                        default:
+                            return response()->json([
+                                'message' => 'Type not found'
+                            ]);
+                    }
+
+                    // $responseBody = json_decode($response->getBody(), true);
+                    // $this->saveMessageAndScheduleDeletion1($telegramId, $responseBody);
+                } else {
+                    return response()->json([
+                        'message' => 'User not found'
+                    ]);
+                }
+            }
+            return response()->json([
+                'message' => 'Messages sent successfully'
+            ]);
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+            return response()->json([
+                'message' => 'An error occurred'
+            ]);
+        }
+    }
     public function replyCallback($chatId, $data)
     {
         //check callbackdata === config_name
@@ -388,6 +500,22 @@ class BotService extends BaseService
 
         DeleteTelegramMessage::dispatch($telegramMessage)->delay(now()->addMinutes($scheduleDelay->delay_time))->onQueue('deleteBotMessage');
     }
+    // public function saveMessageAndScheduleDeletion1($chatId, $responseBody)
+    // {
+    //     $scheduleDelay = ScheduleDeleteMessage::first();
+
+    //     $messageId = $responseBody['result']['message_id'];
+
+    //     $telegramMessage = TelegramMessage::create([
+    //         'chat_id' => $chatId,
+    //         'message_id' => $messageId,
+    //         'sent_at' => Carbon::now()
+    //     ]);
+
+    //     DeleteTelegramMessage::dispatch($telegramMessage)
+    //         ->delay(now()->addMinutes($scheduleDelay->delay_time))
+    //         ->onQueue('deleteBotMessage');
+    // }
     public function disableWebhook($token)
     {
         $client = new Client();
