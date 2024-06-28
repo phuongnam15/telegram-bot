@@ -41,7 +41,7 @@ class AutoSend extends Command
     public function handle()
     {
         $scheduleConfig = ScheduleConfig::first();
-        $schduleGroupConfig = ScheduleGroupConfig::first();
+        $scheduleGroupConfig = ScheduleGroupConfig::first();
 
         $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
         ->where('kind', '!=', ContentConfig::KIND_BUTTON)
@@ -63,26 +63,27 @@ class AutoSend extends Command
 
                 $userTelegramIds = User::all()->pluck('telegram_id')->toArray();
 
-                $id = Arr::random($configIds);
-
-                SendBotMessage::dispatch($userTelegramIds, $id)->onQueue('botSendMessage');
+                foreach ($userTelegramIds as $telegramId) {
+                    $randomConfigId = Arr::random($configIds);
+                    SendBotMessage::dispatch([$telegramId], $randomConfigId)->onQueue('botSendMessage');
+                }
             }
         }
 
-        if ($schduleGroupConfig->status == ScheduleGroupConfig::STATUS_ON) {
-
-            $lastDateTimeGroup = Carbon::parse($schduleGroupConfig->lastime);
-            $timeToCompareGroup = $lastDateTimeGroup->addMinutes($schduleGroupConfig->time);
+        if ($scheduleGroupConfig->status == ScheduleGroupConfig::STATUS_ON) {
+            $lastDateTimeGroup = Carbon::parse($scheduleGroupConfig->lastime);
+            $timeToCompareGroup = $lastDateTimeGroup->addMinutes($scheduleGroupConfig->time);
 
             if (now() > $timeToCompareGroup) {
-                $schduleGroupConfig->lastime = now();
-                $schduleGroupConfig->save();
+                $scheduleGroupConfig->lastime = now();
+                $scheduleGroupConfig->save();
 
                 $groupTelegramIds = TelegramGroup::all()->pluck('telegram_id')->toArray();
 
-                $id = Arr::random($configIds);
-
-                SendBotMessage::dispatch($groupTelegramIds, $id)->onQueue('botSendMessage');
+                foreach ($groupTelegramIds as $telegramId) {
+                    $randomConfigId = Arr::random($configIds);
+                    SendBotMessage::dispatch([$telegramId], $randomConfigId)->onQueue('botSendMessage');
+                }
             }
         }
     }
