@@ -29,6 +29,6 @@ class SendBotMessage implements ShouldQueue
      */
     public function handle(BotService $botService): void
     {
-        $botService->send($this->telegramIds, $this->contentId);
+        $botService->send1($this->telegramIds, $this->contentId);
     }
 }
