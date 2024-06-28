@@ -164,25 +164,71 @@ class BotService extends BaseService
                             $parameter[$type] = fopen($media, 'r');
                         }
 
+                        $token = Bot::where('status', Bot::STATUS_ACTIVE)->first()->token;
+                        $client = new Client();
+                        $telegramApiUrl = 'https://api.telegram.org/bot' . $token . '/';
+
                         switch ($type) {
                             case 'text':
                                 $parameter['text'] = $content;
-                                $response = Telegram::sendMessage($parameter);
+                                $response = $client->post($telegramApiUrl . 'sendMessage', [
+                                    'json' => $parameter
+                                ]);
                                 break;
                             case 'photo':
-                                $response = Telegram::sendPhoto($parameter);
+                                // $parameter['photo'] = fopen($media, 'r');
+                                $response = $client->post($telegramApiUrl . 'sendPhoto', [
+                                    'multipart' => [
+                                        [
+                                            'name' => 'photo',
+                                            'contents' => fopen($media, 'r')
+                                        ],
+                                        [
+                                            'name' => 'caption',
+                                            'contents' => $content
+                                        ],
+                                        [
+                                            'name' => 'chat_id',
+                                            'contents' => $chatId
+                                        ],
+                                        [
+                                            'name' => 'parse_mode',
+                                            'contents' => 'HTML'
+                                        ]
+                                    ]
+                                ]);
                                 break;
                             case 'video':
-                                $response = Telegram::sendVideo($parameter);
+                                // $parameter['video'] = fopen($media, 'r');
+                                $response = $client->post($telegramApiUrl . 'sendVideo', [
+                                    'multipart' => [
+                                        [
+                                            'name' => 'video',
+                                            'contents' => fopen($media, 'r')
+                                        ],
+                                        [
+                                            'name' => 'caption',
+                                            'contents' => $content
+                                        ],
+                                        [
+                                            'name' => 'chat_id',
+                                            'contents' => $chatId
+                                        ],
+                                        [
+                                            'name' => 'parse_mode',
+                                            'contents' => 'HTML'
+                                        ]
+                                    ]
+                                ]);
                                 break;
                             default:
-                                logger('Type not found');
-                                $response = [];
-                                break;
+                                return response()->json([
+                                    'message' => 'Type not found'
+                                ]);
                         }
-                        if ($response !== []) {
-                            $this->saveMessageAndScheduleDeletion($chatId, $response);
-                        }
+                        // if ($response !== []) {
+                        //     $this->saveMessageAndScheduleDeletion($chatId, $response);
+                        // }
                     } else {
                         logger('Config not found');
                     }
