@@ -42,7 +42,7 @@ class SetTelegramWebhook extends Command
             $response = $client->get($getUrl);
             $webhookInfo = json_decode($response->getBody(), true);
 
-            if ($webhookInfo['ok'] && $webhookInfo['result']['url'] === $webhookUrl) {
+            if ($webhookInfo['ok'] && $webhookInfo['result']['url'] === $webhookUrl && !isset($webhookInfo['result']['last_error_date'])) {
                 $this->info('Webhook is already set with the same URL.');
                 return;
             }

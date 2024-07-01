@@ -20,7 +20,7 @@ class BotObserver
             ]);
 
             // Thiết lập webhook
-            Artisan::call('telegram:set-webhook');
+            // Artisan::call('telegram:set-webhook');
         }
     }
 }

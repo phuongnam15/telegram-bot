@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
 
                     config(['telegram.bots.mybot.token' => $activeBot->token]);
 
-                    Artisan::call('telegram:set-webhook');
+                    // Artisan::call('telegram:set-webhook');
                 }
             });
         }
