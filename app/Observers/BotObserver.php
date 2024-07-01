@@ -16,7 +16,7 @@ class BotObserver
     }
     public function updated(Bot $bot)
     {
-        // $this->botService->disableWebhook($bot->token);
+        $this->botService->disableWebhook($bot->token);
 
         if ($bot->status == Bot::STATUS_ACTIVE) {
 

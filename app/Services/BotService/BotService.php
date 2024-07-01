@@ -358,7 +358,7 @@ class BotService extends BaseService
             $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->where('id', '!=', $id)->first();
 
             if ($activeBot) {
-                $this->disableWebhook($activeBot->token);
+                // $this->disableWebhook($activeBot->token);
                 $activeBot->update(['status' => Bot::STATUS_INACTIVE]);
             }
 
