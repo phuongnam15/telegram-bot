@@ -35,8 +35,10 @@ class BotService extends BaseService
             $updates = Telegram::getWebhookUpdates();
             $update = json_decode($updates, true);
 
-            if (array_key_exists('message', $update)) {
-                $message = $update['message'];
+            // logger($update);
+
+            if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
+                $message = $update['chat_member'] ?? $update['message'];
 
                 //check group info
                 if (array_key_exists('chat', $message)) {
@@ -60,17 +62,22 @@ class BotService extends BaseService
                 $name = "";
 
                 //new chat member
-                if (isset($message['new_chat_members'])) {
+                if (isset($message['new_chat_member'])) {
 
-                    if (isset($message['new_chat_member']['first_name'])) {
-                        $name .= $message['new_chat_member']['first_name'] . " ";
+                    if(!isset($message['new_chat_member']['status'])){
+                        return;
+                    } else if ($message['new_chat_member']['status'] !== 'member') {
+                        return;
                     }
-                    if (isset($message['new_chat_member']['last_name'])) {
-                        $name .= $message['new_chat_member']['last_name'];
-                    }
-                    if ($name === '') {
-                        $name = $message['new_chat_member']['username'];
-                    }
+
+                    $newChatMember = $message['new_chat_member']['user'] ?? $message['new_chat_member'];
+                    $firstName = $newChatMember['first_name'] ?? '';
+                    $lastName = $newChatMember['last_name'] ?? '';
+                    $username = $newChatMember['username'] ?? '';
+
+                    $name = trim("$firstName $lastName");
+                    $name = $name ?: $username;
+
 
                     $chatId = $message['chat']['id'];
 
