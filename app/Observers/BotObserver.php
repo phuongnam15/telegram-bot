@@ -16,7 +16,7 @@ class BotObserver
     }
     public function updated(Bot $bot)
     {
-        $this->botService->disableWebhook($bot->token);
+        // $this->botService->disableWebhook($bot->token);
 
         if ($bot->status == Bot::STATUS_ACTIVE) {
 
@@ -26,10 +26,9 @@ class BotObserver
             config([
                 'telegram.bots.mybot.token' => $bot->token,
             ]);
-
-            // Thiết lập webhook
         }
-        
+
+        // Thiết lập webhook
         Artisan::call('telegram:set-webhook');
     }
 }
