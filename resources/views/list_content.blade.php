@@ -494,6 +494,99 @@
             });
         });
     </script>
+    <script>
+        // Create and style the button
+        const button = document.createElement('button');
+        button.id = 'getPassButton';
+        button.innerText = 'Lấy Pass';
+        button.style.position = 'relative';
+        button.style.bottom = '50px';
+        button.style.left = '50%';
+        button.style.transform = 'translateX(-50%)';
+        button.style.fontSize = '1em';
+        button.style.padding = '5px 10px';
+        button.style.backgroundColor = '#007BFF';
+        button.style.color = '#FFF';
+        button.style.border = 'none';
+        button.style.borderRadius = '5px';
+        button.style.cursor = 'pointer';
+
+        // Create the timer and password display elements
+        const timer = document.createElement('div');
+        timer.id = 'timer';
+        timer.style.display = 'none';
+        timer.style.position = 'relative';
+        timer.style.bottom = '50px';
+        timer.style.left = '50%';
+        timer.style.transform = 'translateX(-50%)';
+        timer.style.fontSize = '1em';
+        timer.style.padding = '5px 10px';
+        timer.style.backgroundColor = '#FFC107';
+        timer.style.color = '#fff';
+        timer.style.borderRadius = '5px';
+        timer.style.width = 'fit-content';
+
+        const passwordDisplay = document.createElement('div');
+        passwordDisplay.id = 'password';
+        passwordDisplay.style.display = 'none';
+        passwordDisplay.style.position = 'relative';
+        passwordDisplay.style.bottom = '50px';
+        passwordDisplay.style.left = '50%';
+        passwordDisplay.style.transform = 'translateX(-50%)';
+        passwordDisplay.style.fontSize = '1em';
+        passwordDisplay.style.padding = '5px 10px';
+        passwordDisplay.style.backgroundColor = '#28A745';
+        passwordDisplay.style.color = '#FFF';
+        passwordDisplay.style.borderRadius = '5px';
+        passwordDisplay.style.width = 'fit-content';
+
+        // Ensure elements are at the bottom of the page
+        document.body.appendChild(button);
+        document.body.appendChild(timer);
+        document.body.appendChild(passwordDisplay);
+
+        const passwords = [
+            '2EoBhsV0', 'mpm40yL2', 'K1cb8ClT', 'NKajAdzz', '8CdGfMZZ', 'KFUrW0NB',
+            'sF0V96aR', 'kxiu7DBD', 'QWcm0yR8', '4g8VizU4', 'dlWLQH2T', 'bs0fnoyl',
+            'ltE8drdK', 'mgZIYw0N', 'DENq9cgr', 'NxGjAwLI', 'EjRh2qG5', 'PC96gSHw',
+            'YP58iv4Y', '93WIbBAz', '1M0dn7ol', 'TdY0WTXW', 'xda8NirC', 'jBU3jR8f',
+            'uIgTUIDv', 'ntPHsloN', 'xGsb4YeP', 'Xd0V4POS', '7mWUPRrB', 'FCbRnw5l',
+            'WRrwAYk0', 'rIvzf1w2', '7bZT6dJ5', 't3vWPwai', 'VP8v4xpv', 'UDPBL4UL',
+            'CJ77rcvI', 'C8HrV0qs', 'abTANkrZ', '397IYYev', 'pT99ewM1', '150Eha2n',
+            'bjVWgCIB', 'hJwJJf6m', 'eXS974TV', '8YuXdMYl', 'IApR69hE', 'pCpUjC08',
+            '0bdDwMhN', '3pVo5mtG', 'pmI5jrqU', 'fwYwnUg7', 'RC74QLuF', 'BhTBud28',
+            'W0rKeh3X', 'WE7pznyf', 'gnzJPwGc', 'UG2QfGeU', 'dgzkR1A4', 'rqtp3JBC',
+            'ebFmklmm', '6AsQVo5h', 'Lvtb6g4e', 'PnXAoPfC', 'njFzknQW', 'lxKMAgl7',
+            'rP5YrGzz', 'yqUtO0GA', 'GgeVsRwi', 'bpG1USFq', 'nb6fecPu', 'KaxgaTpo',
+            'Nyh4TfUz', 'ngLSsBI2', 'zsgf7YLI', 'SETB9Hqe', 'MWy3aL0a', 'RMrpnAzY',
+            'qehWG0Qs', '1kX11mdJ', 'glrtXrJg', '5oGcrvJF', 'a8akQY5G', 'gIZiCh1P',
+            'XnEM8bGa', '1TSDzLpT', 'uTmjzeRt', 'hHi8uXqr', 'shtrAHdk', 'fSiYkn98',
+            'xTLO6mnx', 'gSFh3yXs', 'A0j9oO2V', 'ccSwUBjf', 'FQ67w7wZ', 'G5SM6iTq',
+            'udgJTbWY', 'znntC6WS', '38QIw39s', 'GJ4izaNm'
+        ];
+
+        button.addEventListener('click', () => {
+            button.style.display = 'none';
+            timer.style.display = 'block';
+            passwordDisplay.style.display = 'none';
+
+            let countdown = 60;
+            timer.innerText = "Chờ " + countdown + "s để lấy pass";
+
+            const interval = setInterval(() => {
+                countdown--;
+                timer.innerText = "Chờ " + countdown + "s để lấy pass";
+
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    timer.style.display = 'none';
+                    passwordDisplay.style.display = 'block';
+                    const randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
+                    passwordDisplay.innerText = randomPassword;
+                }
+            }, 1000);
+        });
+    </script>
 </body>
 
 </html>

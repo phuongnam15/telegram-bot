@@ -65,7 +65,7 @@
                 <select class="form-select" id="keyboardType" name="keyboardType">
                     <option value="">-- Chọn loại Button --</option>
                     <option value="inline_keyboard">Đi kèm bài viết</option>
-                    <!-- <option value="keyboard">Dưới bàn phím</option> -->
+                    <option value="inline_keyboard_phone_number">Đi kèm bài viết (để lấy SĐT)</option>
                 </select>
             </div>
             <div id="buttonsContainer" class="mb-3">
@@ -164,6 +164,15 @@
                             <button type="button" class="btn btn-danger btn-sm remove-button">Xóa</button>
                         </div>
                     `);
+                }else if (type === 'inline_keyboard_phone_number'){
+                    $('#buttonsContainer').append(`
+                        <div class="button-group mb-2 flex">
+                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-control mb-1">
+                            <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-control mb-1">
+                            <input type="text" name="buttons[][callback_data]" value="get_phone_number" readOnly class="form-control mb-1">
+                            <button type="button" class="btn btn-danger btn-sm remove-button">Xóa</button>
+                        </div>
+                    `);
                 }
             }
 
@@ -215,7 +224,7 @@
             });
 
             // Đóng gói dữ liệu nút thành đối tượng gửi đi
-            const dataToSend = $('#keyboardType').val() === 'inline_keyboard' ? {
+            const dataToSend = $('#keyboardType').val() === 'inline_keyboard' || $('#keyboardType').val() === 'inline_keyboard_phone_number' ? {
                 inline_keyboard: keyboard
             } : {
                 keyboard: keyboard

@@ -5,6 +5,8 @@ namespace App\Services\BotService;
 use App\Jobs\DeleteTelegramMessage;
 use App\Models\Bot;
 use App\Models\ContentConfig;
+use App\Models\Password;
+use App\Models\PhoneNumber;
 use App\Models\ScheduleDeleteMessage;
 use App\Models\TelegramGroup;
 use App\Models\TelegramMessage;
@@ -39,24 +41,20 @@ class BotService extends BaseService
 
             if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
                 $message = $update['chat_member'] ?? $update['message'];
+                $chatId = $message['chat']['id'];
+                $chatType = $message['chat']['type'] ?? null;
 
                 //check group info
-                if (array_key_exists('chat', $message)) {
-                    $chat = $message['chat'];
-                    $chatType = $chat['type'] ?? null;
+                if (in_array($chatType, ['group', 'supergroup', 'channel'])) {
+                    $name = $message['chat']['title'] ?? $message['chat']['username'] ?? "";
 
-                    if (in_array($chatType, ['group', 'supergroup', 'channel'])) {
-                        $chatId = $chat['id'];
-                        $name = $chat['title'] ?? $chat['username'] ?? "";
-
-                        TelegramGroup::firstOrCreate(
-                            ['telegram_id' => $chatId],
-                            [
-                                'name' => $name,
-                                'telegram_id' => $chatId
-                            ]
-                        );
-                    }
+                    TelegramGroup::firstOrCreate(
+                        ['telegram_id' => $chatId],
+                        [
+                            'name' => $name,
+                            'telegram_id' => $chatId
+                        ]
+                    );
                 }
 
                 $name = "";
@@ -64,7 +62,7 @@ class BotService extends BaseService
                 //new chat member
                 if (isset($message['new_chat_member'])) {
 
-                    if(!isset($message['new_chat_member']['status'])){
+                    if (!isset($message['new_chat_member']['status'])) {
                         return;
                     } else if ($message['new_chat_member']['status'] !== 'member') {
                         return;
@@ -77,9 +75,6 @@ class BotService extends BaseService
 
                     $name = trim("$firstName $lastName");
                     $name = $name ?: $username;
-
-
-                    $chatId = $message['chat']['id'];
 
                     $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
 
@@ -123,75 +118,112 @@ class BotService extends BaseService
                         $this->saveMessageAndScheduleDeletion($chatId, $response);
                     }
                 }
-                //start bot
-                if (isset($message['text']) && $message['text'] == '/start') {
 
-                    if (isset($message['from']['first_name'])) {
-                        $name .= $message['from']['first_name'] . " ";
-                    }
-                    if (isset($message['from']['last_name'])) {
-                        $name .= $message['from']['last_name'];
-                    }
-                    if ($name === '') {
-                        $name = $message['from']['username'];
-                    }
+                //check message
+                if (isset($message['text'])) {
 
-                    $chatId = $message['chat']['id'];
+                    //check status of user
+                    $user = User::where('telegram_id', $chatId)->first();
 
-                    User::firstOrCreate(
-                        ['telegram_id' => $chatId],
-                        [
-                            'status' => 'new_chat_member',
-                            'name' => $name,
-                            'telegram_id' => $chatId
-                        ]
-                    );
+                    if ($user && ($user->status !== 'start')) {
 
-                    $configIntro = ContentConfig::where(['kind' => ContentConfig::KIND_START, 'is_default' => true])->first();
+                        $status = $user->status;
 
-                    if ($configIntro) {
-                        $type = $configIntro->type;
-                        $media = $configIntro->media;
-                        $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
-                        $buttons = json_decode($configIntro->buttons, true);
+                        switch ($status) {
 
-                        $parameter = [
-                            "chat_id" => $chatId,
-                            "caption" => $content,
-                            "parse_mode" => "HTML"
-                        ];
+                            case "check_password":
 
-                        $buttons = json_encode($buttons);
+                                $password = $message['text'];
 
-                        if ($buttons) {
-                            $parameter['reply_markup'] = $buttons;
-                        }
+                                if (Password::where('password', $password)->exists()) {
+                                    $text = PhoneNumber::first()->phone_number;
+                                    $user->status = 'start';
+                                    $user->save();
+                                } else {
+                                    $text = "Mật khẩu không chính xác!";
+                                }
 
-                        if ($media) {
-                            $parameter[$type] = fopen($media, 'r');
-                        }
+                                Telegram::sendMessage([
+                                    'chat_id' => $chatId,
+                                    'text' => $text
+                                ]);
 
-                        switch ($type) {
-                            case 'text':
-                                $parameter['text'] = $content;
-                                $response = Telegram::sendMessage($parameter);
                                 break;
-                            case 'photo':
-                                $response = Telegram::sendPhoto($parameter);
-                                break;
-                            case 'video':
-                                $response = Telegram::sendVideo($parameter);
-                                break;
-                            default:
-                                logger('Type not found');
-                                $response = [];
-                                break;
-                        }
-                        if ($response !== []) {
-                            $this->saveMessageAndScheduleDeletion($chatId, $response);
                         }
                     } else {
-                        logger('Config not found');
+                        //start bot
+                        if ($message['text'] == '/start') {
+                            if (isset($message['from']['first_name'])) {
+                                $name .= $message['from']['first_name'] . " ";
+                            }
+                            if (isset($message['from']['last_name'])) {
+                                $name .= $message['from']['last_name'];
+                            }
+                            if ($name === '') {
+                                $name = $message['from']['username'];
+                            }
+
+                            $user = User::firstOrCreate(
+                                ['telegram_id' => $chatId],
+                                [
+                                    'status' => 'start',
+                                    'name' => $name,
+                                    'telegram_id' => $chatId
+                                ]
+                            );
+
+                            $configIntro = ContentConfig::where(['kind' => ContentConfig::KIND_START, 'is_default' => true])->first();
+
+                            if ($configIntro) {
+                                $type = $configIntro->type;
+                                $media = $configIntro->media;
+                                $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
+                                $buttons = json_decode($configIntro->buttons, true);
+
+                                $parameter = [
+                                    "chat_id" => $chatId,
+                                    "caption" => $content,
+                                    "parse_mode" => "HTML"
+                                ];
+
+                                $buttons = json_encode($buttons);
+
+                                if ($buttons) {
+                                    $parameter['reply_markup'] = $buttons;
+                                }
+
+                                if ($media) {
+                                    $parameter[$type] = fopen($media, 'r');
+                                }
+
+                                switch ($type) {
+                                    case 'text':
+                                        $parameter['text'] = $content;
+                                        $response = Telegram::sendMessage($parameter);
+                                        break;
+                                    case 'photo':
+                                        $response = Telegram::sendPhoto($parameter);
+                                        break;
+                                    case 'video':
+                                        $response = Telegram::sendVideo($parameter);
+                                        break;
+                                    default:
+                                        logger('Type not found');
+                                        $response = [];
+                                        break;
+                                }
+                                if ($response !== []) {
+                                    $this->saveMessageAndScheduleDeletion($chatId, $response);
+
+                                    if ($user->status !== 'start') {
+                                        $user->status = 'start';
+                                        $user->save();
+                                    }
+                                }
+                            } else {
+                                logger('Config not found');
+                            }
+                        }
                     }
                 }
             }
@@ -301,13 +333,21 @@ class BotService extends BaseService
             switch ($type) {
                 case 'text':
                     $parameter['text'] = $content;
-                    return Telegram::sendMessage($parameter);
+                    Telegram::sendMessage($parameter);
+                    break;
                 case 'photo':
-                    return Telegram::sendPhoto($parameter);
+                    Telegram::sendPhoto($parameter);
+                    break;
                 case 'video':
-                    return Telegram::sendVideo($parameter);
+                    Telegram::sendVideo($parameter);
+                    break;
                 default:
                     throw new AppServiceException('Type not found');
+            }
+
+            //update status user by callbackdata
+            if ($data === 'get_phone_number') {
+                User::where('telegram_id', $chatId)->update(['status' => 'check_password']);
             }
         }
     }
