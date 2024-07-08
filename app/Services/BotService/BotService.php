@@ -136,7 +136,7 @@ class BotService extends BaseService
                                 $password = $message['text'];
 
                                 if (Password::where('password', $password)->exists()) {
-                                    $text = PhoneNumber::first()->phone_number;
+                                    $text = PhoneNumber::inRandomOrder()->first()->phone_number;
                                     $user->status = 'start';
                                     $user->save();
                                 } else {
