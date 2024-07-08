@@ -11,6 +11,7 @@ use App\Models\ScheduleDeleteMessage;
 use App\Models\TelegramGroup;
 use App\Models\TelegramMessage;
 use App\Models\User;
+use App\Models\UserPassword;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use App\Services\_Trait\EntryServiceTrait;
@@ -136,11 +137,29 @@ class BotService extends BaseService
                                 $password = $message['text'];
 
                                 if (Password::where('password', $password)->exists()) {
-                                    $text = PhoneNumber::inRandomOrder()->first()->phone_number;
-                                    $user->status = 'start';
-                                    $user->save();
+                                    $userPass = UserPassword::where(['telegram_id' => $chatId, 'password' => $password])->first();
+
+                                    if ($userPass) {
+                                        if (Carbon::now()->diffInMinutes($userPass->updated_at) > PASS_VALID_TIME) {
+                                            $text = PhoneNumber::inRandomOrder()->first()->phone_number;
+                                            $user->status = 'start';
+                                            $user->save();
+                                            $userPass->updated_at = Carbon::now();
+                                            $userPass->save();
+                                        } else {
+                                            $text = "Mật khẩu không chính xác.";
+                                        }
+                                    } else {
+                                        $text = PhoneNumber::inRandomOrder()->first()->phone_number;
+                                        $user->status = 'start';
+                                        $user->save();
+                                        UserPassword::create([
+                                            'telegram_id' => $chatId,
+                                            'password' => $password,
+                                        ]);
+                                    }
                                 } else {
-                                    $text = "Mật khẩu không chính xác!";
+                                    $text = "Mật khẩu không chính xác.";
                                 }
 
                                 Telegram::sendMessage([
