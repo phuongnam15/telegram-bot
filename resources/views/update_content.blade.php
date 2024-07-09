@@ -209,6 +209,15 @@
                             <button type="button" class="btn btn-danger btn-sm remove-button">Xóa</button>
                         </div>
                     `);
+                } else if (type === 'inline_keyboard_phone_number') {
+                    $('#buttonsContainer').append(`
+                        <div class="button-group mb-2 flex">
+                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-control mb-1">
+                            <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-control mb-1">
+                            <input type="text" name="buttons[][callback_data]" value="get_phone_number" readOnly class="form-control mb-1">
+                            <button type="button" class="btn btn-danger btn-sm remove-button">Xóa</button>
+                        </div>
+                    `);
                 }
             }
 
