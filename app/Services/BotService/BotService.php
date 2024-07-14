@@ -19,6 +19,7 @@ use GuzzleHttp\Client;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 
 class BotService extends BaseService
@@ -123,124 +124,124 @@ class BotService extends BaseService
                 //check message
                 if (isset($message['text'])) {
 
-                    //check status of user
-                    $user = User::where('telegram_id', $chatId)->first();
+                    //start bot
+                    if ($message['text'] == '/start') {
+                        if (isset($message['from']['first_name'])) {
+                            $name .= $message['from']['first_name'] . " ";
+                        }
+                        if (isset($message['from']['last_name'])) {
+                            $name .= $message['from']['last_name'];
+                        }
+                        if ($name === '') {
+                            $name = $message['from']['username'];
+                        }
 
-                    if ($user && ($user->status !== 'start')) {
+                        $user = User::firstOrCreate(
+                            ['telegram_id' => $chatId],
+                            [
+                                'status' => 'start',
+                                'name' => $name,
+                                'telegram_id' => $chatId
+                            ]
+                        );
 
-                        $status = $user->status;
+                        $configIntro = ContentConfig::where(['kind' => ContentConfig::KIND_START, 'is_default' => true])->first();
 
-                        switch ($status) {
+                        if ($configIntro) {
+                            $type = $configIntro->type;
+                            $media = $configIntro->media;
+                            $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
+                            $buttons = json_decode($configIntro->buttons, true);
 
-                            case "check_password":
+                            $parameter = [
+                                "chat_id" => $chatId,
+                                "caption" => $content,
+                                "parse_mode" => "HTML"
+                            ];
 
-                                $password = $message['text'];
+                            $buttons = json_encode($buttons);
 
-                                if (Password::where('password', $password)->exists()) {
-                                    $userPass = UserPassword::where(['telegram_id' => $chatId, 'password' => $password])->first();
+                            if ($buttons) {
+                                $parameter['reply_markup'] = $buttons;
+                            }
 
-                                    if ($userPass) {
-                                        if (Carbon::now()->diffInMinutes($userPass->updated_at) > PASS_VALID_TIME) {
+                            if ($media) {
+                                $parameter[$type] = fopen($media, 'r');
+                            }
+
+                            switch ($type) {
+                                case 'text':
+                                    $parameter['text'] = $content;
+                                    $response = Telegram::sendMessage($parameter);
+                                    break;
+                                case 'photo':
+                                    $response = Telegram::sendPhoto($parameter);
+                                    break;
+                                case 'video':
+                                    $response = Telegram::sendVideo($parameter);
+                                    break;
+                                default:
+                                    logger('Type not found');
+                                    $response = [];
+                                    break;
+                            }
+                            if ($response !== []) {
+                                $this->saveMessageAndScheduleDeletion($chatId, $response);
+
+                                if ($user->status !== 'start') {
+                                    $user->status = 'start';
+                                    $user->save();
+                                }
+                            }
+                        } else {
+                            logger('Config not found');
+                        }
+                    } else {
+                        //check status of user
+                        $user = User::where('telegram_id', $chatId)->first();
+
+                        if ($user && ($user->status !== 'start')) {
+
+                            $status = $user->status;
+
+                            switch ($status) {
+
+                                case "check_password":
+
+                                    $password = $message['text'];
+
+                                    if (Password::where('password', $password)->exists()) {
+                                        $userPass = UserPassword::where(['telegram_id' => $chatId, 'password' => $password])->first();
+
+                                        if ($userPass) {
+                                            if (Carbon::now()->diffInMinutes($userPass->updated_at) > PASS_VALID_TIME) {
+                                                $text = PhoneNumber::inRandomOrder()->first()->phone_number;
+                                                $user->status = 'start';
+                                                $user->save();
+                                                $userPass->updated_at = Carbon::now();
+                                                $userPass->save();
+                                            } else {
+                                                $text = "Mật khẩu không chính xác.";
+                                            }
+                                        } else {
                                             $text = PhoneNumber::inRandomOrder()->first()->phone_number;
                                             $user->status = 'start';
                                             $user->save();
-                                            $userPass->updated_at = Carbon::now();
-                                            $userPass->save();
-                                        } else {
-                                            $text = "Mật khẩu không chính xác.";
+                                            UserPassword::create([
+                                                'telegram_id' => $chatId,
+                                                'password' => $password,
+                                            ]);
                                         }
                                     } else {
-                                        $text = PhoneNumber::inRandomOrder()->first()->phone_number;
-                                        $user->status = 'start';
-                                        $user->save();
-                                        UserPassword::create([
-                                            'telegram_id' => $chatId,
-                                            'password' => $password,
-                                        ]);
+                                        $text = "Mật khẩu không chính xác.";
                                     }
-                                } else {
-                                    $text = "Mật khẩu không chính xác.";
-                                }
 
-                                Telegram::sendMessage([
-                                    'chat_id' => $chatId,
-                                    'text' => $text
-                                ]);
+                                    Telegram::sendMessage([
+                                        'chat_id' => $chatId,
+                                        'text' => $text
+                                    ]);
 
-                                break;
-                        }
-                    } else {
-                        //start bot
-                        if ($message['text'] == '/start') {
-                            if (isset($message['from']['first_name'])) {
-                                $name .= $message['from']['first_name'] . " ";
-                            }
-                            if (isset($message['from']['last_name'])) {
-                                $name .= $message['from']['last_name'];
-                            }
-                            if ($name === '') {
-                                $name = $message['from']['username'];
-                            }
-
-                            $user = User::firstOrCreate(
-                                ['telegram_id' => $chatId],
-                                [
-                                    'status' => 'start',
-                                    'name' => $name,
-                                    'telegram_id' => $chatId
-                                ]
-                            );
-
-                            $configIntro = ContentConfig::where(['kind' => ContentConfig::KIND_START, 'is_default' => true])->first();
-
-                            if ($configIntro) {
-                                $type = $configIntro->type;
-                                $media = $configIntro->media;
-                                $content = preg_replace('/\s*<br>\s*/', "\n", $configIntro->content);
-                                $buttons = json_decode($configIntro->buttons, true);
-
-                                $parameter = [
-                                    "chat_id" => $chatId,
-                                    "caption" => $content,
-                                    "parse_mode" => "HTML"
-                                ];
-
-                                $buttons = json_encode($buttons);
-
-                                if ($buttons) {
-                                    $parameter['reply_markup'] = $buttons;
-                                }
-
-                                if ($media) {
-                                    $parameter[$type] = fopen($media, 'r');
-                                }
-
-                                switch ($type) {
-                                    case 'text':
-                                        $parameter['text'] = $content;
-                                        $response = Telegram::sendMessage($parameter);
-                                        break;
-                                    case 'photo':
-                                        $response = Telegram::sendPhoto($parameter);
-                                        break;
-                                    case 'video':
-                                        $response = Telegram::sendVideo($parameter);
-                                        break;
-                                    default:
-                                        logger('Type not found');
-                                        $response = [];
-                                        break;
-                                }
-                                if ($response !== []) {
-                                    $this->saveMessageAndScheduleDeletion($chatId, $response);
-
-                                    if ($user->status !== 'start') {
-                                        $user->status = 'start';
-                                        $user->save();
-                                    }
-                                }
-                            } else {
-                                logger('Config not found');
+                                    break;
                             }
                         }
                     }
@@ -323,52 +324,68 @@ class BotService extends BaseService
     }
     public function replyCallback($chatId, $data)
     {
-        //check callbackdata === config_name
-        $config = ContentConfig::where('name', $data)->first();
+        return DbTransactions()->addCallbackJson(function () use ($chatId, $data) {
 
-        if ($config) {
-            $type = $config->type;
-            $media = $config->media;
-            $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
-            $buttons = json_decode($config->buttons, true);
+            if($data === 'get_phone_number') {
 
-            $parameter = [
-                "chat_id" => $chatId,
-                "caption" => $content,
-                "parse_mode" => "HTML"
-            ];
+                $ids = ContentConfig::where('name', $data)->get()->pluck('id')->toArray();
 
-            $buttons = json_encode($buttons);
+                if(count($ids) === 0) {
+                    return 1;
+                }
 
-            if ($buttons) {
-                $parameter['reply_markup'] = $buttons;
-            }
-
-            if ($media) {
-                $parameter[$type] = fopen($media, 'r');
+                $config = ContentConfig::where('id', Arr::random($ids))->first();   
+            }else {
+                $config = ContentConfig::where('name', $data)->first();
             }
 
 
-            switch ($type) {
-                case 'text':
-                    $parameter['text'] = $content;
-                    Telegram::sendMessage($parameter);
-                    break;
-                case 'photo':
-                    Telegram::sendPhoto($parameter);
-                    break;
-                case 'video':
-                    Telegram::sendVideo($parameter);
-                    break;
-                default:
-                    throw new AppServiceException('Type not found');
+            if ($config) {
+                $type = $config->type;
+                $media = $config->media;
+                $content = preg_replace('/\s*<br>\s*/', "\n", $config->content);
+                $buttons = json_decode($config->buttons, true);
+
+                $parameter = [
+                    "chat_id" => $chatId,
+                    "caption" => $content,
+                    "parse_mode" => "HTML"
+                ];
+
+                $buttons = json_encode($buttons);
+
+                if ($buttons) {
+                    $parameter['reply_markup'] = $buttons;
+                }
+
+                if ($media) {
+                    $parameter[$type] = fopen($media, 'r');
+                }
+
+
+                switch ($type) {
+                    case 'text':
+                        $parameter['text'] = $content;
+                        Telegram::sendMessage($parameter);
+                        break;
+                    case 'photo':
+                        Telegram::sendPhoto($parameter);
+                        break;
+                    case 'video':
+                        Telegram::sendVideo($parameter);
+                        break;
+                    default:
+                        throw new AppServiceException('Type not found');
+                }
+
+                //update status user by callbackdata
+                if ($data === 'get_phone_number') {
+                    User::where('telegram_id', $chatId)->update(['status' => 'check_password']);
+                }
             }
 
-            //update status user by callbackdata
-            if ($data === 'get_phone_number') {
-                User::where('telegram_id', $chatId)->update(['status' => 'check_password']);
-            }
-        }
+            return 1;
+        });
     }
     public function saveBot($request)
     {
