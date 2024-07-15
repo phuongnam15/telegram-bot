@@ -20,14 +20,17 @@
             <h4>Tổng số phone: <span id="totalPhones">0</span></h4>
         </div>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#createPhoneModal">Thêm phone mới</button>
+        <button class="btn btn-danger mb-3" id="deleteSelected" disabled>Delete Selected</button>
 
         <!-- Phone Table -->
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
                         <th>ID</th>
                         <th>Phone Number</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="phoneTableBody">
@@ -82,8 +85,12 @@
                         data.data.data.forEach(function(phone) {
                             $('#phoneTableBody').append(`
                                 <tr>
+                                    <td><input type="checkbox" class="select-phone" data-id="${phone.id}"></td>
                                     <td>${phone.id}</td>
                                     <td>${phone.phone_number}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-phone" data-id="${phone.id}">Delete</button>
+                                    </td>
                                 </tr>
                             `);
                         });
@@ -186,6 +193,68 @@
                         alert('An error occurred: ' + xhr.responseText);
                     }
                 });
+            });
+
+            //delete phone
+            $(document).on('click', '.delete-phone', function() {
+                const phoneId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this phone?')) {
+                    $.ajax({
+                        url: `/api/admin/phone/${phoneId}`,
+                        method: 'DELETE',
+                        success: function(data) {
+                            alert(data.data.message);
+                            fetchTotalPhones();
+                        },
+                        error: function(xhr) {
+                            alert('An error occurred: ' + xhr.responseText);
+                        }
+                    });
+                }
+            });
+
+            //delete phones
+            $('#deleteSelected').on('click', function() {
+                const selectedPhones = [];
+                $('.select-phone:checked').each(function() {
+                    selectedPhones.push($(this).data('id'));
+                });
+
+                if (selectedPhones.length === 0) {
+                    alert('Please select at least one phone to delete.');
+                    return;
+                }
+
+                if (confirm('Are you sure you want to delete the selected phones?')) {
+                    $.ajax({
+                        url: '/api/admin/phone/batch',
+                        method: 'DELETE',
+                        data: {
+                            ids: selectedPhones
+                        },
+                        success: function(data) {
+                            alert(data.data.message);
+                            fetchTotalPhones();
+                            $('#deleteSelected').prop('disabled', true);
+                        },
+                        error: function(xhr) {
+                            alert('An error occurred: ' + xhr.responseText);
+                            $('#deleteSelected').prop('disabled', true);
+                        }
+                    });
+                }
+            });
+            // Handle select all functionality
+            $('#selectAll').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                $('.select-phone').prop('checked', isChecked);
+                $('#deleteSelected').prop('disabled', !isChecked);
+            });
+
+            // Enable/disable the delete button based on selected checkboxes
+            $(document).on('change', '.select-phone', function() {
+                const hasChecked = $('.select-phone:checked').length > 0;
+                $('#deleteSelected').prop('disabled', !hasChecked);
             });
         });
     </script>

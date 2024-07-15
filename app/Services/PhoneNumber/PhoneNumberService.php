@@ -45,10 +45,37 @@ class PhoneNumberService extends BaseService
     public function get()
     {
         return DbTransactions()->addCallBackJson(function () {
-            
-            $phoneNumbers = PhoneNumber::paginate(DEFAULT_PAGINATE);
+            $phoneNumbers = PhoneNumber::paginate(50);
 
             return $phoneNumbers;
+        });
+    }
+    public function delete($id)
+    {
+        return DbTransactions()->addCallBackJson(function () use ($id) {
+
+            $phoneNumber = PhoneNumber::find($id);
+
+            if (!$phoneNumber) {
+                throw new AppServiceException('Phone number not found');
+            }
+
+            $phoneNumber->delete();
+
+            return ['message' => 'Success'];
+        });
+    }
+    public function deleteSelected()
+    {
+        return DbTransactions()->addCallBackJson(function () {
+
+            $phoneNumbers = PhoneNumber::whereIn('id', request()->ids)->get();
+
+            foreach ($phoneNumbers as $phoneNumber) {
+                $phoneNumber->delete();
+            }
+
+            return ['message' => 'Success'];
         });
     }
 }

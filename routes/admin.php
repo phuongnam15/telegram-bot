@@ -61,6 +61,8 @@ Route::prefix('bot')->group(function () {
 Route::prefix('phone')->group(function () {
     Route::post('/', [PhoneNumberController::class, 'save']);
     Route::get('/', [PhoneNumberController::class, 'get']);
+    Route::delete('/batch', [PhoneNumberController::class, 'deleteSelected']);
+    Route::delete('/{id}', [PhoneNumberController::class, 'delete']);
 });
 
 Route::prefix('password')->group(function () {

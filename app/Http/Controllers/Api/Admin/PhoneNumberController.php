@@ -23,4 +23,12 @@ class PhoneNumberController extends Controller
     {
         return $this->service->get();
     }
+    public function delete($id)
+    {
+        return $this->service->delete($id);
+    }
+    public function deleteSelected()
+    {
+        return $this->service->deleteSelected();
+    }
 }
