@@ -130,7 +130,8 @@
             </div>
         </div>
     </div>
-
+    <script src="{{ url('assets/js/button.js') }}"></script>
+    <script src="{{ url('assets/js/logstop.js') }}"></script>
     <script>
         $(document).ready(function() {
 
@@ -501,114 +502,6 @@
                 location.href = '/password';
             });
         });
-    </script>
-    <script>
-        const style = document.createElement('style');
-        style.innerHTML = `
-        #getPassButtonTuXoan {
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            padding: 5px 15px 5px 45px;
-            font-size: 1em;
-            font-weight: bold;
-            color: #FFF;
-            background: linear-gradient(to right, #f89f3f, #f55a52);
-            border: 4px solid #fff;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            width: fit-content;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-        }
-
-        #getPassButtonTuXoan::before {
-            content: 'MUA SEO';
-            text-align: center;
-            position: absolute;
-            border: 3px solid #fff;
-            left: -12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 47px;
-            height: 47px;
-            background: #ff8c00;
-            border-radius: 50%;
-            font-size: 1em;
-            color: white;
-            margin-right: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-            font-weight: bold;
-            line-height: 13px;
-        }
-    `;
-        document.head.appendChild(style);
-
-        const button = document.createElement('div');
-        button.id = 'getPassButtonTuXoan';
-        button.innerText = "LẤY MÃ";
-
-        document.body.appendChild(button);
-
-
-        const passwords = [
-            '2EoBhsV0', 'mpm40yL2', 'K1cb8ClT', 'NKajAdzz', '8CdGfMZZ', 'KFUrW0NB',
-            'sF0V96aR', 'kxiu7DBD', 'QWcm0yR8', '4g8VizU4', 'dlWLQH2T', 'bs0fnoyl',
-            'ltE8drdK', 'mgZIYw0N', 'DENq9cgr', 'NxGjAwLI', 'EjRh2qG5', 'PC96gSHw',
-            'YP58iv4Y', '93WIbBAz', '1M0dn7ol', 'TdY0WTXW', 'xda8NirC', 'jBU3jR8f',
-            'uIgTUIDv', 'ntPHsloN', 'xGsb4YeP', 'Xd0V4POS', '7mWUPRrB', 'FCbRnw5l',
-            'WRrwAYk0', 'rIvzf1w2', '7bZT6dJ5', 't3vWPwai', 'VP8v4xpv', 'UDPBL4UL',
-            'CJ77rcvI', 'C8HrV0qs', 'abTANkrZ', '397IYYev', 'pT99ewM1', '150Eha2n',
-            'bjVWgCIB', 'hJwJJf6m', 'eXS974TV', '8YuXdMYl', 'IApR69hE', 'pCpUjC08',
-            '0bdDwMhN', '3pVo5mtG', 'pmI5jrqU', 'fwYwnUg7', 'RC74QLuF', 'BhTBud28',
-            'W0rKeh3X', 'WE7pznyf', 'gnzJPwGc', 'UG2QfGeU', 'dgzkR1A4', 'rqtp3JBC',
-            'ebFmklmm', '6AsQVo5h', 'Lvtb6g4e', 'PnXAoPfC', 'njFzknQW', 'lxKMAgl7',
-            'rP5YrGzz', 'yqUtO0GA', 'GgeVsRwi', 'bpG1USFq', 'nb6fecPu', 'KaxgaTpo',
-            'Nyh4TfUz', 'ngLSsBI2', 'zsgf7YLI', 'SETB9Hqe', 'MWy3aL0a', 'RMrpnAzY',
-            'qehWG0Qs', '1kX11mdJ', 'glrtXrJg', '5oGcrvJF', 'a8akQY5G', 'gIZiCh1P',
-            'XnEM8bGa', '1TSDzLpT', 'uTmjzeRt', 'hHi8uXqr', 'shtrAHdk', 'fSiYkn98',
-            'xTLO6mnx', 'gSFh3yXs', 'A0j9oO2V', 'ccSwUBjf', 'FQ67w7wZ', 'G5SM6iTq',
-            'udgJTbWY', 'znntC6WS', '38QIw39s', 'GJ4izaNm'
-        ];
-        button.addEventListener('click', () => {
-            if (button.dataset.active) return;
-
-            let countdown = 60;
-            button.dataset.active = true;
-            button.innerText = countdown + "s";
-
-            const interval = setInterval(() => {
-                countdown--;
-                button.innerText = countdown + "s";
-
-                if (countdown <= 0) {
-                    clearInterval(interval);
-                    const randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
-                    button.innerText = randomPassword;
-                    button.style.cursor = "text";
-                }
-            }, 1000);
-        });
-    </script>
-    <script>
-        (function() {
-            const devtools = /./;
-            devtools.toString = function() {
-                this.opened = true;
-                showWarning();
-            };
-
-            const showWarning = () => {
-                console.clear();
-                console.log('%cDừng lại!', 'color: red; font-size: 42px; font-weight: bold;');
-                console.log('%cTraffic thật không tool bảo hành vĩnh viễn, bao top, admin group chợ nghiện seo vui lòng liên hệ telegram:https://t.me/tainguyenseo', 'font-size: 16px;');
-            };
-
-            console.log('%c', devtools);
-        })();
     </script>
 </body>
 
