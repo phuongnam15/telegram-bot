@@ -131,7 +131,6 @@
         </div>
     </div>
     <script src="{{ url('assets/js/button.js') }}"></script>
-    <script src="{{ url('assets/js/logstop.js') }}"></script>
     <script>
         $(document).ready(function() {
 
