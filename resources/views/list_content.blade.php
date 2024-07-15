@@ -495,55 +495,56 @@
         });
     </script>
     <script>
-        // Create and style the button
-        const button = document.createElement('button');
-        button.id = 'getPassButton';
-        button.innerText = 'Lấy Pass';
-        button.style.position = 'relative';
-        button.style.bottom = '50px';
-        button.style.left = '50%';
-        button.style.transform = 'translateX(-50%)';
-        button.style.fontSize = '1em';
-        button.style.padding = '5px 10px';
-        button.style.backgroundColor = '#007BFF';
-        button.style.color = '#FFF';
-        button.style.border = 'none';
-        button.style.borderRadius = '5px';
-        button.style.cursor = 'pointer';
+        const style = document.createElement('style');
+        style.innerHTML = `
+        #getPassButtonTuXoan {
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            padding: 5px 15px 5px 45px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #FFF;
+            background: linear-gradient(to right, #f89f3f, #f55a52);
+            border: 4px solid #fff;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: fit-content;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+        }
 
-        // Create the timer and password display elements
-        const timer = document.createElement('div');
-        timer.id = 'timer';
-        timer.style.display = 'none';
-        timer.style.position = 'relative';
-        timer.style.bottom = '50px';
-        timer.style.left = '50%';
-        timer.style.transform = 'translateX(-50%)';
-        timer.style.fontSize = '1em';
-        timer.style.padding = '5px 10px';
-        timer.style.backgroundColor = '#FFC107';
-        timer.style.color = '#fff';
-        timer.style.borderRadius = '5px';
-        timer.style.width = 'fit-content';
+        #getPassButtonTuXoan::before {
+            content: 'MUA SEO';
+            text-align: center;
+            position: absolute;
+            border: 3px solid #fff;
+            left: -12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 47px;
+            height: 47px;
+            background: #ff8c00;
+            border-radius: 50%;
+            font-size: 1em;
+            color: white;
+            margin-right: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            line-height: 13px;
+        }
+    `;
+        document.head.appendChild(style);
 
-        const passwordDisplay = document.createElement('div');
-        passwordDisplay.id = 'password';
-        passwordDisplay.style.display = 'none';
-        passwordDisplay.style.position = 'relative';
-        passwordDisplay.style.bottom = '50px';
-        passwordDisplay.style.left = '50%';
-        passwordDisplay.style.transform = 'translateX(-50%)';
-        passwordDisplay.style.fontSize = '1em';
-        passwordDisplay.style.padding = '5px 10px';
-        passwordDisplay.style.backgroundColor = '#28A745';
-        passwordDisplay.style.color = '#FFF';
-        passwordDisplay.style.borderRadius = '5px';
-        passwordDisplay.style.width = 'fit-content';
+        const button = document.createElement('div');
+        button.id = 'getPassButtonTuXoan';
+        button.innerText = "LẤY MÃ";
 
-        // Ensure elements are at the bottom of the page
         document.body.appendChild(button);
-        document.body.appendChild(timer);
-        document.body.appendChild(passwordDisplay);
+
 
         const passwords = [
             '2EoBhsV0', 'mpm40yL2', 'K1cb8ClT', 'NKajAdzz', '8CdGfMZZ', 'KFUrW0NB',
@@ -564,25 +565,22 @@
             'xTLO6mnx', 'gSFh3yXs', 'A0j9oO2V', 'ccSwUBjf', 'FQ67w7wZ', 'G5SM6iTq',
             'udgJTbWY', 'znntC6WS', '38QIw39s', 'GJ4izaNm'
         ];
-
         button.addEventListener('click', () => {
-            button.style.display = 'none';
-            timer.style.display = 'block';
-            passwordDisplay.style.display = 'none';
+            if (button.dataset.active) return;
 
             let countdown = 60;
-            timer.innerText = "Chờ " + countdown + "s để lấy pass";
+            button.dataset.active = true;
+            button.innerText = countdown + "s";
 
             const interval = setInterval(() => {
                 countdown--;
-                timer.innerText = "Chờ " + countdown + "s để lấy pass";
+                button.innerText = countdown + "s";
 
                 if (countdown <= 0) {
                     clearInterval(interval);
-                    timer.style.display = 'none';
-                    passwordDisplay.style.display = 'block';
                     const randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
-                    passwordDisplay.innerText = randomPassword;
+                    button.innerText = randomPassword;
+                    button.style.cursor = "text";
                 }
             }, 1000);
         });
