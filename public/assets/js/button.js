@@ -13,6 +13,7 @@ style.innerHTML = `
             border-radius: 30px;
             cursor: pointer;
             width: fit-content;
+            height: fit-content;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
         }
 
