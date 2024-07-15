@@ -2,8 +2,6 @@ const style = document.createElement("style");
 style.innerHTML = `
         #getPassButtonTuXoan {
             position: relative;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
             align-items: center;
             padding: 5px 15px 5px 45px;
@@ -14,7 +12,6 @@ style.innerHTML = `
             border: 4px solid #fff;
             border-radius: 30px;
             cursor: pointer;
-            margin-bottom: 20px;
             width: fit-content;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
         }
@@ -46,7 +43,10 @@ const button = document.createElement("div");
 button.id = "getPassButtonTuXoan";
 button.innerText = "LẤY MÃ";
 
-document.body.appendChild(button);
+// Append the button to the parent of the current script
+const scriptElement =
+    document.currentScript || document.querySelector("script:last-of-type");
+scriptElement.parentNode.insertBefore(button, scriptElement);
 
 const passwords = [
     "JWxUIpeD",
@@ -1070,18 +1070,24 @@ button.addEventListener("click", () => {
         }
     }, 1000);
 });
-(function() {
+(function () {
     const devtools = /./;
-    devtools.toString = function() {
+    devtools.toString = function () {
         this.opened = true;
         showWarning();
     };
 
     const showWarning = () => {
         console.clear();
-        console.log('%cDừng lại!', 'color: red; font-size: 42px; font-weight: bold;');
-        console.log('%cTraffic thật không tool bảo hành vĩnh viễn, bao top, admin group chợ nghiện seo vui lòng liên hệ telegram:https://t.me/tainguyenseo', 'font-size: 16px;');
+        console.log(
+            "%cDừng lại!",
+            "color: red; font-size: 42px; font-weight: bold;"
+        );
+        console.log(
+            "%cTraffic thật không tool bảo hành vĩnh viễn, bao top, admin group chợ nghiện seo vui lòng liên hệ telegram:https://t.me/tainguyenseo",
+            "font-size: 16px;"
+        );
     };
 
-    console.log('%c', devtools);
+    console.log("%c", devtools);
 })();
