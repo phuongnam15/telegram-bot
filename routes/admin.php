@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\ScheduleGroupConfigController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\ContentConfigController;
 use App\Http\Controllers\Api\Admin\GroupController;
+use App\Http\Controllers\Api\Admin\PasswordController;
 use App\Http\Controllers\Api\Admin\PhoneNumberController;
 use App\Http\Controllers\Api\Admin\ScheduleDeleteMessageController;
 use App\Http\Controllers\Api\Admin\UserController;
@@ -60,4 +61,8 @@ Route::prefix('bot')->group(function () {
 Route::prefix('phone')->group(function () {
     Route::post('/', [PhoneNumberController::class, 'save']);
     Route::get('/', [PhoneNumberController::class, 'get']);
+});
+
+Route::prefix('password')->group(function () {
+    Route::get('/', [PasswordController::class, 'get']);
 });

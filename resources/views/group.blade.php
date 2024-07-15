@@ -11,6 +11,9 @@
 
 <body>
     <div class="container mt-5">
+        <button class="btn btn-info mb-3" onclick="window.location.href='/'">
+            &laquo Home
+        </button>
         <h2 class="mb-4">Group Management</h2>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#groupModal">Add Group</button>
         <table class="table table-bordered" id="groupTable">

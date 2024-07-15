@@ -31,3 +31,6 @@ Route::get('/bot', function () {
 Route::get('/phone', function () {
     return view('phone');
 });
+Route::get('/password', function () {
+    return view('password');
+});

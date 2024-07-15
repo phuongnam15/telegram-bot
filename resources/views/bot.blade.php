@@ -10,6 +10,9 @@
 </head>
 <body>
     <div class="container mt-5">
+        <button class="btn btn-info mb-3" onclick="window.location.href='/'">
+            &laquo Home
+        </button>
         <h2>Bot Management</h2>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#createBotModal">Tạo bot mới</button>
         <table class="table table-bordered">
@@ -69,7 +72,7 @@
                         data.data.forEach(function(bot) {
                             activeButton = bot.status === "1" ? '' : `<button class="btn btn-info activate-btn" data-id="${bot.id}">Active</button>`;
                             status = bot.status === "1" ? '<span class="badge badge-success">Bật</span>' : '<span class="badge badge-secondary">Tắt</span>';
-                            
+
                             $('#botTableBody').append(`
                                 <tr>
                                     <td>${bot.id}</td>
@@ -94,7 +97,9 @@
                 $.ajax({
                     url: '/api/admin/bot',
                     method: 'POST',
-                    data: { token: token },
+                    data: {
+                        token: token
+                    },
                     success: function() {
                         $('#createBotModal').modal('hide');
                         fetchBots();

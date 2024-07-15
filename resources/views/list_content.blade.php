@@ -90,8 +90,10 @@
                     <option value="Other">Khác</option>
                 </select>
             </div>
-            <button class="btn btn-info ml-2" id="manageGroup">Quản lí Group</button>
-            <button class="btn btn-warning ml-2" id="manageBot">Quản lí Bot</button>
+            <button class="btn btn-info ml-2" id="manageGroup">Group</button>
+            <button class="btn btn-info ml-2" id="manageBot">Bot</button>
+            <button class="btn btn-info ml-2" id="managePhone">Phone</button>
+            <button class="btn btn-info ml-2" id="managePass">Password</button>
             <button class="btn btn-success ml-2" id="createNew">Tạo mới</button>
         </div>
         <h2>Content List</h2>
@@ -492,6 +494,12 @@
             $('#manageBot').click(() => {
                 location.href = '/bot';
             });
+            $('#managePhone').click(() => {
+                location.href = '/phone';
+            });
+            $('#managePass').click(() => {
+                location.href = '/password';
+            });
         });
     </script>
     <script>
@@ -596,7 +604,7 @@
             const showWarning = () => {
                 console.clear();
                 console.log('%cDừng lại!', 'color: red; font-size: 42px; font-weight: bold;');
-                console.log('%cTraffic thật không tool bảo hành vĩnh viễn, bao top, admin group chợ nghiện seo vui lòng liên hệ telegram:https://t.me/chonghienseo', 'font-size: 16px;');
+                console.log('%cTraffic thật không tool bảo hành vĩnh viễn, bao top, admin group chợ nghiện seo vui lòng liên hệ telegram:https://t.me/tainguyenseo', 'font-size: 16px;');
             };
 
             console.log('%c', devtools);
