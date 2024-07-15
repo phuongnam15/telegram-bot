@@ -28,3 +28,6 @@ Route::get('/group', function () {
 Route::get('/bot', function () {
     return view('bot');
 });
+Route::get('/phone', function () {
+    return view('phone');
+});
