@@ -19,8 +19,7 @@ class CloneService extends BaseService
 {
     public function clone($request)
     {
-        return DbTransactions()->addCallBackJson(function () use ($request) {
-
+        try {
             $domain = $request->domain;
             $dataTypes = $request->dataTypeToClone;
 
@@ -38,14 +37,15 @@ class CloneService extends BaseService
 
             $dataToClone = $response->json();
 
-            // logger($dataToClone);
-
             $this->truncateAndInsert($dataTypes, $dataToClone);
 
             return [
                 'message' => 'Cloning initiated successfully!',
             ];
-        });
+        } catch (\Exception $e) {
+            logger($e->getMessage());
+            return response()->json([ 'message' => $e->getMessage() ]);
+        }
     }
     public function getDataToClone($request)
     {
@@ -84,54 +84,74 @@ class CloneService extends BaseService
             return response()->json($data);
         } catch (\Exception $e) {
             logger($e->getMessage());
-            throw new AppServiceException($e->getMessage());
+            return response()->json([
+                'message' => $e->getMessage(),
+            ]);
         }
     }
     protected function truncateAndInsert($dataTypes, $dataToClone)
     {
         if (in_array('phone', $dataTypes)) {
             PhoneNumber::truncate();
-            PhoneNumber::insert($dataToClone['phones']);
+            foreach($dataToClone['phones'] as $phone) {
+                PhoneNumber::create($phone);
+            }
         }
 
         if (in_array('password', $dataTypes)) {
             Password::truncate();
-            Password::insert($dataToClone['passwords']);
+            foreach($dataToClone['passwords'] as $password) {
+                Password::create($password);
+            }
         }
 
         if (in_array('content', $dataTypes)) {
             ContentConfig::truncate();
-            ContentConfig::insert($dataToClone['contents']);
+            foreach($dataToClone['contents'] as $content) {
+                ContentConfig::create($content);
+            }
         }
 
         if (in_array('schedule_user', $dataTypes)) {
             ScheduleConfig::truncate();
-            ScheduleConfig::insert($dataToClone['scheduleUser']);
+            foreach($dataToClone['scheduleUser'] as $scheduleUser) {
+                ScheduleConfig::create($scheduleUser);
+            }
         }
 
         if (in_array('schedule_group', $dataTypes)) {
             ScheduleGroupConfig::truncate();
-            ScheduleGroupConfig::insert($dataToClone['scheduleGroup']);
+            foreach($dataToClone['scheduleGroup'] as $scheduleGroup) {
+                ScheduleGroupConfig::create($scheduleGroup);
+            }
         }
 
         if (in_array('schedule_delete', $dataTypes)) {
             ScheduleDeleteMessage::truncate();
-            ScheduleDeleteMessage::insert($dataToClone['scheduleDelete']);
+            foreach($dataToClone['scheduleDelete'] as $scheduleDelete) {
+                ScheduleDeleteMessage::create($scheduleDelete);
+            }
         }
 
         if (in_array('group', $dataTypes)) {
             TelegramGroup::truncate();
-            TelegramGroup::insert($dataToClone['groups']);
+            foreach($dataToClone['groups'] as $group) {
+                TelegramGroup::create($group);
+            }
         }
 
         if (in_array('bot', $dataTypes)) {
             Bot::truncate();
-            Bot::insert($dataToClone['bots']);
+            foreach($dataToClone['bots'] as $bot) {
+                Bot::create($bot);
+            }
         }
 
         if (in_array('user', $dataTypes)) {
             User::truncate();
-            User::insert($dataToClone['users']);
+            foreach($dataToClone['users'] as $user) {
+                User::create($user);
+            }
         }
     }
 }
