@@ -38,10 +38,9 @@ class CloneService extends BaseService
 
             $dataToClone = $response->json();
 
-            logger($dataToClone);
+            // logger($dataToClone);
 
-            // Truncate các bảng và insert dữ liệu
-            // $this->truncateAndInsert($dataTypes, $dataToClone);
+            $this->truncateAndInsert($dataTypes, $dataToClone);
 
             return [
                 'message' => 'Cloning initiated successfully!',
@@ -55,31 +54,31 @@ class CloneService extends BaseService
             $data = [];
 
             if (in_array('phone', $dataTypes)) {
-                $data['phones'] = PhoneNumber::all();
+                $data['phones'] = PhoneNumber::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('password', $dataTypes)) {
-                $data['passwords'] = Password::all();
+                $data['passwords'] = Password::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('content', $dataTypes)) {
-                $data['contents'] = ContentConfig::all();
+                $data['contents'] = ContentConfig::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('schedule_user', $dataTypes)) {
-                $data['scheduleUser'] = ScheduleConfig::all();
+                $data['scheduleUser'] = ScheduleConfig::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('schedule_group', $dataTypes)) {
-                $data['scheduleGroup'] = ScheduleGroupConfig::all();
+                $data['scheduleGroup'] = ScheduleGroupConfig::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('schedule_delete', $dataTypes)) {
-                $data['scheduleDelete'] = ScheduleDeleteMessage::all();
+                $data['scheduleDelete'] = ScheduleDeleteMessage::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('group', $dataTypes)) {
-                $data['groups'] = TelegramGroup::all();
+                $data['groups'] = TelegramGroup::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('bot', $dataTypes)) {
-                $data['bots'] = Bot::all();
+                $data['bots'] = Bot::all()->makeHidden(['created_at', 'updated_at']);
             }
             if (in_array('user', $dataTypes)) {
-                $data['users'] = User::all();
+                $data['users'] = User::all()->makeHidden(['created_at', 'updated_at']);
             }
 
             return response()->json($data);
@@ -90,54 +89,49 @@ class CloneService extends BaseService
     }
     protected function truncateAndInsert($dataTypes, $dataToClone)
     {
-        return DbTransactions()->addCallBackJson(function () use ($dataTypes, $dataToClone) {
-            // Xóa dữ liệu cũ và thêm dữ liệu mới cho từng loại dữ liệu
-            if (in_array('phone', $dataTypes)) {
-                PhoneNumber::truncate();
-                PhoneNumber::insert($dataToClone['phones']);
-            }
+        if (in_array('phone', $dataTypes)) {
+            PhoneNumber::truncate();
+            PhoneNumber::insert($dataToClone['phones']);
+        }
 
-            if (in_array('password', $dataTypes)) {
-                Password::truncate();
-                Password::insert($dataToClone['passwords']);
-            }
+        if (in_array('password', $dataTypes)) {
+            Password::truncate();
+            Password::insert($dataToClone['passwords']);
+        }
 
-            if (in_array('content', $dataTypes)) {
-                ContentConfig::truncate();
-                ContentConfig::insert($dataToClone['contents']);
-            }
+        if (in_array('content', $dataTypes)) {
+            ContentConfig::truncate();
+            ContentConfig::insert($dataToClone['contents']);
+        }
 
-            if (in_array('schedule_user', $dataTypes)) {
-                ScheduleConfig::truncate();
-                ScheduleConfig::insert($dataToClone['scheduleUser']);
-            }
+        if (in_array('schedule_user', $dataTypes)) {
+            ScheduleConfig::truncate();
+            ScheduleConfig::insert($dataToClone['scheduleUser']);
+        }
 
-            if (in_array('schedule_group', $dataTypes)) {
-                ScheduleGroupConfig::truncate();
-                ScheduleGroupConfig::insert($dataToClone['scheduleGroup']);
-            }
+        if (in_array('schedule_group', $dataTypes)) {
+            ScheduleGroupConfig::truncate();
+            ScheduleGroupConfig::insert($dataToClone['scheduleGroup']);
+        }
 
-            if (in_array('schedule_delete', $dataTypes)) {
-                ScheduleDeleteMessage::truncate();
-                ScheduleDeleteMessage::insert($dataToClone['scheduleDelete']);
-            }
+        if (in_array('schedule_delete', $dataTypes)) {
+            ScheduleDeleteMessage::truncate();
+            ScheduleDeleteMessage::insert($dataToClone['scheduleDelete']);
+        }
 
-            if (in_array('group', $dataTypes)) {
-                TelegramGroup::truncate();
-                TelegramGroup::insert($dataToClone['groups']);
-            }
+        if (in_array('group', $dataTypes)) {
+            TelegramGroup::truncate();
+            TelegramGroup::insert($dataToClone['groups']);
+        }
 
-            if (in_array('bot', $dataTypes)) {
-                Bot::truncate();
-                Bot::insert($dataToClone['bots']);
-            }
+        if (in_array('bot', $dataTypes)) {
+            Bot::truncate();
+            Bot::insert($dataToClone['bots']);
+        }
 
-            if (in_array('user', $dataTypes)) {
-                User::truncate();
-                User::insert($dataToClone['users']);
-            }
-
-            return [];
-        });
+        if (in_array('user', $dataTypes)) {
+            User::truncate();
+            User::insert($dataToClone['users']);
+        }
     }
 }
