@@ -14,6 +14,9 @@
 
 <body>
     <div class="mt-5 mx-5" style="position: relative;">
+        <!-- Clone Data -->
+        <button class="btn btn-danger" id="cloneData" style="position: absolute; right: 0px;">Clone Data</button>
+
         <!-- schedule delete message -->
         <div class="mb-3">
             <!-- <h5>Độ trễ xoá tin nhắn</h5> -->
@@ -130,10 +133,107 @@
             </div>
         </div>
     </div>
-    <script src="{{ url('assets/js/button.js') }}"></script>
+    <!-- Clone Modal -->
+    <div class="modal fade" id="cloneModal" tabindex="-1" role="dialog" aria-labelledby="cloneModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cloneModalLabel">Clone Data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="cloneForm">
+                        <div class="form-group">
+                            <label for="domain">Domain</label>
+                            <input type="text" class="form-control" id="domain" name="domain" required placeholder="ex: https://telegram.daominhtu.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn loại dữ liệu để clone:</label>
+                            <div>
+                                <input type="checkbox" id="user" name="dataTypeToClone[]" value="user">
+                                <label for="user">User</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="password" name="dataTypeToClone[]" value="password">
+                                <label for="password">Password</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="phone" name="dataTypeToClone[]" value="phone">
+                                <label for="phone">Phone</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="content" name="dataTypeToClone[]" value="content">
+                                <label for="content">Content</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="schedule_user" name="dataTypeToClone[]" value="schedule_user">
+                                <label for="schedule_user">Schedule User</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="schedule_group" name="dataTypeToClone[]" value="schedule_group">
+                                <label for="schedule_group">Schedule Group</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="schedule_delete" name="dataTypeToClone[]" value="schedule_delete">
+                                <label for="schedule_delete">Schedule Delete</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="bot" name="dataTypeToClone[]" value="bot">
+                                <label for="bot">Bot</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="group" name="dataTypeToClone[]" value="group">
+                                <label for="group">Group</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="cloneButton">Clone</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{url('assets/js/button.js')}}"></script>
     <script>
         $(document).ready(function() {
+            //CLONE DATA
+            // Show Clone Modal on button click
+            $('#cloneData').click(function() {
+                $('#cloneModal').modal('show');
+            });
 
+            // Clone button functionality
+            $('#cloneButton').click(function() {
+                const domain = $('#domain').val();
+
+                const formData = new FormData();
+                formData.append('domain', domain);
+
+                // Get all checked checkboxes
+                $('input[name="dataTypeToClone[]"]:checked').each(function() {
+                    formData.append('dataTypeToClone[]', this.value);
+                });
+
+                fetch('/api/admin/clone', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message || 'Cloning initiated successfully!');
+                        $('#cloneModal').modal('hide'); // Hide modal after cloning
+                    })
+                    .catch(error => {
+                        console.error('Error cloning data:', error);
+                    });
+            });
             //GET SCHEDULE CONFIG
             fetch('/api/admin/schedule')
                 .then(response => response.json())

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BotController;
+use App\Http\Controllers\Api\Admin\CloneDataController;
 use App\Http\Controllers\Api\Admin\ScheduleConfigController;
 use App\Http\Controllers\Api\Admin\ScheduleGroupConfigController;
 use Illuminate\Support\Facades\Route;
@@ -67,4 +68,8 @@ Route::prefix('phone')->group(function () {
 
 Route::prefix('password')->group(function () {
     Route::get('/', [PasswordController::class, 'get']);
+});
+Route::prefix('clone')->group(function () {
+    Route::post('/', [CloneDataController::class, 'clone']);
+    Route::get('/', [CloneDataController::class, 'getData']);   
 });

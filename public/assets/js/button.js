@@ -15,6 +15,9 @@ style.innerHTML = `
             width: fit-content;
             height: fit-content;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 10px 0px;
         }
 
         #getPassButtonTuXoan::before {
@@ -36,6 +39,16 @@ style.innerHTML = `
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
             font-weight: bold;
             line-height: 13px;
+        }
+        .copiedTuXoan {
+            background-color: #28a745;
+            border-radius: 10px;
+            display: block;
+            color: #fff;
+            position: absolute;
+            right: -50%;
+            font-size: 11px;
+            padding: 2px 7px;
         }
     `;
 document.head.appendChild(style);
@@ -1052,7 +1065,31 @@ const passwords = [
     "fp59wzex",
 ];
 button.addEventListener("click", () => {
-    if (button.dataset.active) return;
+    if (button.dataset.active) {
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = button.innerText;
+        document.body.appendChild(tempTextarea);
+
+        // Select and copy the text
+        tempTextarea.select();
+        document.execCommand("copy");
+
+        // Clean up
+        document.body.removeChild(tempTextarea);
+
+        // Show "Copied" message
+        const copiedMessage = document.createElement("span");
+        button.appendChild(copiedMessage);
+        copiedMessage.textContent = "Đã sao chép";
+        copiedMessage.classList.add("copiedTuXoan");
+
+        // Remove the "Copied" message after 1.5 seconds
+        setTimeout(() => {
+            copiedMessage.remove();
+        }, 1500);
+
+        return;
+    }
 
     let countdown = 60;
     button.dataset.active = true;
