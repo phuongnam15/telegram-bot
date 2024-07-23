@@ -34,3 +34,9 @@ Route::get('/phone', function () {
 Route::get('/password', function () {
     return view('password');
 });
+Route::get('/login', function () {
+    return view('login');
+});
+Route::get('/register', function () {
+    return view('register');
+});

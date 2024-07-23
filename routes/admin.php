@@ -1,6 +1,5 @@
 <?php
-
-use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\Customer\AuthController;
 use App\Http\Controllers\Api\Admin\BotController;
 use App\Http\Controllers\Api\Admin\CloneDataController;
 use App\Http\Controllers\Api\Admin\ScheduleConfigController;
