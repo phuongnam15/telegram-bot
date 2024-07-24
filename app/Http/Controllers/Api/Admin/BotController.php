@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\Base\BaseAuth;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendBotMessage;
 use App\Services\BotService\BotService;
@@ -10,7 +9,6 @@ use Illuminate\Http\Request;
 
 class BotController extends Controller
 {
-  use BaseAuth;
   protected $botService;
 
   public function __construct(BotService $botService)

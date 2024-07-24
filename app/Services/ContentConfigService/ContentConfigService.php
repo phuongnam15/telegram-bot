@@ -32,12 +32,14 @@ class ContentConfigService extends BaseService
                 $input['content'] = sanitizeHtml(html_entity_decode($input['content'], ENT_QUOTES, 'UTF-8'));
             }
 
+            $input['admin_id'] = auth()->user()->id;
+
             return ContentConfig::create($input);
         });
     }
     public function list($request)
     {
-        $contents = ContentConfig::paginate(DEFAULT_PAGINATE);
+        $contents = ContentConfig::where('admin_id', auth()->user()->id)->paginate(DEFAULT_PAGINATE);
 
         return response()->json($contents);
     }

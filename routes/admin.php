@@ -22,53 +22,52 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:admin')->group(function () {
-});
+    Route::post('/schedule', [ScheduleConfigController::class, 'configShedule']);
+    Route::get('/schedule', [ScheduleConfigController::class, 'getSchedule']);
 
-Route::post('/schedule', [ScheduleConfigController::class, 'configShedule']);
-Route::get('/schedule', [ScheduleConfigController::class, 'getSchedule']);
+    Route::post('/schedule-group', [ScheduleGroupConfigController::class, 'configShedule']);
+    Route::get('/schedule-group', [ScheduleGroupConfigController::class, 'getSchedule']);
 
-Route::post('/schedule-group', [ScheduleGroupConfigController::class, 'configShedule']);
-Route::get('/schedule-group', [ScheduleGroupConfigController::class, 'getSchedule']);
+    Route::post('/schedule-delete', [ScheduleDeleteMessageController::class, 'configShedule']);
+    Route::get('/schedule-delete', [ScheduleDeleteMessageController::class, 'getSchedule']);
 
-Route::post('/schedule-delete', [ScheduleDeleteMessageController::class, 'configShedule']);
-Route::get('/schedule-delete', [ScheduleDeleteMessageController::class, 'getSchedule']);
+    Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');
+    Route::get('/list', [ContentConfigController::class, 'list']);
+    Route::delete('/delete/{id}', [ContentConfigController::class, 'delete']);
+    Route::post('/update/{id}', [ContentConfigController::class, 'update']);
+    Route::get('/detail/{id}', [ContentConfigController::class, 'detail']);
+    Route::post('/set-default/{id}', [ContentConfigController::class, 'setDefault']);
 
-Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');
-Route::get('/list', [ContentConfigController::class, 'list']);
-Route::delete('/delete/{id}', [ContentConfigController::class, 'delete']);
-Route::post('/update/{id}', [ContentConfigController::class, 'update']);
-Route::get('/detail/{id}', [ContentConfigController::class, 'detail']);
-Route::post('/set-default/{id}', [ContentConfigController::class, 'setDefault']);
+    Route::prefix('group')->group(function () {
+        Route::get('/', [GroupController::class, 'list']);
+        Route::get('/{id}', [GroupController::class, 'detail']);
+        Route::post('/', [GroupController::class, 'create']);
+        Route::put('/{id}', [GroupController::class, 'update']);
+        Route::delete('/{id}', [GroupController::class, 'delete']);
+    });
 
-Route::prefix('group')->group(function () {
-    Route::get('/', [GroupController::class, 'list']);
-    Route::get('/{id}', [GroupController::class, 'detail']);
-    Route::post('/', [GroupController::class, 'create']);
-    Route::put('/{id}', [GroupController::class, 'update']);
-    Route::delete('/{id}', [GroupController::class, 'delete']);
-});
+    Route::get('/users', [UserController::class, 'list']);
+    Route::post('/send', [BotController::class, 'send']);
 
-Route::get('/users', [UserController::class, 'list']);
-Route::post('/send', [BotController::class, 'send']);
+    Route::prefix('bot')->group(function () {
+        Route::get('/', [BotController::class, 'list']);
+        Route::post('/{id}', [BotController::class, 'activeBot']);
+        Route::post('/', [BotController::class, 'saveBot']);
+        Route::delete('/{id}', [BotController::class, 'delete']);
+    });
 
-Route::prefix('bot')->group(function () {
-    Route::get('/', [BotController::class, 'list']);
-    Route::post('/{id}', [BotController::class, 'activeBot']);
-    Route::post('/', [BotController::class, 'saveBot']);
-    Route::delete('/{id}', [BotController::class, 'delete']);
-});
+    Route::prefix('phone')->group(function () {
+        Route::post('/', [PhoneNumberController::class, 'save']);
+        Route::get('/', [PhoneNumberController::class, 'get']);
+        Route::delete('/batch', [PhoneNumberController::class, 'deleteSelected']);
+        Route::delete('/{id}', [PhoneNumberController::class, 'delete']);
+    });
 
-Route::prefix('phone')->group(function () {
-    Route::post('/', [PhoneNumberController::class, 'save']);
-    Route::get('/', [PhoneNumberController::class, 'get']);
-    Route::delete('/batch', [PhoneNumberController::class, 'deleteSelected']);
-    Route::delete('/{id}', [PhoneNumberController::class, 'delete']);
-});
-
-Route::prefix('password')->group(function () {
-    Route::get('/', [PasswordController::class, 'get']);
-});
-Route::prefix('clone')->group(function () {
-    Route::post('/', [CloneDataController::class, 'clone']);
-    Route::get('/', [CloneDataController::class, 'getData']);   
+    Route::prefix('password')->group(function () {
+        Route::get('/', [PasswordController::class, 'get']);
+    });
+    Route::prefix('clone')->group(function () {
+        Route::post('/', [CloneDataController::class, 'clone']);
+        Route::get('/', [CloneDataController::class, 'getData']);
+    });
 });

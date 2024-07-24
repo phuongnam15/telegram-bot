@@ -60,7 +60,7 @@
 
                 if (response.status === 200) {
                     const data = await response.json();
-                    localStorage.setItem('token', data?.data?.token);
+                    localStorage.setItem('access_token', data?.data?.token);
                     window.location.href = '/';
                 } else {
                     const data = await response.json();
