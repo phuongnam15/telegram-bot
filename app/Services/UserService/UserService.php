@@ -11,7 +11,7 @@ class UserService extends BaseService
     use SaveFile;
 
     public function list() {
-        $users = User::all();
+        $users = User::where('admin_id', auth()->user()->id)->get();
         return response()->json($users);
     }
 }

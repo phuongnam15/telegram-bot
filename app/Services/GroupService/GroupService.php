@@ -14,7 +14,7 @@ class GroupService extends BaseService
 
     public function list()
     {
-        return TelegramGroup::paginate(DEFAULT_PAGINATE);
+        return TelegramGroup::where('admin_id', auth()->user()->id)->get();
     }
     public function create($input)
     {
@@ -28,6 +28,7 @@ class GroupService extends BaseService
         $data = json_decode($response, true);
 
         $input['name'] = $data['title'] ?? $data['username'];
+        $input['admin_id'] = auth()->user()->id;
 
         $a = TelegramGroup::create($input);
 

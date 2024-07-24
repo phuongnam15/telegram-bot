@@ -11,6 +11,7 @@ class TelegramGroup extends Model
     protected $table = 'telegram_groups';
     protected $fillable = [
         'telegram_id', 
-        'name'
+        'name',
+        'admin_id',
     ];
 }

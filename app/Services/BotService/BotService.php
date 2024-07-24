@@ -402,6 +402,7 @@ class BotService extends BaseService
                 $bot = Bot::create([
                     'token' => $request->token,
                     "name" => $data['result']['username'],
+                    "admin_id" => auth()->user()->id
                 ]);
 
                 return response()->json($bot);
@@ -414,7 +415,7 @@ class BotService extends BaseService
     }
     public function list()
     {
-        $bots = Bot::paginate(DEFAULT_PAGINATE);
+        $bots = Bot::where('admin_id', auth()->user()->id)->get();
 
         return response()->json($bots);
     }

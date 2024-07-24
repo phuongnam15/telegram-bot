@@ -13,7 +13,8 @@ class Bot extends Model
     protected $fillable = [
         'name',
         'token',
-        'status'
+        'status',
+        'admin_id'
     ];
     const STATUS_ACTIVE = true;
     const STATUS_INACTIVE = false;
