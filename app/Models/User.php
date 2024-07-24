@@ -16,7 +16,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'telegram_id',
-        'status',
-        'admin_id'
+        'status'
     ];
+
+    public function admins()
+    {
+        return $this->belongsToMany(AdminModel::class, 'admin_user', 'user_id', 'admin_id');
+    }
 }

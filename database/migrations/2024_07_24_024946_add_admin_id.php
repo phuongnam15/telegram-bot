@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::table('content_configs', function (Blueprint $table) {
             $table->unsignedBigInteger('admin_id');
         });
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('admin_id');
-        });
         Schema::table('telegram_groups', function (Blueprint $table) {
             $table->unsignedBigInteger('admin_id');
         });
@@ -32,9 +29,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('content_configs', function (Blueprint $table) {
-            $table->dropColumn('admin_id');
-        });
-        Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('admin_id');
         });
         Schema::table('telegram_groups', function (Blueprint $table) {

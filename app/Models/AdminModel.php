@@ -39,4 +39,8 @@ class AdminModel extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'admin_user', 'admin_id', 'user_id');
+    }
 }

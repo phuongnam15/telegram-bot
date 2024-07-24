@@ -129,9 +129,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send to Selected Users</button>
+                <div class="bg-gray-50 px-4 py-3 flex justify-end gap-2">
                     <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-dismiss="modal">Close</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send to Selected Users</button>
                 </div>
             </div>
         </div>
