@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('app:auto-send')->everyMinute();
-        $schedule->command('telegram:set-webhook')->everyMinute();
+        $schedule->command('bot:check-expire')->everyMinute();
     }
 
     /**

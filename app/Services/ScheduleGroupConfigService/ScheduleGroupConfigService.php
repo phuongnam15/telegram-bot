@@ -2,39 +2,39 @@
 
 namespace App\Services\ScheduleGroupConfigService;
 
-use App\Models\ScheduleGroupConfig;
+use App\Repositories\ScheduleGroupConfig\IScheduleGroupConfigRepo;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
-use App\Services\_Trait\SaveFile;
 
 class ScheduleGroupConfigService extends BaseService
 {
-    use SaveFile;
-
-    public function configSchedule($request)
+    protected $mainRepo;
+    function __construct(IScheduleGroupConfigRepo $iScheduleGroupConfigRepo)
+    {
+        $this->mainRepo = $iScheduleGroupConfigRepo;
+    }
+    public function create($request)
     {
         return DbTransactions()->addCallBackJson(function () use ($request) {
-            $record = ScheduleGroupConfig::first();
-            
-            if(!$record){
-                throw new AppServiceException('Seed data ?');
+            $input = $request->all();
+
+            $record = $this->mainRepo->create($input);
+
+            return $record;
+        });
+    }
+    public function update($request, $id)
+    {
+        return DbTransactions()->addCallBackJson(function () use ($request, $id) {
+            $record = $this->mainRepo->find($id);
+
+            if (!$record) {
+                throw new AppServiceException('Not Found');
             }
 
             $record->update($request->all());
 
             return $record;
         });
-    }
-    public function getSchedule()
-    {
-        $record = ScheduleGroupConfig::first();
-
-        if(!$record){
-            return response()->json([
-                'message' => 'Seed data ?'
-            ]);
-        }
-
-        return response()->json($record);
     }
 }

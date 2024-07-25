@@ -22,14 +22,19 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:admin')->group(function () {
-    Route::post('/schedule', [ScheduleConfigController::class, 'configShedule']);
-    Route::get('/schedule', [ScheduleConfigController::class, 'getSchedule']);
+    Route::prefix('schedule')->group(function () {
+        Route::post('/', [ScheduleConfigController::class, 'store']);
+        Route::get('/', [ScheduleConfigController::class, 'update']);
+    });
+    Route::prefix('schedule-group')->group(function () {
+        Route::post('/', [ScheduleGroupConfigController::class, 'store']);
+        Route::get('/', [ScheduleGroupConfigController::class, 'update']);
+    });
 
-    Route::post('/schedule-group', [ScheduleGroupConfigController::class, 'configShedule']);
-    Route::get('/schedule-group', [ScheduleGroupConfigController::class, 'getSchedule']);
-
-    Route::post('/schedule-delete', [ScheduleDeleteMessageController::class, 'configShedule']);
-    Route::get('/schedule-delete', [ScheduleDeleteMessageController::class, 'getSchedule']);
+    Route::prefix('schedule-delete')->group(function () {
+        Route::post('/', [ScheduleDeleteMessageController::class, 'store']);
+        Route::get('/', [ScheduleDeleteMessageController::class, 'update']);
+    });
 
     Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');
     Route::get('/list', [ContentConfigController::class, 'list']);
@@ -51,6 +56,7 @@ Route::middleware('auth:admin')->group(function () {
 
     Route::prefix('bot')->group(function () {
         Route::get('/', [BotController::class, 'list']);
+        Route::get('/{id}', [BotController::class, 'detail']);
         Route::post('/{id}', [BotController::class, 'activeBot']);
         Route::post('/', [BotController::class, 'saveBot']);
         Route::delete('/{id}', [BotController::class, 'delete']);

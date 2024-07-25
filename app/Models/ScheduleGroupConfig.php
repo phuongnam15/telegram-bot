@@ -12,7 +12,8 @@ class ScheduleGroupConfig extends Model
     protected $fillable = [
         'status',
         'time',
-        'lastime'
+        'lastime',
+        'bot_id'
     ];
     const STATUS_ON = "on";
     const STATUS_OFF = "off";

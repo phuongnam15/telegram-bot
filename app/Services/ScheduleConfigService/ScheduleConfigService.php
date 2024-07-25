@@ -2,39 +2,38 @@
 
 namespace App\Services\ScheduleConfigService;
 
-use App\Models\ScheduleConfig;
+use App\Repositories\ScheduleConfig\IScheduleConfigRepo;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
-use App\Services\_Trait\SaveFile;
 
 class ScheduleConfigService extends BaseService
 {
-    use SaveFile;
-
-    public function configSchedule($request)
+    protected $mainRepo;
+    function __construct(IScheduleConfigRepo $iScheduleConfigRepo)
     {
+        $this->mainRepo = $iScheduleConfigRepo;
+
+    }
+    public function create($request) {
         return DbTransactions()->addCallBackJson(function () use ($request) {
-            $record = ScheduleConfig::first();
-            
-            if(!$record){
-                throw new AppServiceException('Seed data ?');
+            $input = $request->all();
+
+            $record = $this->mainRepo->create($input);
+
+            return $record;
+        });
+    }
+    public function update($request, $id) {
+        return DbTransactions()->addCallBackJson(function () use ($request, $id) {
+            $record = $this->mainRepo->find($id);
+
+            if (!$record) {
+                throw new AppServiceException('Not Found');
             }
 
             $record->update($request->all());
 
             return $record;
         });
-    }
-    public function getSchedule()
-    {
-        $record = ScheduleConfig::first();
-
-        if(!$record){
-            return response()->json([
-                'message' => 'Seed data ?'
-            ]);
-        }
-
-        return response()->json($record);
     }
 }

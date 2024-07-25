@@ -5,7 +5,7 @@ namespace App\Repositories\ContentConfigRepo;
 use App\Models\ContentConfig;
 use App\Repositories\_Abstract\BaseRepository;
 
-class ContentConfigRepo extends BaseRepository
+class ContentConfigRepo extends BaseRepository implements IContentConfigRepo
 {
     protected $model;
 

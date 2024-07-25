@@ -4,12 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\_Transaction\TransactionService;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\App;
-use App\Models\Bot;
-use App\Observers\BotObserver;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,7 +12,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
         $this->app->singleton("app.transactions", function () {
             return new TransactionService();
         });
@@ -29,23 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (Schema::hasTable('bots')) {
-
-            Bot::observe(BotObserver::class);
-
-            App::booted(function () {
-
-                $activeBot = Bot::where('status', Bot::STATUS_ACTIVE)->first();
-
-                if ($activeBot) {
-
-                    Cache::put('active_bot_token', $activeBot->token);
-
-                    config(['telegram.bots.mybot.token' => $activeBot->token]);
-
-                    // Artisan::call('telegram:set-webhook');
-                }
-            });
-        }
+       //
     }
 }

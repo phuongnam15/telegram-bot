@@ -10,6 +10,9 @@ class ScheduleDeleteMessage extends Model
     use HasFactory;
     protected $table = 'schedule_delete_message';
     protected $fillable = [
-        'delay_time'
+        'delay_time',
+        'bot_id',
+        'status',
+        'admin_id'
     ];
 }

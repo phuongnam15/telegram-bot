@@ -16,13 +16,13 @@ class BotController extends Controller
     $this->botService = $botService;
   }
 
-  public function webhook()
+  public function webhook(Request $request, $botId)
   {
-    return $this->botService->webhook();
+    return $this->botService->webhook($request, $botId);
   }
   public function send(Request $request)
   {
-    SendBotMessage::dispatch($request->telegramIds, $request->configId)->onQueue('botSendMessage');
+    SendBotMessage::dispatch($request->telegramIds, $request->configId, $request->botToken)->onQueue('botSendMessage');
     return response()->json(['message' => 'Đã nhận yêu cầu, chờ gửi ...']);
   }
   public function saveBot(Request $request) {
@@ -31,10 +31,13 @@ class BotController extends Controller
   public function list(){
     return $this->botService->list();
   }
-  public function activeBot($id){
-    return $this->botService->activeBot($id);
+  public function activeBot($id, Request $request){
+    return $this->botService->activeBot($id, $request);
   }
   public function delete($id){
     return $this->botService->delete($id);
+  }
+  public function detail($id) {
+    return $this->botService->listScheduleBot($id);
   }
 }

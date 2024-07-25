@@ -12,6 +12,7 @@ class TelegramMessage extends Model
     protected $fillable = [
         'chat_id', 
         'message_id', 
-        'sent_at'
+        'sent_at',
+        'bot_id'
     ];
 }

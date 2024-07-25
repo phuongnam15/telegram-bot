@@ -13,10 +13,12 @@ class ScheduleDeleteMessageController extends Controller
         $this->service = $scheduleDeleteMessageService;
     }
 
-    public function getSchedule() {
-        return $this->service->get();
+    public function store(Request $request)
+    {
+        return $this->service->create($request);
     }
-    public function configShedule(Request $request) {
-        return $this->service->update($request);
+    public function update(Request $request, $id)
+    {
+        return $this->service->update($request, $id);
     }
 }

@@ -15,63 +15,6 @@
 
 <body>
     <div class="mt-5 mx-5 relative">
-        <!-- Clone Data -->
-        <!-- <button class="btn btn-danger" id="cloneData" style="position: absolute; right: 0px;">Clone Data</button> -->
-
-        <!-- schedule delete message -->
-        <!-- <div class="mb-3">
-            <form id="scheduleForm" class="d-flex" style="gap: 5px;">
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="delay_time">Độ trễ xoá tin (phút)</label>
-                    <input type="number" id="delay_time" class="form-control" name="delay_time">
-                </div>
-                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateScheduleDeleteMesesage()">Cập nhật</button>
-            </form>
-        </div> -->
-
-        <!-- schedule config -->
-        <!-- <div class="mb-3">
-            <form id="scheduleForm" class="d-flex" style="gap: 5px;">
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="status">Trạng thái</label>
-                    <select id="status" class="form-control" name="status">
-                        <option value="on">Bật</option>
-                        <option value="off">Tắt</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="time">Auto gửi User (phút)</label>
-                    <input type="number" id="time" class="form-control" name="time">
-                </div>
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="lastime">Lần cuối chạy</label>
-                    <input type="text" id="lastime" class="form-control" name="lastime" readonly>
-                </div>
-                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateSchedule()">Cập nhật</button>
-            </form>
-        </div> -->
-
-        <!-- schedule group config -->
-        <!-- <div class="mb-3">
-            <form id="scheduleGroupForm" class="d-flex" style="gap: 5px;">
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="status">Trạng thái</label>
-                    <select id="status-group" class="form-control" name="status">
-                        <option value="on">Bật</option>
-                        <option value="off">Tắt</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="time">Auto gửi Group (phút)</label>
-                    <input type="number" id="time-group" class="form-control" name="time">
-                </div>
-                <div class="form-group" style="margin-bottom: 0px;">
-                    <label style="font-size: 13px;" for="lastime">Lần cuối chạy</label>
-                    <input type="text" id="lastime-group" class="form-control" name="lastime" readonly>
-                </div>
-                <button type="button" class="btn btn-info" style="align-self: flex-end;" onclick="updateScheduleGroup()">Cập nhật</button>
-            </form>
-        </div> -->
         <div class="absolute right-0 flex">
             <div class="filter w-48">
                 <select id="typeFilter" class="form-control w-full border border-gray-300 rounded py-1 px-2 outline-none">
@@ -113,17 +56,45 @@
                         <div class="mt-3 text-center sm:mt-0 sm:text-left">
                             <h5 class="text-lg leading-6 font-medium text-gray-900" id="userModalLabel">List Users</h5>
                             <div class="mt-2">
-                                <form id="sendUsersForm">
-                                    <div class="mb-4">
-                                        <input type="hidden" name="content_id" id="contentId">
-                                        <label class="inline-flex items-center">
-                                            <input type="checkbox" id="selectAllUsers" class="mr-2"> Chọn tất cả
-                                        </label>
-                                    </div>
-                                    <div class="mb-4">
-                                        <input type="text" id="userSearch" class="form-control w-full border border-gray-300 rounded p-2" placeholder="Tìm kiếm Telegram ID">
-                                    </div>
-                                    <div id="userList" class="text-sm"></div>
+                                <!-- <form id="sendUsersForm"> -->
+                                <div class="mb-4">
+                                    <input type="hidden" name="content_id" id="contentId">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" id="selectAllUsers" class="mr-2"> Chọn tất cả
+                                    </label>
+                                </div>
+                                <div class="mb-4">
+                                    <input type="text" id="userSearch" class="form-control w-full border border-gray-300 rounded p-2" placeholder="Tìm kiếm Telegram ID">
+                                </div>
+                                <div id="userList" class="text-sm"></div>
+                                <!-- </form> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+                    <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-dismiss="modal">Close</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded" id="nextToBots">Next to select bot</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Selection Modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto hidden" id="botModal" tabindex="-1" role="dialog" aria-labelledby="botModalLabel" aria-hidden="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                            <h5 class="text-lg leading-6 font-medium text-gray-900" id="botModalLabel">Select Bot</h5>
+                            <div class="mt-2">
+                                <form id="selectBotForm">
+                                    <select id="botList" class="text-sm"></select>
                                 </form>
                             </div>
                         </div>
@@ -131,96 +102,7 @@
                 </div>
                 <div class="bg-gray-50 px-4 py-3 flex justify-end gap-2">
                     <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-dismiss="modal">Close</button>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send to Selected Users</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Clone Modal -->
-    <div class="fixed z-10 inset-0 overflow-y-auto hidden" id="cloneModal" tabindex="-1" role="dialog" aria-labelledby="cloneModalLabel" aria-hidden="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <!-- This element is to trick the browser into centering the modal contents. -->
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                            <h5 class="text-lg leading-6 font-medium text-gray-900" id="cloneModalLabel">Clone Data</h5>
-                            <div class="mt-2">
-                                <form id="cloneForm">
-                                    <div class="mb-4">
-                                        <label for="domain" class="block text-gray-700">Domain</label>
-                                        <input type="text" class="form-control w-full border border-gray-300 rounded p-2" id="domain" name="domain" required placeholder="ex: https://telegram.daominhtu.com">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="block text-gray-700">Chọn loại dữ liệu để clone:</label>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="user" name="dataTypeToClone[]" value="user" class="mr-2">
-                                                User
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="password" name="dataTypeToClone[]" value="password" class="mr-2">
-                                                Password
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="phone" name="dataTypeToClone[]" value="phone" class="mr-2">
-                                                Phone
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="content" name="dataTypeToClone[]" value="content" class="mr-2">
-                                                Content
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="schedule_user" name="dataTypeToClone[]" value="schedule_user" class="mr-2">
-                                                Schedule User
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="schedule_group" name="dataTypeToClone[]" value="schedule_group" class="mr-2">
-                                                Schedule Group
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="schedule_delete" name="dataTypeToClone[]" value="schedule_delete" class="mr-2">
-                                                Schedule Delete
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="bot" name="dataTypeToClone[]" value="bot" class="mr-2">
-                                                Bot
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" id="group" name="dataTypeToClone[]" value="group" class="mr-2">
-                                                Group
-                                            </label>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" class="bg-red-500 text-white px-4 py-2 rounded" id="cloneButton">Clone</button>
-                    <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded" id="sendContent">Send</button>
                 </div>
             </div>
         </div>
@@ -228,80 +110,6 @@
 
     <script>
         $(document).ready(async () => {
-            //CLONE DATA
-            // Show Clone Modal on button click
-            // $('#cloneData').click(function() {
-            //     $('#cloneModal').modal('show');
-            // });
-
-            // // Clone button functionality
-            // $('#cloneButton').click(function() {
-            //     const domain = $('#domain').val();
-
-            //     const formData = new FormData();
-            //     formData.append('domain', domain);
-
-            //     // Get all checked checkboxes
-            //     $('input[name="dataTypeToClone[]"]:checked').each(function() {
-            //         formData.append('dataTypeToClone[]', this.value);
-            //     });
-
-            //     fetch('/api/admin/clone', {
-            //             method: 'POST',
-            //             body: formData,
-            //             headers: {
-            //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            //             }
-            //         })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             alert(data.message || 'Cloning initiated successfully!');
-            //             $('#cloneModal').modal('hide'); // Hide modal after cloning
-            //         })
-            //         .catch(error => {
-            //             console.error('Error cloning data:', error);
-            //         });
-            // });
-            // //GET SCHEDULE CONFIG
-            // fetch('/api/admin/schedule')
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.message) {
-            //             alert(data.message);
-            //         } else {
-            //             document.getElementById('status').value = data.status;
-            //             document.getElementById('time').value = data.time;
-            //             document.getElementById('lastime').value = data.lastime;
-            //         }
-            //     })
-            //     .catch(error => console.error('Error fetching schedule config:', error));
-
-            // //GET SCHEDULE DELETE
-            // fetch('/api/admin/schedule-delete')
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.message) {
-            //             alert(data.message);
-            //         } else {
-            //             document.getElementById('delay_time').value = data.delay_time;
-            //         }
-            //     })
-            //     .catch(error => console.error('Error fetching schedule config:', error));
-
-            // //GET SCHEDULE GROUP CONFIG
-            // fetch('/api/admin/schedule-group')
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.message) {
-            //             alert(data.message);
-            //         } else {
-            //             document.getElementById('status-group').value = data.status;
-            //             document.getElementById('time-group').value = data.time;
-            //             document.getElementById('lastime-group').value = data.lastime;
-            //         }
-            //     })
-            //     .catch(error => console.error('Error fetching schedule config:', error));
-
             //FILTER TYPE or KIND
             {
                 function filterTable() {
@@ -392,11 +200,11 @@
                             <tr>
                                 <td class="border px-4 py-2">${content.id}</td>
                                 <td class="border px-4 py-2">${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
-                                <td class="border px-4 py-2 max-w-[600px] break-words">${content.content}</td>
+                                <td class="border px-4 py-2 max-w-[600px] min-w-[400px] break-words">${content.content}</td>
                                 <td class="border px-4 py-2">${typeBadge}</td>
                                 <td class="border px-4 py-2">${kindBadge}</td>
                                 <td class="border px-4 py-2">${mediaHTML}</td>
-                                <td class="border px-4 py-2">
+                                <td class="border px-4 py-2 text-center">
                                     <button class="bg-blue-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="showUsers(${content.id})">Gửi</button>
                                     <button class="bg-red-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="deleteConfig(${content.id})">Xoá</button>
                                     <button class="bg-yellow-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="updateConfig(${content.id})">Sửa</button>
@@ -428,73 +236,6 @@
                     }
                 };
             }
-
-            // UPDATE SCHEDULE DELETE
-            // window.updateScheduleDeleteMesesage = function() {
-            //     const delayTime = document.getElementById('delay_time').value;
-
-            //     const formData = new FormData();
-            //     formData.append('delay_time', delayTime);
-
-            //     fetch('/api/admin/schedule-delete', {
-            //             method: 'POST',
-            //             body: formData,
-            //             headers: {
-            //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            //             }
-            //         })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             alert('Schedule updated successfully');
-            //         })
-            //         .catch(error => console.error('Error updating schedule config:', error));
-            // }
-
-            // // UPDATE SCHEDULE
-            // window.updateSchedule = function() {
-            //     const status = document.getElementById('status').value;
-            //     const time = document.getElementById('time').value;
-
-            //     const formData = new FormData();
-            //     formData.append('status', status);
-            //     formData.append('time', time);
-
-            //     fetch('/api/admin/schedule', {
-            //             method: 'POST',
-            //             body: formData,
-            //             headers: {
-            //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            //             }
-            //         })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             alert('Schedule updated successfully');
-            //         })
-            //         .catch(error => console.error('Error updating schedule config:', error));
-            // }
-
-            // // UPDATE SCHEDULE GROUP
-            // window.updateScheduleGroup = function() {
-            //     const status = document.getElementById('status-group').value;
-            //     const time = document.getElementById('time-group').value;
-
-            //     const formData = new FormData();
-            //     formData.append('status', status);
-            //     formData.append('time', time);
-
-            //     fetch('/api/admin/schedule-group', {
-            //             method: 'POST',
-            //             body: formData,
-            //             headers: {
-            //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            //             }
-            //         })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             alert('Schedule updated successfully');
-            //         })
-            //         .catch(error => console.error('Error updating schedule config:', error));
-            // }
 
             // // LIST USER & GROUP
             window.showUsers = async (contentId) => {
@@ -543,7 +284,7 @@
                 document.querySelectorAll('#userList label').forEach(label => {
                     const telegramId = label.textContent.toLowerCase();
                     if (telegramId.includes(searchTerm)) {
-                        label.style.display = 'block';
+                        label.style.display = 'inline-block';
                     } else {
                         label.style.display = 'none';
                     }
@@ -580,30 +321,57 @@
                 location.href = `/update/${contentId}`;
             }
 
-            // //SEND
-            document.getElementById('sendUsersForm').onsubmit = async (event) => {
+            //Get active bots
+            document.getElementById('nextToBots').addEventListener('click', async (event) => {
                 event.preventDefault();
 
-                let contentId = document.getElementById('contentId').value;
                 let checkboxes = document.querySelectorAll('#userList input[type="checkbox"]:checked');
-                let telegramIds = Array.from(checkboxes).map(cb => cb.value);
+                if (checkboxes.length === 0) {
+                    alert('Please select at least one user');
+                    return;
+                }
 
-                let formData = new FormData();
+                $('#userModal').modal('hide');
+                $('#botModal').modal('show');
+
+                try {
+                    const response = await fetchClient('/api/admin/bot');
+                    let botListHTML = '';
+                    response.forEach(bot => {
+                        botListHTML += `<option value="${bot.token}">${bot.name}</option>`;
+                    });
+                    document.getElementById('botList').innerHTML = botListHTML;
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+
+            //Send
+            document.getElementById('sendContent').addEventListener('click', async () => {
+                let botToken = document.getElementById('botList').value;
+                let contentId = document.getElementById('contentId').value;
+                let telegramIds = Array.from(document.querySelectorAll('#userList input[type="checkbox"]:checked')).map(cb => cb.value);
+
+                const formData = new FormData();
+                formData.append('botToken', botToken);
                 formData.append('configId', contentId);
                 telegramIds.forEach(id => formData.append('telegramIds[]', id));
 
+
                 try {
-                    const response = await fetchClient('/api/admin/send', {
+                    const response = await fetchClient(`/api/admin/send`, {
                         method: 'POST',
                         body: formData
                     });
 
-                    $('#userModal').modal('hide');
+                    console.log(response);
+
+                    $('#botModal').modal('hide');
                     alert(response.message);
                 } catch (error) {
                     console.error('Error:', error);
                 }
-            };
+            });
 
             // //SET DEFAULT
             window.setDefault = async (contentId) => {

@@ -15,5 +15,5 @@ use App\Http\Controllers\Api\Admin\BotController;
 |
 */
 
-Route::post('/webhook', [BotController::class, 'webhook']);
+Route::post('/webhook/{bot_id}', [BotController::class, 'webhook']);
 

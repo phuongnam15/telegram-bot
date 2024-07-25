@@ -15,13 +15,15 @@ class SendBotMessage implements ShouldQueue
 
     protected $telegramIds;
     protected $contentId;
+    protected $botToken;
     /**
      * Create a new job instance.
      */
-    public function __construct($telegramIds, $contentId)
+    public function __construct($telegramIds, $contentId, $botToken)
     {
         $this->telegramIds = $telegramIds;
         $this->contentId = $contentId;
+        $this->botToken = $botToken;
     }
 
     /**
@@ -29,6 +31,6 @@ class SendBotMessage implements ShouldQueue
      */
     public function handle(BotService $botService): void
     {
-        $botService->send($this->telegramIds, $this->contentId);
+        $botService->send($this->telegramIds, $this->contentId, $this->botToken);
     }
 }

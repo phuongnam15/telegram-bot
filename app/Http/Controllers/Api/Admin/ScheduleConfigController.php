@@ -13,12 +13,12 @@ class ScheduleConfigController extends Controller
     {
         $this->service = $scheduleConfigService;
     }
-    public function configShedule(Request $request)
+    public function store(Request $request)
     {
-        return $this->service->configSchedule($request);
+        return $this->service->create($request);
     }
-    public function getSchedule()
+    public function update(Request $request, $id)
     {
-        return $this->service->getSchedule();
+        return $this->service->update($request, $id);
     }
 }

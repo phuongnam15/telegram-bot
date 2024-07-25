@@ -2,31 +2,39 @@
 
 namespace App\Services\ScheduleDeleteMessageService;
 
-use App\Models\ScheduleDeleteMessage;
+use App\Repositories\ScheduleDeleteMessage\IScheduleDeleteMessageRepo;
 use App\Services\_Abstract\BaseService;
+use App\Services\_Exception\AppServiceException;
 
 class ScheduleDeleteMessageService extends BaseService
 {
-    public function get()
+    protected $mainRepo;
+    function __construct(IScheduleDeleteMessageRepo $iScheduleDeleteMessageRepo)
     {
-        $a = ScheduleDeleteMessage::first();
-
-        if (!$a) {
-            return response()->json('Not found config');
-        }
-        
-        return response()->json($a);
+        $this->mainRepo = $iScheduleDeleteMessageRepo;
     }
-    public function update($request)
+    public function create($request)
     {
-        $a = ScheduleDeleteMessage::first();
+        return DbTransactions()->addCallBackJson(function () use ($request) {
+            $input = $request->all();
 
-        if (!$a) {
-            return response()->json('Not found config');
-        }
+            $record = $this->mainRepo->create($input);
 
-        $a->update($request->all());
+            return $record;
+        });
+    }
+    public function update($request, $id)
+    {
+        return DbTransactions()->addCallBackJson(function () use ($request, $id) {
+            $record = $this->mainRepo->find($id);
 
-        return response()->json($a);
+            if (!$record) {
+                throw new AppServiceException('Not Found');
+            }
+
+            $record->update($request->all());
+
+            return $record;
+        });
     }
 }
