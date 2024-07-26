@@ -2,6 +2,7 @@
 use App\Http\Controllers\Api\Admin\Customer\AuthController;
 use App\Http\Controllers\Api\Admin\BotController;
 use App\Http\Controllers\Api\Admin\CloneDataController;
+use App\Http\Controllers\Api\Admin\CommandController;
 use App\Http\Controllers\Api\Admin\ScheduleConfigController;
 use App\Http\Controllers\Api\Admin\ScheduleGroupConfigController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,13 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:admin')->group(function () {
+    Route::prefix('command')->group(function () {
+        Route::post('/', [CommandController::class, 'store']);
+        Route::get('/', [CommandController::class, 'list']);
+        Route::get('/{id}', [CommandController::class, 'show']);
+        Route::put('/{id}', [CommandController::class, 'update']);
+        Route::delete('/{id}', [CommandController::class, 'destroy']);
+    });
     Route::prefix('schedule')->group(function () {
         Route::post('/', [ScheduleConfigController::class, 'store']);
         Route::post('/{id}', [ScheduleConfigController::class, 'update']);

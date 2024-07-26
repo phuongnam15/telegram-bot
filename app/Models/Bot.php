@@ -32,4 +32,8 @@ class Bot extends Model
     {
         return $this->hasOne(ScheduleConfig::class, 'bot_id', 'id');
     }
+    function commands()
+    {
+        return $this->belongsToMany(Command::class, 'bot_command_content', 'bot_id', 'command_id');
+    }
 }
