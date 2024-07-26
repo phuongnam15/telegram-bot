@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container px-5 mt-5">
-    <h2 class="text-2xl font-bold mb-3">Bot Settings</h2>
+    <h2 class="text-[23px] text-gray-700 font-bold mb-3">Bot Settings</h2>
     <div id="botDetails" class="bg-white p-4 rounded shadow-md space-y-2">
         <!-- Bot details will be populated here -->
     </div>
@@ -93,7 +93,7 @@
                                     </div>
                                     <button 
                                         type="button" 
-                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-green-500 border-green-500 hover:bg-green-600 hover:border-green-600"
+                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-600 hover:border-gray-600 transform duration-200"
                                         onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
                                     >
                                         Cập nhật
@@ -145,7 +145,7 @@
                                     </div>
                                     <button 
                                         type="button" 
-                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-green-500 border-green-500 hover:bg-green-600 hover:border-green-600"
+                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-600 hover:border-gray-600 transform duration-200"
                                         onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
                                     >
                                         Cập nhật
@@ -197,7 +197,7 @@
                                     </div>
                                     <button 
                                         type="button" 
-                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-green-500 border-green-500 hover:bg-green-600 hover:border-green-600"
+                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-600 hover:border-gray-600 transform duration-200"
                                         onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
                                     >
                                         Cập nhật

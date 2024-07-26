@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="container px-5 mt-5">
-    <h2 class="mb-4 text-2xl font-bold">Group Management</h2>
-    <button class="bg-blue-500 text-white py-2 px-4 rounded mb-3" data-toggle="modal" data-target="#groupModal">Add Group</button>
+    <h2 class="mb-4 text-[23px] text-gray-700 font-bold">Group Management</h2>
+    <button class="bg-gray-400 text-white font-bold py-2 px-4 rounded mb-3" data-toggle="modal" data-target="#groupModal">Add Group</button>
     <table class="min-w-full bg-white border border-gray-300" id="groupTable">
         <thead>
             <tr class="w-full bg-gray-200">

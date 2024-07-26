@@ -22,11 +22,11 @@
                 <option value="Other">Khác</option>
             </select>
         </div>
-        <button class="bg-green-500 text-white ml-2 px-3 py-1 rounded" id="createNew">Tạo mới</button>
+        <button class="bg-gray-700 text-white ml-2 px-4 py-1 rounded hover:bg-gray-50 hover:text-gray-700 border border-gray-700 transition-all duration-200" id="createNew">Tạo mới</button>
     </div>
-    <button class="bg-red-500 text-white font-bold py-2 px-4 rounded right-0" id="cloneData">Clone Data</button>
+    <button class="bg-gray-400 text-white font-bold py-2 px-4 rounded right-0" id="cloneData">Clone Data</button>
     <!-- <h2 class="text-2xl font-bold">Content List</h2> -->
-    <div id="contentData" class="mt-3 w-full overflow-x-auto"></div>
+    <div id="contentData" class="mt-3 w-full overflow-x-auto rounded-md"></div>
     <div id="pagination" class="mt-3"></div>
 </div>
 
@@ -225,15 +225,15 @@
             function renderContentList(data) {
                 let contentHTML = `
                             <table class="min-w-full bg-white border border-gray-300">
-                                <thead class="bg-green-600 text-white">
+                                <thead class="bg-gray-500 border-[1px] border-solid border-gray-400 text-white">
                                     <tr>
-                                        <th class="py-2 px-4 border-b">ID</th>
-                                        <th class="py-2 px-4 border-b">Tên</th>
-                                        <th class="py-2 px-4 border-b">Nội dung</th>
-                                        <th class="py-2 px-4 border-b">Hình thức</th>
-                                        <th class="py-2 px-4 border-b">Loại</th>
-                                        <th class="py-2 px-4 border-b">Media</th>
-                                        <th class="py-2 px-4 border-b">Thao tác</th>
+                                        <th class="py-3 px-4">ID</th>
+                                        <th class="py-3 px-4">Tên</th>
+                                        <th class="py-3 px-4">Nội dung</th>
+                                        <th class="py-3 px-4">Hình thức</th>
+                                        <th class="py-3 px-4">Loại</th>
+                                        <th class="py-3 px-4">Media</th>
+                                        <th class="py-3 px-4">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>`;
@@ -242,9 +242,9 @@
                     let buttonSetDefault = '';
 
                     if (content.type === 'photo') {
-                        mediaHTML = `<img src="${content.media}" class="max-w-[200px] max-h-[200px]">`;
+                        mediaHTML = `<img src="${content.media}" class="max-w-[200px] max-h-[200px] mx-auto rounded">`;
                     } else if (content.type === 'video') {
-                        mediaHTML = `<video controls class="max-w-[200px] max-h-[200px]">
+                        mediaHTML = `<video controls class="max-w-[200px] max-h-[200px] mx-auto rounded">
                                                 <source src="${content.media}" type="video/mp4">
                                                 Your browser does not support the video tag.
                                             </video>`;
@@ -278,7 +278,7 @@
                                 <tr>
                                     <td class="border px-4 py-2">${content.id}</td>
                                     <td class="border px-4 py-2">${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
-                                    <td class="border px-4 py-2 min-w-[400px] break-words">${content.content}</td>
+                                    <td class="border px-4 py-2 max-w-[600px] min-w-[400px] break-words">${content.content}</td>
                                     <td class="border px-4 py-2 text-center">${typeBadge}</td>
                                     <td class="border px-4 py-2 text-center">${kindBadge}</td>
                                     <td class="border px-4 py-2">${mediaHTML}</td>

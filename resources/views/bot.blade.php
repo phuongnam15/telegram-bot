@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="container px-5 mt-5">
-    <h2 class="text-2xl font-bold mb-3">Bot Management</h2>
-    <button class="bg-blue-500 text-white py-2 px-3 rounded mb-3 text-sm" data-toggle="modal" data-target="#createBotModal">Tạo bot mới</button>
-    <table class="min-w-full bg-white border border-gray-300 overflow-x-auto border-separate border-spacing-0">
+    <h2 class="text-[23px] font-bold mb-3 text-gray-700">Bot Management</h2>
+    <button class="bg-gray-400 text-white py-2 px-3 rounded mb-3 text-sm" data-toggle="modal" data-target="#createBotModal">Tạo bot mới</button>
+    <table class="min-w-full bg-white border border-gray-300 overflow-x-auto">
         <thead>
             <tr class="w-full bg-gray-200">
                 <th class="py-2 px-4 border-b">ID</th>
@@ -90,10 +90,10 @@
                                 <td class="border px-4 py-2 text-gray-500 text-sm text-center">${bot.name}</td>
                                 <td class="border px-4 py-2 text-center">${status}</td>
                                 <td class="border px-4 py-2 text-gray-500 font-medium text-sm text-center">${bot.expired_at ?? "--"}</td>
-                                <td class="border px-4 py-2 space-y-1 text-center flex flex-col">
+                                <td class="border px-4 py-2 space-y-1 text-center">
                                     ${activeButton}
-                                    <button class="bg-red-500 text-white py-1 rounded delete-btn text-[13px]" onClick="deleteBot(${bot.id})">Delete</button>
-                                    <button class="bg-green-500 text-white py-1 rounded setting-btn text-[13px]" data-id="${bot.id}">Setting</button>
+                                    <button class="px-2 bg-red-500 text-white py-1 rounded delete-btn text-[13px]" onClick="deleteBot(${bot.id})">Delete</button>
+                                    <button class="px-2 bg-green-500 text-white py-1 rounded setting-btn text-[13px]" data-id="${bot.id}">Setting</button>
                                 </td>
                             </tr>
                         `);
