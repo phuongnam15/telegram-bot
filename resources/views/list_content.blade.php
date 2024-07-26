@@ -5,16 +5,16 @@
 @section('content')
 <div class="mt-5 mx-5 relative">
     <div class="absolute right-0 flex">
-        <div class="filter w-48">
-            <select id="typeFilter" class="form-control w-full border border-gray-300 rounded py-1 px-2 outline-none">
+        <div class="filter w-48 flex">
+            <select id="typeFilter" class="form-control w-full border border-gray-300 rounded px-2 outline-none">
                 <option value="">-- Hình thức --</option>
                 <option value="text">Text</option>
                 <option value="photo">Ảnh</option>
                 <option value="video">Video</option>
             </select>
         </div>
-        <div class="filter ml-2 w-48">
-            <select id="kindFilter" class="form-control w-full border border-gray-300 rounded py-1 px-2 outline-none">
+        <div class="filter ml-2 w-48 flex">
+            <select id="kindFilter" class="form-control w-full border border-gray-300 rounded px-2 outline-none">
                 <option value="">-- Loại --</option>
                 <option value="Giới thiệu">Giới thiệu</option>
                 <option value="Click button">Click Button</option>
@@ -22,11 +22,11 @@
                 <option value="Other">Khác</option>
             </select>
         </div>
-        <button class="bg-gray-700 text-white ml-2 px-4 py-1 rounded hover:bg-gray-50 hover:text-gray-700 border border-gray-700 transition-all duration-200" id="createNew">Tạo mới</button>
+        <button class="bg-gray-700 text-white ml-2 px-4 p-1 rounded hover:bg-gray-50 hover:text-gray-700 border border-gray-700 transition-all duration-200" id="createNew">Tạo mới</button>
     </div>
-    <button class="bg-gray-400 text-white font-bold py-2 px-4 rounded right-0" id="cloneData">Clone Data</button>
+    <button class="text-gray-800 border-2 border-solid border-gray-800 font-bold py-2 px-4 rounded-lg" id="cloneData">Clone Data</button>
     <!-- <h2 class="text-2xl font-bold">Content List</h2> -->
-    <div id="contentData" class="mt-3 w-full overflow-x-auto rounded-md"></div>
+    <div id="contentData" class="mt-3 w-full overflow-x-auto rounded-md shadow"></div>
     <div id="pagination" class="mt-3"></div>
 </div>
 
@@ -108,7 +108,6 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                     <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                        <h5 class="text-lg leading-6 font-medium text-gray-900" id="cloneModalLabel">Clone Data</h5>
                         <div class="mt-2">
                             <form id="cloneForm">
                                 <div class="mb-4">
@@ -116,7 +115,7 @@
                                     <input type="text" class="outline-none w-full border border-gray-300 rounded p-2" id="domain" name="domain" required placeholder="ex: https://telegram.daominhtu.com">
                                 </div>
                                 <div class="mb-4">
-                                    <label class="block text-gray-700">Chọn loại dữ liệu để clone:</label>
+                                    <label class="block text-gray-700 text-[14px] mb-2 underline">Chọn loại dữ liệu để clone</label>
                                     <!-- <div>
                                         <label class="inline-flex items-center">
                                             <input type="checkbox" id="user" name="dataTypeToClone[]" value="user" class="mr-2">
@@ -136,7 +135,7 @@
                                         </label>
                                     </div> -->
                                     <div>
-                                        <label class="inline-flex items-center">
+                                        <label class="inline-flex items-center text-sm">
                                             <input type="checkbox" id="content" name="dataTypeToClone[]" value="content" class="mr-2">
                                             Content
                                         </label>
@@ -178,8 +177,8 @@
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 flex flex-row-reverse gap-1">
-                <button type="button" class="bg-red-500 text-white px-4 py-2 rounded" id="cloneButton">Clone</button>
-                <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-dismiss="modal">Cancel</button>
+                <button type="button" class="bg-gray-700 text-white px-4 py-[5px] rounded" id="cloneButton">Clone</button>
+                <button type="button" class="bg-white py-[5px] px-4 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-500" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -224,20 +223,20 @@
 
             function renderContentList(data) {
                 let contentHTML = `
-                            <table class="min-w-full bg-white border border-gray-300">
-                                <thead class="bg-gray-500 border-[1px] border-solid border-gray-400 text-white">
+                            <table class="min-w-full bg-white rounded-md overflow-hidden">
+                                <thead class="bg-gray-500 text-white">
                                     <tr>
-                                        <th class="py-3 px-4">ID</th>
-                                        <th class="py-3 px-4">Tên</th>
-                                        <th class="py-3 px-4">Nội dung</th>
-                                        <th class="py-3 px-4">Hình thức</th>
-                                        <th class="py-3 px-4">Loại</th>
-                                        <th class="py-3 px-4">Media</th>
-                                        <th class="py-3 px-4">Thao tác</th>
+                                        <th class="py-3 px-4 text-sm">ID</th>
+                                        <th class="py-3 px-4 text-sm">Tên</th>
+                                        <th class="py-3 px-4 text-sm">Nội dung</th>
+                                        <th class="py-3 px-4 text-sm">Hình thức</th>
+                                        <th class="py-3 px-4 text-sm">Loại</th>
+                                        <th class="py-3 px-4 text-sm">Media</th>
+                                        <th class="py-3 px-4 text-sm">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>`;
-                data.data.forEach(content => {
+                data.data.forEach((content, index) => {
                     let mediaHTML = '';
                     let buttonSetDefault = '';
 
@@ -275,14 +274,14 @@
                     }
 
                     contentHTML += `
-                                <tr>
-                                    <td class="border px-4 py-2">${content.id}</td>
-                                    <td class="border px-4 py-2">${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
-                                    <td class="border px-4 py-2 max-w-[600px] min-w-[400px] break-words">${content.content}</td>
-                                    <td class="border px-4 py-2 text-center">${typeBadge}</td>
-                                    <td class="border px-4 py-2 text-center">${kindBadge}</td>
-                                    <td class="border px-4 py-2">${mediaHTML}</td>
-                                    <td class="border px-4 py-2 text-center space-y-1">
+                                <tr class="${index !== (data.data.length - 1) ? 'border-b-[1px] border-solid border-gray-100' : ''}">
+                                    <td class="px-4 py-2">${content.id}</td>
+                                    <td class="px-4 py-2 text-center text-gray-600 text-sm">${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
+                                    <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words text-[14px] font-sans text-gray-600">${content.content}</td>
+                                    <td class="px-4 py-2 text-center">${typeBadge}</td>
+                                    <td class="px-4 py-2 text-center">${kindBadge}</td>
+                                    <td class="px-4 py-2">${mediaHTML}</td>
+                                    <td class="px-4 py-2 text-center space-y-1">
                                         <button class="bg-blue-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="showUsers(${content.id})">Gửi</button>
                                         <button class="bg-red-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="deleteConfig(${content.id})">Xoá</button>
                                         <button class="bg-yellow-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="updateConfig(${content.id})">Sửa</button>
@@ -463,26 +462,16 @@
             const formData = new FormData();
             formData.append('domain', domain);
 
+            if ($('input[name="dataTypeToClone[]"]:checked').length === 0) {
+                alert('Please select at least one data type to clone');
+                return;
+            }
+
             // Get all checked checkboxes
             $('input[name="dataTypeToClone[]"]:checked').each(function() {
                 formData.append('dataTypeToClone[]', this.value);
             });
 
-            // fetch('/api/admin/clone', {
-            //         method: 'POST',
-            //         body: formData,
-            //         headers: {
-            //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            //         }
-            //     })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         alert(data.message || 'Cloning initiated successfully!');
-            //         $('#cloneModal').modal('hide'); // Hide modal after cloning
-            //     })
-            //     .catch(error => {
-            //         console.error('Error cloning data:', error);
-            //     });
             try {
                 const response = await fetchClient('/api/admin/clone', {
                     method: 'POST',
