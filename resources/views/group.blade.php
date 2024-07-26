@@ -54,8 +54,11 @@
                                     <label for="telegram_id" class="text-gray-700">ID</label>
                                     <input type="text" class="border-[1px] border-solid border-gray-300 outline-none py-1 px-2 rounded w-full bg-gray-100 focus:ring-1 focus:ring-blue-300 focus:border-white" id="telegram_id" name="telegram_id" required>
                                 </div>
+                                <div class="mb-4">
+                                    <select id="botList" class="text-sm outline-none"></select>
+                                </div>
                                 <input type="hidden" id="group_id">
-                                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Save</button>
+                                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded float-end">Save</button>
                             </form>
                         </div>
                     </div>
@@ -90,7 +93,20 @@
                     console.log(error);
                 }
             }
+            const fetchBots = async () => {
+                try {
+                    const response = await fetchClient('/api/admin/bot');
+                    let botListHTML = '';
+                    response.forEach(bot => {
+                        botListHTML += `<option value="${bot.token}">${bot.name}</option>`;
+                    });
+                    document.getElementById('botList').innerHTML = botListHTML;
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
 
+            fetchBots();
             fetchGroups();
 
             window.deleteGroup = async (id) => {
@@ -105,6 +121,26 @@
                     }
                 }
             }
+
+            $('#groupForm').on('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData();
+                formData.append('telegram_id', $('#telegram_id').val());
+                formData.append('bot_token', $('#botList').val());
+
+                try {
+                    const response = await fetchClient('/api/admin/group', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    $('#groupModal').modal('hide');
+                    fetchGroups();
+                } catch (error) {
+                    console.log(error);
+                }
+            });
 
             $('#groupModal').on('hidden.bs.modal', function() {
                 $('#groupForm')[0].reset();

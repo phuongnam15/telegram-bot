@@ -6,7 +6,7 @@ use App\Models\TelegramGroup;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use App\Services\_Trait\SaveFile;
-use Telegram\Bot\Laravel\Facades\Telegram;
+use GuzzleHttp\Client;
 
 class GroupService extends BaseService
 {
@@ -18,21 +18,31 @@ class GroupService extends BaseService
     }
     public function create($input)
     {
-        $response = Telegram::getChat(['chat_id' => $input['telegram_id']]);
+        return DbTransactions()->addCallBackJson(function () use ($input) {
 
-        if(!$response) {
-            return response()->json([
-                'message' => 'Group not found'
+            $client = new Client();
+
+            $botToken = $input['bot_token'];
+            $chatId = $input['telegram_id'];
+
+            $response = $client->get("https://api.telegram.org/bot{$botToken}/getChat", [
+                'query' => ['chat_id' => $chatId]
             ]);
-        } 
-        $data = json_decode($response, true);
 
-        $input['name'] = $data['title'] ?? $data['username'];
-        $input['admin_id'] = auth()->user()->id;
+            $data = json_decode($response->getBody(), true);
 
-        $a = TelegramGroup::create($input);
+            if (!$data['ok']) {
+                throw new AppServiceException('Group not found');
+            }
 
-        return response()->json($a);
+            $chat = $data['result'];
+            $input['name'] = $chat['title'] ?? $chat['username'];
+            $input['admin_id'] = auth()->user()->id;
+
+            $a = TelegramGroup::create($input);
+
+            return $a;
+        });
     }
     public function detail($id)
     {
