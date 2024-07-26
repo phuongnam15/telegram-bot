@@ -26,8 +26,7 @@ use Illuminate\Support\Arr;
 
 class BotService extends BaseService
 {
-    public function __construct(
-    )
+    public function __construct()
     {
     }
 
@@ -59,7 +58,8 @@ class BotService extends BaseService
                         ['telegram_id' => $chatId],
                         [
                             'name' => $name,
-                            'telegram_id' => $chatId
+                            'telegram_id' => $chatId,
+                            'admin_id' => $adminId
                         ]
                     );
                 }
@@ -118,8 +118,11 @@ class BotService extends BaseService
                             ]
                         );
 
-                        // Check if the user was newly created
-                        if ($user->wasRecentlyCreated) {
+                        $adminUserExists = AdminUser::where([
+                            'user_id' => $user->id, 
+                            'admin_id' => $adminId
+                        ])->exists();
+                        if (!$adminUserExists) {
                             AdminUser::create([
                                 'user_id' => $user->id,
                                 'admin_id' => $adminId,
@@ -480,16 +483,17 @@ class BotService extends BaseService
             return response()->json(['error' => 'Failed to delete webhook', 'details' => $e->getMessage()], 500);
         }
     }
-    public function listScheduleBot($id) {
+    public function listScheduleBot($id)
+    {
         return DbTransactions()->addCallBackJson(function () use ($id) {
 
-           $bot = Bot::with([
+            $bot = Bot::with([
                 'scheduleDeleteMessage',
                 'scheduleConfig',
                 'scheduleGroupConfig'
-           ])->find($id);
+            ])->find($id);
 
-           return $bot;
+            return $bot;
         });
     }
 }

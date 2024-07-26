@@ -13,6 +13,7 @@ use App\Services\BotService\BotService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AutoSend extends Command
 {
@@ -27,6 +28,7 @@ class AutoSend extends Command
     public function handle()
     {
         try {
+            DB::beginTransaction();
             $bots = Bot::where('status', Bot::STATUS_ACTIVE)->get();
 
             foreach ($bots as $bot) {
@@ -49,11 +51,12 @@ class AutoSend extends Command
                     $timeToCompare = $lastDateTime->addMinutes($scheduleConfig->time);
 
                     if (now() > $timeToCompare) {
-                        logger('Send to user');
                         $scheduleConfig->lastime = now();
                         $scheduleConfig->save();
 
-                        $userTelegramIds = User::where('admin_id', $bot->admin_id)->pluck('telegram_id')->toArray();
+                        $userTelegramIds = User::whereHas('admins', function ($q) use ($bot) {
+                            $q->where('admin_id', $bot->admin_id);
+                        })->pluck('telegram_id')->toArray();
 
                         foreach ($userTelegramIds as $telegramId) {
                             $randomConfigId = Arr::random($configIds);
@@ -67,7 +70,6 @@ class AutoSend extends Command
                     $timeToCompareGroup = $lastDateTimeGroup->addMinutes($scheduleGroupConfig->time);
 
                     if (now() > $timeToCompareGroup) {
-                        logger('Send to group');
                         $scheduleGroupConfig->lastime = now();
                         $scheduleGroupConfig->save();
 
@@ -81,8 +83,11 @@ class AutoSend extends Command
                 }
             }
 
+            DB::commit();
+
             $this->info('Auto send successfully!');
         } catch (\Exception $e) {
+            DB::rollBack();
             logger($e->getMessage());
         }
     }
