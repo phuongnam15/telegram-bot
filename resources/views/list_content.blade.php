@@ -480,6 +480,7 @@
 
                 alert(response.message || 'Cloning initiated successfully!');
                 $('#cloneModal').modal('hide');
+                window.location.reload();
             } catch (error) {
                 console.error(error);
             }
