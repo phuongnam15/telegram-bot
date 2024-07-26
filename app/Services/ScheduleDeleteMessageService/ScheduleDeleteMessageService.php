@@ -18,6 +18,9 @@ class ScheduleDeleteMessageService extends BaseService
         return DbTransactions()->addCallBackJson(function () use ($request) {
             $input = $request->all();
 
+            $input['admin_id'] = auth()->user()->id;
+            $input['delay_time'] = $input['time'];
+
             $record = $this->mainRepo->create($input);
 
             return $record;
@@ -32,7 +35,10 @@ class ScheduleDeleteMessageService extends BaseService
                 throw new AppServiceException('Not Found');
             }
 
-            $record->update($request->all());
+            $input = $request->all();
+            $input['delay_time'] = $input['time'];
+
+            $record->update($input);
 
             return $record;
         });

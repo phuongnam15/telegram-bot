@@ -24,16 +24,16 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:admin')->group(function () {
     Route::prefix('schedule')->group(function () {
         Route::post('/', [ScheduleConfigController::class, 'store']);
-        Route::get('/', [ScheduleConfigController::class, 'update']);
+        Route::post('/{id}', [ScheduleConfigController::class, 'update']);
     });
     Route::prefix('schedule-group')->group(function () {
         Route::post('/', [ScheduleGroupConfigController::class, 'store']);
-        Route::get('/', [ScheduleGroupConfigController::class, 'update']);
+        Route::post('/{id}', [ScheduleGroupConfigController::class, 'update']);
     });
 
     Route::prefix('schedule-delete')->group(function () {
         Route::post('/', [ScheduleDeleteMessageController::class, 'store']);
-        Route::get('/', [ScheduleDeleteMessageController::class, 'update']);
+        Route::post('/{id}', [ScheduleDeleteMessageController::class, 'update']);
     });
 
     Route::post('/config', [ContentConfigController::class, 'store'])->name('config.store');

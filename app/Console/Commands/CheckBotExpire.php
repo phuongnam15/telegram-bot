@@ -19,14 +19,20 @@ class CheckBotExpire extends Command
    
     public function handle()
     {
-        $bots = Bot::where('status', Bot::STATUS_ACTIVE)->get();
-
-        foreach ($bots as $bot) {
-            if ($bot->expired_at < now()) {
-                $bot->status = Bot::STATUS_INACTIVE;
-                $bot->save();
-                $this->botService->disableWebhook($bot->token);
+        try {
+            $bots = Bot::where('status', Bot::STATUS_ACTIVE)->get();
+    
+            foreach ($bots as $bot) {
+                if ($bot->expired_at < now()) {
+                    $bot->status = Bot::STATUS_INACTIVE;
+                    $bot->save();
+                    $this->botService->disableWebhook($bot->token);
+                }
             }
+
+            $this->info('Bot status checked successfully!');
+        }catch (\Exception $e) {
+            logger($e->getMessage());
         }
     }
 }

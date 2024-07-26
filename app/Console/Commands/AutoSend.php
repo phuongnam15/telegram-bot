@@ -16,83 +16,74 @@ use Carbon\Carbon;
 
 class AutoSend extends Command
 {
+    protected $signature = 'app:auto-send';
+    protected $description = 'Auto send';
     protected $botService;
     function __construct(BotService $botService)
     {
         parent::__construct();
         $this->botService = $botService;
     }
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:auto-send';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Auto send';
-
-    /**
-     * Execute the console command.
-     */
-    public function sendScheduledMessages()
+    public function handle()
     {
-        $bots = Bot::where('status', Bot::STATUS_ACTIVE)->get();
+        try {
+            $bots = Bot::where('status', Bot::STATUS_ACTIVE)->get();
 
-        foreach ($bots as $bot) {
-            // Get individual schedule configurations for the bot
-            $scheduleConfig = $bot->scheduleConfig;
-            $scheduleGroupConfig = $bot->scheduleGroupConfig;
+            foreach ($bots as $bot) {
+                $scheduleConfig = $bot->scheduleConfig;
+                $scheduleGroupConfig = $bot->scheduleGroupConfig;
 
-            // Retrieve config IDs excluding specific kinds and filtering by admin_id
-            $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
-                ->where('kind', '!=', ContentConfig::KIND_BUTTON)
-                ->where('kind', '!=', ContentConfig::KIND_START)
-                ->where('admin_id', $bot->admin_id)
-                ->pluck('id')
-                ->toArray();
+                $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
+                    ->where('kind', '!=', ContentConfig::KIND_BUTTON)
+                    ->where('kind', '!=', ContentConfig::KIND_START)
+                    ->where('admin_id', $bot->admin_id)
+                    ->pluck('id')
+                    ->toArray();
 
-            if (count($configIds) == 0) {
-                continue;
-            }
+                if (count($configIds) == 0) {
+                    continue;
+                }
 
-            if ($scheduleConfig && $scheduleConfig->status == ScheduleConfig::STATUS_ON) {
-                $lastDateTime = Carbon::parse($scheduleConfig->lastime);
-                $timeToCompare = $lastDateTime->addMinutes($scheduleConfig->time);
+                if ($scheduleConfig && $scheduleConfig->status == ScheduleConfig::STATUS_ON) {
+                    $lastDateTime = Carbon::parse($scheduleConfig->lastime);
+                    $timeToCompare = $lastDateTime->addMinutes($scheduleConfig->time);
 
-                if (now() > $timeToCompare) {
-                    $scheduleConfig->lastime = now();
-                    $scheduleConfig->save();
+                    if (now() > $timeToCompare) {
+                        logger('Send to user');
+                        $scheduleConfig->lastime = now();
+                        $scheduleConfig->save();
 
-                    $userTelegramIds = User::where('admin_id', $bot->admin_id)->pluck('telegram_id')->toArray();
+                        $userTelegramIds = User::where('admin_id', $bot->admin_id)->pluck('telegram_id')->toArray();
 
-                    foreach ($userTelegramIds as $telegramId) {
-                        $randomConfigId = Arr::random($configIds);
-                        SendBotMessage::dispatch([$telegramId], $randomConfigId, $bot->token)->onQueue('botSendMessage');
+                        foreach ($userTelegramIds as $telegramId) {
+                            $randomConfigId = Arr::random($configIds);
+                            SendBotMessage::dispatch([$telegramId], $randomConfigId, $bot->token)->onQueue('botSendMessage');
+                        }
+                    }
+                }
+
+                if ($scheduleGroupConfig && $scheduleGroupConfig->status == ScheduleGroupConfig::STATUS_ON) {
+                    $lastDateTimeGroup = Carbon::parse($scheduleGroupConfig->lastime);
+                    $timeToCompareGroup = $lastDateTimeGroup->addMinutes($scheduleGroupConfig->time);
+
+                    if (now() > $timeToCompareGroup) {
+                        logger('Send to group');
+                        $scheduleGroupConfig->lastime = now();
+                        $scheduleGroupConfig->save();
+
+                        $groupTelegramIds = TelegramGroup::where('admin_id', $bot->admin_id)->pluck('telegram_id')->toArray();
+
+                        foreach ($groupTelegramIds as $telegramId) {
+                            $randomConfigId = Arr::random($configIds);
+                            SendBotMessage::dispatch([$telegramId], $randomConfigId, $bot->token)->onQueue('botSendMessage');
+                        }
                     }
                 }
             }
 
-            if ($scheduleGroupConfig && $scheduleGroupConfig->status == ScheduleGroupConfig::STATUS_ON) {
-                $lastDateTimeGroup = Carbon::parse($scheduleGroupConfig->lastime);
-                $timeToCompareGroup = $lastDateTimeGroup->addMinutes($scheduleGroupConfig->time);
-
-                if (now() > $timeToCompareGroup) {
-                    $scheduleGroupConfig->lastime = now();
-                    $scheduleGroupConfig->save();
-
-                    $groupTelegramIds = TelegramGroup::where('admin_id', $bot->admin_id)->pluck('telegram_id')->toArray();
-
-                    foreach ($groupTelegramIds as $telegramId) {
-                        $randomConfigId = Arr::random($configIds);
-                        SendBotMessage::dispatch([$telegramId], $randomConfigId, $bot->token)->onQueue('botSendMessage');
-                    }
-                }
-            }
+            $this->info('Auto send successfully!');
+        } catch (\Exception $e) {
+            logger($e->getMessage());
         }
     }
 }

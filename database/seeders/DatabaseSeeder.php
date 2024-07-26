@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        $this->call(AdminSeeder::class);
-        $this->call(ScheduleConfigSeeder::class);
-        $this->call(ScheduleGroupConfigSeeder::class);
-        $this->call(ScheduleDeleteMessageSeeder::class);
+        // $this->call(AdminSeeder::class);
+        // $this->call(ScheduleConfigSeeder::class);
+        // $this->call(ScheduleGroupConfigSeeder::class);
+        // $this->call(ScheduleDeleteMessageSeeder::class);
     }
 }

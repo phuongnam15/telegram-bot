@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bot Management</title>
-    <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     @vite('resources/js/app.js')
@@ -94,7 +93,7 @@
                     response.forEach(function(bot) {
                         const activeButton = bot.status === "1" ? '' : `<button class="flex-1 bg-blue-500 text-white py-1 px-2 rounded activate-btn text-[13px]" onClick="openActivateBotModal(${bot.id})">Activate</button>`;
                         const status = bot.status === "1" ? '<span class="inline-block px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Bật</span>' : '<span class="inline-block px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">Tắt</span>';
-    
+
                         document.getElementById('botTableBody').insertAdjacentHTML('beforeend', `
                             <tr>
                                 <td class="border px-4 py-2 text-gray-500 font-medium text-sm text-center">${bot.id}</td>
@@ -105,6 +104,7 @@
                                 <td class="border px-4 py-2 space-y-1 text-center">
                                     ${activeButton}
                                     <button class="bg-red-500 text-white py-1 px-2 rounded delete-btn text-[13px]" onClick="deleteBot(${bot.id})">Delete</button>
+                                    <button class="bg-green-500 text-white py-1 px-2 rounded setting-btn text-[13px]" data-id="${bot.id}">Setting</button>
                                 </td>
                             </tr>
                         `);
@@ -173,6 +173,10 @@
                     }
                 }
             }
+            $('.setting-btn').on('click', function() {
+                const botId = $(this).data('id');
+                window.location.href = `/setting-bot/${botId}`;
+            });
         });
     </script>
 </body>

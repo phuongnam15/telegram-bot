@@ -13,7 +13,8 @@ class ScheduleGroupConfig extends Model
         'status',
         'time',
         'lastime',
-        'bot_id'
+        'bot_id',
+        'admin_id'
     ];
     const STATUS_ON = "on";
     const STATUS_OFF = "off";

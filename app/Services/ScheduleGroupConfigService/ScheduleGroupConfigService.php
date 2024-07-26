@@ -18,6 +18,9 @@ class ScheduleGroupConfigService extends BaseService
         return DbTransactions()->addCallBackJson(function () use ($request) {
             $input = $request->all();
 
+            $input['admin_id'] = auth()->user()->id;
+            $input['lastime'] = now();
+
             $record = $this->mainRepo->create($input);
 
             return $record;

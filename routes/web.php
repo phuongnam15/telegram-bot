@@ -40,3 +40,6 @@ Route::get('/login', function () {
 Route::get('/register', function () {
     return view('register');
 });
+Route::get('/setting-bot/{id}', function ($id) {
+    return view('setting_bot');
+});
