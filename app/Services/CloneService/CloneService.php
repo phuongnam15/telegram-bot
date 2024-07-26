@@ -53,33 +53,33 @@ class CloneService extends BaseService
             $dataTypes = $request->input('dataType');
             $data = [];
 
-            if (in_array('phone', $dataTypes)) {
-                $data['phones'] = PhoneNumber::all()->makeHidden(['created_at', 'updated_at']);
-            }
-            if (in_array('password', $dataTypes)) {
-                $data['passwords'] = Password::all()->makeHidden(['created_at', 'updated_at']);
-            }
+            // if (in_array('phone', $dataTypes)) {
+            //     $data['phones'] = PhoneNumber::all()->makeHidden(['created_at', 'updated_at']);
+            // }
+            // if (in_array('password', $dataTypes)) {
+            //     $data['passwords'] = Password::all()->makeHidden(['created_at', 'updated_at']);
+            // }
             if (in_array('content', $dataTypes)) {
                 $data['contents'] = ContentConfig::all()->makeHidden(['created_at', 'updated_at']);
             }
-            if (in_array('schedule_user', $dataTypes)) {
-                $data['scheduleUser'] = ScheduleConfig::all()->makeHidden(['created_at', 'updated_at']);
-            }
-            if (in_array('schedule_group', $dataTypes)) {
-                $data['scheduleGroup'] = ScheduleGroupConfig::all()->makeHidden(['created_at', 'updated_at']);
-            }
-            if (in_array('schedule_delete', $dataTypes)) {
-                $data['scheduleDelete'] = ScheduleDeleteMessage::all()->makeHidden(['created_at', 'updated_at']);
-            }
-            if (in_array('group', $dataTypes)) {
-                $data['groups'] = TelegramGroup::all()->makeHidden(['created_at', 'updated_at']);
-            }
-            if (in_array('bot', $dataTypes)) {
-                $data['bots'] = Bot::all()->makeHidden(['created_at', 'updated_at']);
-            }
-            if (in_array('user', $dataTypes)) {
-                $data['users'] = User::all()->makeHidden(['created_at', 'updated_at']);
-            }
+            // if (in_array('schedule_user', $dataTypes)) {
+            //     $data['scheduleUser'] = ScheduleConfig::all()->makeHidden(['created_at', 'updated_at']);
+            // }
+            // if (in_array('schedule_group', $dataTypes)) {
+            //     $data['scheduleGroup'] = ScheduleGroupConfig::all()->makeHidden(['created_at', 'updated_at']);
+            // }
+            // if (in_array('schedule_delete', $dataTypes)) {
+            //     $data['scheduleDelete'] = ScheduleDeleteMessage::all()->makeHidden(['created_at', 'updated_at']);
+            // }
+            // if (in_array('group', $dataTypes)) {
+            //     $data['groups'] = TelegramGroup::all()->makeHidden(['created_at', 'updated_at']);
+            // }
+            // if (in_array('bot', $dataTypes)) {
+            //     $data['bots'] = Bot::all()->makeHidden(['created_at', 'updated_at']);
+            // }
+            // if (in_array('user', $dataTypes)) {
+            //     $data['users'] = User::all()->makeHidden(['created_at', 'updated_at']);
+            // }
 
             return response()->json($data);
         } catch (\Exception $e) {
@@ -91,67 +91,69 @@ class CloneService extends BaseService
     }
     protected function truncateAndInsert($dataTypes, $dataToClone)
     {
-        if (in_array('phone', $dataTypes)) {
-            PhoneNumber::truncate();
-            foreach($dataToClone['phones'] as $phone) {
-                PhoneNumber::create($phone);
-            }
-        }
+        $adminId = auth()->user()->id;
+        // if (in_array('phone', $dataTypes)) {
+        //     PhoneNumber::truncate();
+        //     foreach($dataToClone['phones'] as $phone) {
+        //         PhoneNumber::create($phone);
+        //     }
+        // }
 
-        if (in_array('password', $dataTypes)) {
-            Password::truncate();
-            foreach($dataToClone['passwords'] as $password) {
-                Password::create($password);
-            }
-        }
+        // if (in_array('password', $dataTypes)) {
+        //     Password::truncate();
+        //     foreach($dataToClone['passwords'] as $password) {
+        //         Password::create($password);
+        //     }
+        // }
 
         if (in_array('content', $dataTypes)) {
             ContentConfig::truncate();
             foreach($dataToClone['contents'] as $content) {
+                $content['admin_id'] = $adminId;
                 ContentConfig::create($content);
             }
         }
 
-        if (in_array('schedule_user', $dataTypes)) {
-            ScheduleConfig::truncate();
-            foreach($dataToClone['scheduleUser'] as $scheduleUser) {
-                ScheduleConfig::create($scheduleUser);
-            }
-        }
+        // if (in_array('schedule_user', $dataTypes)) {
+        //     ScheduleConfig::truncate();
+        //     foreach($dataToClone['scheduleUser'] as $scheduleUser) {
+        //         ScheduleConfig::create($scheduleUser);
+        //     }
+        // }
 
-        if (in_array('schedule_group', $dataTypes)) {
-            ScheduleGroupConfig::truncate();
-            foreach($dataToClone['scheduleGroup'] as $scheduleGroup) {
-                ScheduleGroupConfig::create($scheduleGroup);
-            }
-        }
+        // if (in_array('schedule_group', $dataTypes)) {
+        //     ScheduleGroupConfig::truncate();
+        //     foreach($dataToClone['scheduleGroup'] as $scheduleGroup) {
+        //         ScheduleGroupConfig::create($scheduleGroup);
+        //     }
+        // }
 
-        if (in_array('schedule_delete', $dataTypes)) {
-            ScheduleDeleteMessage::truncate();
-            foreach($dataToClone['scheduleDelete'] as $scheduleDelete) {
-                ScheduleDeleteMessage::create($scheduleDelete);
-            }
-        }
+        // if (in_array('schedule_delete', $dataTypes)) {
+        //     ScheduleDeleteMessage::truncate();
+        //     foreach($dataToClone['scheduleDelete'] as $scheduleDelete) {
+        //         ScheduleDeleteMessage::create($scheduleDelete);
+        //     }
+        // }
 
-        if (in_array('group', $dataTypes)) {
-            TelegramGroup::truncate();
-            foreach($dataToClone['groups'] as $group) {
-                TelegramGroup::create($group);
-            }
-        }
+        // if (in_array('group', $dataTypes)) {
+        //     TelegramGroup::truncate();
+        //     foreach($dataToClone['groups'] as $group) {
+        //         TelegramGroup::create($group);
+        //     }
+        // }
 
-        if (in_array('bot', $dataTypes)) {
-            Bot::truncate();
-            foreach($dataToClone['bots'] as $bot) {
-                Bot::create($bot);
-            }
-        }
+        // if (in_array('bot', $dataTypes)) {
+        //     Bot::truncate();
+        //     foreach($dataToClone['bots'] as $bot) {
+        //         Bot::create($bot);
+        //     }
+        // }
 
-        if (in_array('user', $dataTypes)) {
-            User::truncate();
-            foreach($dataToClone['users'] as $user) {
-                User::create($user);
-            }
-        }
+        // if (in_array('user', $dataTypes)) {
+        //     User::truncate();
+        //     foreach($dataToClone['users'] as $user) {
+        //         User::create($user);
+        //     }
+        // }
     }
 }

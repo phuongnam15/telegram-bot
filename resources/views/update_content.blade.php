@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sửa bài viết</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
 
 <body>
-    <div class="container mx-auto my-5 relative p-5 bg-white shadow rounded">
+    <div class="container mx-auto my-5 relative p-5 bg-white shadow rounded w-2/3">
+    <button class="absolute right-3 top-3 bg-blue-500 text-white px-4 py-2 rounded" id="watchList">Xem danh sách</button>
         <h2 class="text-2xl font-bold mb-5">Cập nhật nội dung bài viết</h2>
         <form action="{{ url('/api/posts') }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
             @csrf
@@ -385,6 +385,10 @@
             });
         });
 
+        //watch list
+        $('#watchList').click(function() {
+            window.location.href = "{{ url('/') }}";
+        });
 
         //REMOVE BUTTON
         $(document).on('click', '.remove-button', function() {

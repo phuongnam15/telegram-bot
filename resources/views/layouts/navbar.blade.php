@@ -1,50 +1,31 @@
 <!-- resources/views/components/navbar.blade.php -->
 
-<nav class="bg-gray-800 p-4">
-    <div class="container mx-auto flex justify-between items-center">
-        <!-- Logo -->
-        <div class="text-white font-bold">
-            <a href="/">Brand</a>
+<nav class="bg-[#795548] py-4 h-lvh sticky top-0 left-0 z-10">
+    <div class="flex flex-col h-full">
+        <div class="flex-col flex flex-1">
+            <a href="/" id="homeLink" class="text-white font-medium py-2 px-5 hover:bg-white transition-bg duration-200 hover:text-[#795548]">Home</a>
+            <a href="/group" id="groupLink" class="text-white font-medium py-2 px-5 hover:bg-white transition-bg duration-200 hover:text-[#795548]">Group</a>
+            <a href="/bot" id="botLink" class="text-white font-medium py-2 px-5 hover:bg-white transition-bg duration-200 hover:text-[#795548]">Bot</a>
         </div>
-
-        <!-- Primary Nav -->
-        <div class="hidden md:flex items-center space-x-4">
-            <a href="#" class="text-gray-300 hover:text-white">Home</a>
-            <a href="/group" class="text-gray-300 hover:text-white">Group</a>
-            <a href="/bot" class="text-gray-300 hover:text-white">Bot</a>
-        </div>
-
-        <!-- Logout Button -->
         <div>
-            <a href="#" id="logoutButton" class="text-gray-300 hover:text-white">Logout</a>
-        </div>
-
-        <!-- Mobile Button -->
-        <div class="md:hidden flex items-center">
-            <button class="mobile-menu-button text-gray-300 focus:outline-none">
-                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
+            <a href="#" id="logoutButton" class="text-white font-bold py-2 px-5 hover:bg-white transition-bg duration-200 hover:text-[#795548]">Logout</a>
         </div>
     </div>
-
-    <!-- Mobile Menu -->
-    <!-- <div class="mobile-menu hidden md:hidden">
-        <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
-        <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">About</a>
-        <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Services</a>
-        <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Contact</a>
-        <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>
-    </div> -->
 </nav>
 
 <script>
-    const btn = document.querySelector('button.mobile-menu-button');
-    const menu = document.querySelector('.mobile-menu');
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentPath = window.location.pathname;
+        const links = {
+            '/': document.getElementById('homeLink'),
+            '/group': document.getElementById('groupLink'),
+            '/bot': document.getElementById('botLink')
+        };
 
-    btn.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
+        if (links[currentPath]) {
+            links[currentPath].classList.add('bg-white', 'text-[#795548]');
+            links[currentPath].classList.remove('text-white');
+        }
     });
 
     document.getElementById('logoutButton').addEventListener('click', () => {

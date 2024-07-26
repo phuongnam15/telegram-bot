@@ -26,7 +26,7 @@
     </div>
     <button class="bg-red-500 text-white font-bold py-2 px-4 rounded right-0" id="cloneData">Clone Data</button>
     <!-- <h2 class="text-2xl font-bold">Content List</h2> -->
-    <div id="contentData" class="mt-3"></div>
+    <div id="contentData" class="mt-3 w-full overflow-x-auto"></div>
     <div id="pagination" class="mt-3"></div>
 </div>
 
@@ -117,7 +117,7 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="block text-gray-700">Chọn loại dữ liệu để clone:</label>
-                                    <div>
+                                    <!-- <div>
                                         <label class="inline-flex items-center">
                                             <input type="checkbox" id="user" name="dataTypeToClone[]" value="user" class="mr-2">
                                             User
@@ -134,14 +134,14 @@
                                             <input type="checkbox" id="phone" name="dataTypeToClone[]" value="phone" class="mr-2">
                                             Phone
                                         </label>
-                                    </div>
+                                    </div> -->
                                     <div>
                                         <label class="inline-flex items-center">
                                             <input type="checkbox" id="content" name="dataTypeToClone[]" value="content" class="mr-2">
                                             Content
                                         </label>
                                     </div>
-                                    <div>
+                                    <!-- <div>
                                         <label class="inline-flex items-center">
                                             <input type="checkbox" id="schedule_user" name="dataTypeToClone[]" value="schedule_user" class="mr-2">
                                             Schedule User
@@ -170,7 +170,7 @@
                                             <input type="checkbox" id="group" name="dataTypeToClone[]" value="group" class="mr-2">
                                             Group
                                         </label>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </form>
                         </div>
@@ -278,11 +278,11 @@
                                 <tr>
                                     <td class="border px-4 py-2">${content.id}</td>
                                     <td class="border px-4 py-2">${content.name + (content.is_default ? " <strong>(mặc định)</strong>" : "")}</td>
-                                    <td class="border px-4 py-2 max-w-[600px] min-w-[400px] break-words">${content.content}</td>
-                                    <td class="border px-4 py-2">${typeBadge}</td>
-                                    <td class="border px-4 py-2">${kindBadge}</td>
+                                    <td class="border px-4 py-2 min-w-[400px] break-words">${content.content}</td>
+                                    <td class="border px-4 py-2 text-center">${typeBadge}</td>
+                                    <td class="border px-4 py-2 text-center">${kindBadge}</td>
                                     <td class="border px-4 py-2">${mediaHTML}</td>
-                                    <td class="border px-4 py-2 text-center">
+                                    <td class="border px-4 py-2 text-center space-y-1">
                                         <button class="bg-blue-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="showUsers(${content.id})">Gửi</button>
                                         <button class="bg-red-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="deleteConfig(${content.id})">Xoá</button>
                                         <button class="bg-yellow-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="updateConfig(${content.id})">Sửa</button>

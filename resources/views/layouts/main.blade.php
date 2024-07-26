@@ -13,14 +13,13 @@
 </head>
 
 <body>
-    @include('layouts.navbar')
-    
-    <main class="p-2">
-        @yield('content')
-    </main>
-
-    <footer>
-    </footer>
+    <div class="flex">
+        @include('layouts.navbar')
+        
+        <main class="p-2 w-full">
+            @yield('content')
+        </main>
+    </div>
 
     @stack('scripts')
 </body>

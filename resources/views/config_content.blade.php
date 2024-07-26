@@ -11,7 +11,7 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="container mx-auto my-5 relative p-5 bg-white shadow rounded">
+    <div class="container mx-auto my-5 relative p-5 bg-white shadow rounded w-2/3">
         <button class="absolute right-3 top-3 bg-blue-500 text-white px-4 py-2 rounded" id="watchList">Xem danh sách</button>
         <h2 class="text-2xl font-bold mb-5">Tạo bài viết mới</h2>
         <form action="{{ url('/api/posts') }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
