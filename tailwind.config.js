@@ -4,8 +4,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                'ubuntu': ['Ubuntu', 'sans-serif'],
-            }
+                ubuntu: ["Ubuntu", "sans-serif"],
+            },
         },
     },
     plugins: [],

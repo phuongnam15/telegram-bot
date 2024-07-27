@@ -1,30 +1,73 @@
 <!-- resources/views/components/navbar.blade.php -->
 
-<nav class="bg-gray-700 py-4 h-lvh sticky top-0 left-0 z-10">
-    <div class="flex flex-col h-full">
-        <div class="flex-col flex flex-1">
-            <a href="/" id="homeLink" class="rounded-s-2xl text-white font-medium py-2 px-5 hover:bg-[#fafbfb] transition-bg duration-200 hover:text-gray-700">Home</a>
-            <a href="/group" id="groupLink" class="rounded-s-2xl text-white font-medium py-2 px-5 hover:bg-[#fafbfb] transition-bg duration-200 hover:text-gray-700">Group</a>
-            <a href="/bot" id="botLink" class="rounded-s-2xl text-white font-medium py-2 px-5 hover:bg-[#fafbfb] transition-bg duration-200 hover:text-gray-700">Bot</a>
+<nav class="sticky left-0 top-0 z-10 h-lvh bg-gray-700 py-4">
+    <div class="flex h-full flex-col">
+        <div class="flex flex-1 flex-col">
+            <div class="flex w-full">
+                <a href="/" id="homeLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:rounded-s-2xl hover:bg-[#fafbfb] hover:text-gray-700">
+                    Home
+                </a>
+            </div>
+            <div class="flex w-full">
+                <a href="/group" id="groupLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:rounded-s-2xl hover:bg-[#fafbfb] hover:text-gray-700">
+                    Group
+                </a>
+            </div>
+            <div class="flex w-full">
+                <a href="/bot" id="botLink" class="h-full w-full px-[60px] py-2 pl-5 font-medium text-white hover:rounded-s-2xl hover:bg-[#fafbfb] hover:text-gray-700">
+                    Bot
+                </a>
+            </div>
         </div>
         <div>
-            <a href="#" id="logoutButton" class="text-white font-bold py-2 px-5 hover:bg-[#fafbfb] transition-bg duration-200 hover:text-gray-700">Logout</a>
+            <a href="#" id="logoutButton" class="transition-bg px-[60px] py-2 font-bold text-white duration-200 hover:bg-[#fafbfb] hover:text-gray-700">
+                Logout
+            </a>
         </div>
     </div>
 </nav>
 
 <script>
+    //div cha của 2 element a trên và dưới sẽ thêm bg-white và rounded-s-2xl, còn phần tử a ở dưới sẽ thêm rounded-tr-2xl còn ở trên sẽ thêm rounded-br-2xl
     document.addEventListener('DOMContentLoaded', () => {
         const currentPath = window.location.pathname;
         const links = {
             '/': document.getElementById('homeLink'),
             '/group': document.getElementById('groupLink'),
-            '/bot': document.getElementById('botLink')
+            '/bot': document.getElementById('botLink'),
         };
 
         if (links[currentPath]) {
-            links[currentPath].classList.add('bg-[#fafbfb]', 'text-gray-700');
-            links[currentPath].classList.remove('text-white');
+            const currentLink = links[currentPath];
+            currentLink.classList.add(
+                'bg-[#fafbfb]',
+                'text-gray-700',
+                'rounded-s-2xl',
+            );
+            currentLink.classList.remove('text-white');
+
+            // Get keys as an array
+            // const paths = Object.keys(links);
+
+            // // Find the index of the current path
+            // const currentIndex = paths.indexOf(currentPath);
+
+            // // Add rounded corners to the parent elements before and after the current path element
+            // if (currentIndex > 0) {
+            //     const previousLink = links[paths[currentIndex - 1]];
+            //     if (previousLink && previousLink.parentElement) {
+            //         previousLink.parentElement.classList.add('bg-white', 'rounded-s-2xl');
+            //         previousLink.classList.add('rounded-br-2xl', 'bg-gray-700');
+            //     }
+            // }
+
+            // if (currentIndex < paths.length - 1) {
+            //     const nextLink = links[paths[currentIndex + 1]];
+            //     if (nextLink && nextLink.parentElement) {
+            //         nextLink.parentElement.classList.add('bg-white', 'rounded-s-2xl');
+            //         nextLink.classList.add('rounded-tr-2xl', 'bg-gray-700');
+            //     }
+            // }
         }
     });
 

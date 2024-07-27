@@ -5,6 +5,8 @@ namespace App\Services\BotService;
 use App\Jobs\DeleteTelegramMessage;
 use App\Models\AdminUser;
 use App\Models\Bot;
+use App\Models\BotCommandContent;
+use App\Models\Command;
 use App\Models\ContentConfig;
 use App\Models\Password;
 use App\Models\PhoneNumber;
@@ -98,45 +100,52 @@ class BotService extends BaseService
                 // Check message
                 if (isset($message['text'])) {
                     // Start bot
-                    if ($message['text'] == '/start') {
-                        if (isset($message['from']['first_name'])) {
-                            $name .= $message['from']['first_name'] . " ";
-                        }
-                        if (isset($message['from']['last_name'])) {
-                            $name .= $message['from']['last_name'];
-                        }
-                        if ($name === '') {
-                            $name = $message['from']['username'];
+                    if (Command::where('command', $message['text'])->exists()) {
+
+                        $command = Command::where('command', $message['text'])->first();
+
+                        if($message['text'] === '/start') {
+                            if (isset($message['from']['first_name'])) {
+                                $name .= $message['from']['first_name'] . " ";
+                            }
+                            if (isset($message['from']['last_name'])) {
+                                $name .= $message['from']['last_name'];
+                            }
+                            if ($name === '') {
+                                $name = $message['from']['username'];
+                            }
+    
+                            $user = User::firstOrCreate(
+                                ['telegram_id' => $chatId],
+                                [
+                                    'status' => 'start',
+                                    'name' => $name,
+                                    'telegram_id' => $chatId,
+                                ]
+                            );
+    
+                            $adminUserExists = AdminUser::where([
+                                'user_id' => $user->id, 
+                                'admin_id' => $adminId
+                            ])->exists();
+
+                            if (!$adminUserExists) {
+                                AdminUser::create([
+                                    'user_id' => $user->id,
+                                    'admin_id' => $adminId,
+                                ]);
+                            }
+
                         }
 
-                        $user = User::firstOrCreate(
-                            ['telegram_id' => $chatId],
-                            [
-                                'status' => 'start',
-                                'name' => $name,
-                                'telegram_id' => $chatId,
-                            ]
-                        );
-
-                        $adminUserExists = AdminUser::where([
-                            'user_id' => $user->id, 
-                            'admin_id' => $adminId
-                        ])->exists();
-                        if (!$adminUserExists) {
-                            AdminUser::create([
-                                'user_id' => $user->id,
-                                'admin_id' => $adminId,
-                            ]);
-                        }
-
-                        $configIntro = ContentConfig::where([
-                            'kind' => ContentConfig::KIND_START,
-                            'is_default' => true,
-                            'admin_id' => $adminId
+                        $bCC = BotCommandContent::where([
+                            'bot_id' => $botId,
+                            'command_id' => $command->id
                         ])->first();
-
-                        if ($configIntro) {
-                            $this->send([$chatId], $configIntro->id, $botToken);
+                        
+                        if($bCC) {
+                            $content = ContentConfig::where('id', $bCC->content_id)->first();
+                            $this->send([$chatId], $content->id, $botToken);
                         }
                     } else {
                         // Check status of user
