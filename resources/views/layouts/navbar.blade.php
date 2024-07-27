@@ -4,18 +4,18 @@
     <div class="flex h-full flex-col">
         <div class="flex flex-1 flex-col">
             <div class="flex w-full">
-                <a href="/" id="homeLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:rounded-s-2xl hover:bg-[#fafbfb] hover:text-gray-700">
-                    Home
+                <a href="/" id="homeLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:bg-gray-600">
+                <i class="fa-solid fa-house mr-4"></i> <span>Home</span>
                 </a>
             </div>
             <div class="flex w-full">
-                <a href="/group" id="groupLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:rounded-s-2xl hover:bg-[#fafbfb] hover:text-gray-700">
-                    Group
+                <a href="/group" id="groupLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:bg-gray-600">
+                <i class="fa-solid fa-user-group mr-4"></i> <span>Group</span>
                 </a>
             </div>
             <div class="flex w-full">
-                <a href="/bot" id="botLink" class="h-full w-full px-[60px] py-2 pl-5 font-medium text-white hover:rounded-s-2xl hover:bg-[#fafbfb] hover:text-gray-700">
-                    Bot
+                <a href="/bot" id="botLink" class="h-full w-full px-[60px] py-2 pl-5 font-medium text-white hover:bg-gray-600">
+                <i class="fa-solid fa-robot mr-4"></i> <span>Bot</span>
                 </a>
             </div>
         </div>
@@ -44,30 +44,30 @@
                 'text-gray-700',
                 'rounded-s-2xl',
             );
-            currentLink.classList.remove('text-white');
+            currentLink.classList.remove('text-white', 'hover:bg-gray-600');
 
             // Get keys as an array
-            // const paths = Object.keys(links);
+            const paths = Object.keys(links);
 
-            // // Find the index of the current path
-            // const currentIndex = paths.indexOf(currentPath);
+            // Find the index of the current path
+            const currentIndex = paths.indexOf(currentPath);
 
-            // // Add rounded corners to the parent elements before and after the current path element
-            // if (currentIndex > 0) {
-            //     const previousLink = links[paths[currentIndex - 1]];
-            //     if (previousLink && previousLink.parentElement) {
-            //         previousLink.parentElement.classList.add('bg-white', 'rounded-s-2xl');
-            //         previousLink.classList.add('rounded-br-2xl', 'bg-gray-700');
-            //     }
-            // }
+            // Add rounded corners to the parent elements before and after the current path element
+            if (currentIndex > 0) {
+                const previousLink = links[paths[currentIndex - 1]];
+                if (previousLink && previousLink.parentElement) {
+                    previousLink.parentElement.classList.add('bg-[#fafbfb]', 'rounded-s-2xl');
+                    previousLink.classList.add('rounded-br-2xl', 'bg-gray-700');
+                }
+            }
 
-            // if (currentIndex < paths.length - 1) {
-            //     const nextLink = links[paths[currentIndex + 1]];
-            //     if (nextLink && nextLink.parentElement) {
-            //         nextLink.parentElement.classList.add('bg-white', 'rounded-s-2xl');
-            //         nextLink.classList.add('rounded-tr-2xl', 'bg-gray-700');
-            //     }
-            // }
+            if (currentIndex < paths.length - 1) {
+                const nextLink = links[paths[currentIndex + 1]];
+                if (nextLink && nextLink.parentElement) {
+                    nextLink.parentElement.classList.add('bg-[#fafbfb]', 'rounded-s-2xl');
+                    nextLink.classList.add('rounded-tr-2xl', 'bg-gray-700');
+                }
+            }
         }
     });
 
