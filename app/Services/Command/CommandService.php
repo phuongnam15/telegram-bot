@@ -16,6 +16,9 @@ class CommandService extends BaseService
         return DbTransactions()->addCallBackJson(function () use ($request) {
             $commands = BotCommandContent::where('bot_id', $request->bot_id)->with([
                 'command',
+                'content' => function ($query) {
+                    $query->select('id', 'name');
+                }
             ])->get();
 
             return $commands;
