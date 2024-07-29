@@ -10,7 +10,7 @@
                     id="typeFilter"
                     class="form-control w-full rounded border border-gray-300 px-2 outline-none"
                 >
-                    <option value="">-- Hình thức --</option>
+                    <option value="">-- Type --</option>
                     <option value="text">Text</option>
                     <option value="photo">Ảnh</option>
                     <option value="video">Video</option>
@@ -21,7 +21,7 @@
                     id="kindFilter"
                     class="form-control w-full rounded border border-gray-300 px-2 outline-none"
                 >
-                    <option value="">-- Loại --</option>
+                    <option value="">-- Kind --</option>
                     <option value="Giới thiệu">Giới thiệu</option>
                     <option value="Click button">Click Button</option>
                     <option value="Start">Start</option>
@@ -29,10 +29,10 @@
                 </select>
             </div>
             <button
-                class="ml-2 rounded border border-gray-700 bg-gray-700 p-1 px-4 text-white transition-all duration-200 hover:bg-gray-50 hover:text-gray-700"
+                class="ml-2 rounded border border-gray-900 bg-gray-900 p-1 px-4 text-white transition-all duration-200 hover:bg-gray-50 hover:text-gray-700"
                 id="createNew"
             >
-                Tạo mới
+                Create
             </button>
         </div>
         <button
@@ -47,6 +47,10 @@
             class="mt-3 w-full overflow-x-auto rounded-md shadow"
         ></div>
         <div id="pagination" class="mt-3"></div>
+        <div class="w-full mt-[13%] text-center hidden" id="thinkOutOfTheBox">
+            <img src="{{asset('assets/images/think-out-of-the-box.png')}}" alt="" class="w-[230px] mx-auto">
+            <p class="mt-3 font-bold text-2xl text-gray-800">There are no posts to show.</p>
+        </div>
     </div>
 
     <!-- Modal -->
@@ -386,15 +390,20 @@
                                 <thead class="bg-gray-500 text-white">
                                     <tr>
                                         <th class="py-3 px-4 text-sm">ID</th>
-                                        <th class="py-3 px-4 text-sm">Tên</th>
-                                        <th class="py-3 px-4 text-sm">Nội dung</th>
-                                        <th class="py-3 px-4 text-sm">Hình thức</th>
-                                        <th class="py-3 px-4 text-sm">Loại</th>
+                                        <th class="py-3 px-4 text-sm">Name</th>
+                                        <th class="py-3 px-4 text-sm">Content</th>
+                                        <th class="py-3 px-4 text-sm">Type</th>
+                                        <th class="py-3 px-4 text-sm">Kind</th>
                                         <th class="py-3 px-4 text-sm">Media</th>
-                                        <th class="py-3 px-4 text-sm">Thao tác</th>
+                                        <th class="py-3 px-4 text-sm">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>`;
+
+                    if (data.data.length === 0) {
+                        document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
+                    }
+
                     data.data.forEach((content, index) => {
                         let mediaHTML = '';
                         let buttonSetDefault = '';

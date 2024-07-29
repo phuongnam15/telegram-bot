@@ -3,25 +3,22 @@
 @section("title", "Config Content")
 
 @section("content")
-<div class="container relative mx-auto my-5 w-2/3 rounded bg-white p-5 shadow">
-    <button class="absolute right-3 top-3 rounded bg-blue-500 px-4 py-2 text-white" id="watchList">
-        Xem danh sách
-    </button>
-    <h2 class="mb-5 text-2xl font-bold">Tạo bài viết mới</h2>
+<div class="container relative mx-auto rounded bg-white p-5 shadow">
+    <h2 class="mb-5 text-2xl font-bold">Create new post</h2>
     <form action="{{ url("/api/posts") }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
         @csrf
         <div class="mb-4">
             <label for="name" class="mb-2 block font-bold text-gray-700">
-                Tên bài viết
+                Name
             </label>
             <input type="text" class="form-input w-full rounded border px-3 py-2" id="name" name="name" required placeholder="vd: tuyen_nguoi_yeu" />
         </div>
         <div class="mb-4">
             <label for="type" class="mb-2 block font-bold text-gray-700">
-                Hình thức bài viết
+                Type
             </label>
             <select class="form-select w-full rounded border px-3 py-2" id="type" name="type" required>
-                <option value="">-- Chọn hình thức bài viết --</option>
+                <option value="">-- Select type --</option>
                 <option value="text">Text</option>
                 <option value="photo">Ảnh</option>
                 <option value="video">Video</option>
@@ -30,10 +27,10 @@
 
         <div class="mb-4">
             <label for="kind" class="mb-2 block font-bold text-gray-700">
-                Loại nội dung
+                Kind
             </label>
             <select class="form-select w-full rounded border px-3 py-2" id="kind" name="kind" required>
-                <option value="">-- Chọn loại nội dung --</option>
+                <option value="">-- Select kind --</option>
                 <option value="introduce">Tin nhắn Chào Mừng</option>
                 <option value="button">Click Button</option>
                 <option value="start">Start</option>
@@ -43,14 +40,14 @@
 
         <div class="mb-4">
             <label for="content" class="mb-2 block font-bold text-gray-700">
-                Nội dung
+                Content
             </label>
             <textarea class="form-input w-full rounded border px-3 py-2" id="content" name="content"></textarea>
         </div>
 
         <div class="mb-4">
             <label for="media" class="mb-2 block font-bold text-gray-700">
-                Media (Ảnh/Video)
+                Media (Image/Video)
             </label>
             <input type="file" class="form-input w-full rounded border px-3 py-2" id="media" name="media" />
             <img id="preview" src="#" alt="Media preview" class="max-h-xs mt-2 hidden max-w-xs" />
@@ -62,10 +59,10 @@
 
         <div class="mb-4">
             <label for="keyboardType" class="mb-2 block font-bold text-gray-700">
-                Loại Button
+                Type Button
             </label>
             <select class="form-select w-full rounded border px-3 py-2" id="keyboardType" name="keyboardType">
-                <option value="">-- Chọn loại Button --</option>
+                <option value="">-- Select type button --</option>
                 <option value="inline_keyboard">Đi kèm bài viết</option>
                 <option value="inline_keyboard_phone_number">
                     Đi kèm bài viết (để lấy SĐT)
@@ -76,10 +73,10 @@
             <!-- Dynamic buttons will be added here -->
         </div>
         <button type="button" id="addButton" class="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
-            Thêm Button
+            More button
         </button>
         <button type="submit" class="rounded bg-green-500 px-4 py-2 text-white">
-            Tạo
+            Create
         </button>
     </form>
 </div>

@@ -10,7 +10,7 @@
             data-toggle="modal"
             data-target="#createBotModal"
         >
-            Tạo bot mới
+            New bot
         </button>
         <table
             class="min-w-full overflow-x-auto border border-gray-300 bg-white"
