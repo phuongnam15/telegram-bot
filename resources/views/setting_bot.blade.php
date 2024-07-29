@@ -350,7 +350,7 @@
             }
         }
 
-        function openScheduleModal(type, botId, schedule = {}) {
+        window.openScheduleModal = (type, botId, schedule = {}) => {
             $('#scheduleModal').removeClass('hidden');
             $('#scheduleType').val(type);
             $('#scheduleBotId').val(botId);

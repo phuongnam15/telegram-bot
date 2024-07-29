@@ -14,18 +14,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     @vite("resources/js/app.js")
     @vite("resources/css/app.css")
-    <style>
-        .parent:hover {
-            background-color: white;
-            border-radius: 0 1rem 1rem 0;
-            /* rounded-s-2xl */
-        }
-
-        .parent:hover a:hover {
-            background-color: #fafbfb;
-            color: gray;
-        }
-    </style>
 </head>
 
 <body class="font-ubuntu">
