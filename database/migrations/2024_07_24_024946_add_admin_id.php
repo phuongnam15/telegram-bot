@@ -20,6 +20,16 @@ return new class extends Migration
         Schema::table('bots', function (Blueprint $table) {
             $table->unsignedBigInteger('admin_id');
         });
+        Schema::table('schedule_delete_message', function (Blueprint $table) {
+            // $table->string('status')->default('off');
+            $table->unsignedBigInteger('admin_id');
+        });
+        Schema::table('schedule_config', function (Blueprint $table) {
+            $table->unsignedBigInteger('admin_id');
+        });
+        Schema::table('schedule_group_config', function (Blueprint $table) {
+            $table->unsignedBigInteger('admin_id');
+        });
 
     }
 
@@ -35,6 +45,15 @@ return new class extends Migration
             $table->dropColumn('admin_id');
         });
         Schema::table('bots', function (Blueprint $table) {
+            $table->dropColumn('admin_id');
+        });
+        Schema::table('schedule_delete_message', function (Blueprint $table) {
+            $table->dropColumn('admin_id');
+        });
+        Schema::table('schedule_config', function (Blueprint $table) {
+            $table->dropColumn('admin_id');
+        });
+        Schema::table('schedule_group_config', function (Blueprint $table) {
             $table->dropColumn('admin_id');
         });
     }

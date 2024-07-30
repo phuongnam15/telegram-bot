@@ -3,14 +3,14 @@
 @section("title", "Setting Bot Page")
 
 @section("content")
-<div class="container mt-5 px-5">
-    <h2 class="mb-3 text-[23px] font-bold text-gray-700">Bot Settings</h2>
-    <div id="botDetails" class="mb-3 space-y-2 rounded bg-white p-4 font-sans shadow-md">
+<div class="container mt-5">
+    <!-- <h2 class="mb-3 text-[23px] font-bold text-gray-700">Bot Settings</h2> -->
+    <div id="botDetails" class="mb-5 space-y-3 bg-white font-sans border-b-[1px] border-solid border-gray-200 pb-5">
         <!-- Bot details will be populated here -->
     </div>
-    <div id="botCommands" class="space-y-2 rounded bg-white p-4 shadow-md">
-        <button class="transform rounded border border-gray-500 bg-gray-500 px-4 py-1 font-medium text-white duration-200 hover:border-gray-600 hover:bg-gray-50 hover:text-gray-600" data-toggle="modal" data-target="#newCommandModal">
-            New Command
+    <div id="botCommands" class="space-y-2 rounded bg-white">
+        <button class="transform rounded border border-gray-400 bg-gray-400 px-4 py-[7px] text-sm font-popi text-white duration-200 hover:border-gray-500 hover:bg-gray-50 hover:text-gray-500" data-toggle="modal" data-target="#newCommandModal">
+            New command
         </button>
         <table class="w-full">
             <thead class="bg-gray-200">
@@ -26,8 +26,11 @@
     </div>
 </div>
 <!-- Modal for creating or updating schedule -->
-<div class="fixed inset-0 z-10 hidden overflow-y-auto" id="scheduleModal">
+<div class="fixed inset-0 z-10 overflow-y-auto hidden" id="scheduleModal">
     <div class="flex min-h-screen items-center justify-center">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
         <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
             <div class="bg-gray-200 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
                 <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" aria-label="Close" onclick="document.getElementById('scheduleModal').classList.add('hidden')">
@@ -36,13 +39,13 @@
                     </span>
                 </button>
             </div>
-            <div class="bg-white px-4 py-5 sm:p-6">
-                <form id="scheduleForm">
+            <div class="bg-white px-4 py-2 pt-4 pb-1">
+                <form id="scheduleUpdateForm">
                     <input type="hidden" id="scheduleType" />
                     <input type="hidden" id="scheduleId" />
                     <input type="hidden" id="scheduleBotId" />
                     <div class="mb-4">
-                        <label for="scheduleStatus" class="text-sm font-medium text-gray-700">
+                        <label for="scheduleStatus" class="text-sm font-mono tracking-tighter text-gray-700">
                             Status
                         </label>
                         <select id="scheduleStatus" name="status" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
@@ -51,7 +54,7 @@
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label for="scheduleTime" class="text-sm font-medium text-gray-700">
+                        <label for="scheduleTime" class="text-sm font-mono tracking-tighter text-gray-700">
                             Delay Time (minutes)
                         </label>
                         <input type="number" id="scheduleTime" name="delay_time" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" />
@@ -65,7 +68,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal to set new command -->
 <div class="fixed inset-0 z-10 hidden overflow-y-auto" id="newCommandModal" tabindex="-1" role="dialog" aria-labelledby="newCommandModalLabel" aria-hidden="true">
     <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -87,7 +90,7 @@
                     <div class="w-full">
                         <form id="commandForm">
                             <div class="mb-4">
-                                <label for="command" class="text-gray-700">
+                                <label for="command" class="text-gray-700 font-mono text-sm">
                                     Command
                                 </label>
                                 <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" id="command" name="command" required placeholder="ex: /start" />
@@ -103,6 +106,48 @@
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for activating bot -->
+<div class="fixed inset-0 z-10 hidden overflow-y-auto" id="activateBotModal">
+    <div class="flex min-h-screen items-center justify-center">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
+            <div class="bg-gray-200 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
+                <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('activateBotModal').classList.add('hidden')">
+                    <span aria-hidden="true" class="text-[20px]">
+                        &times;
+                    </span>
+                </button>
+            </div>
+            <div class="bg-white px-4 py-5 sm:p-6">
+                <div class="mb-4">
+                    <label for="monthQty" class="text-sm font-medium text-gray-700">
+                        Select Number of Months
+                    </label>
+                    <select id="monthQty" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
+                        <option value="1" data-price="10">
+                            1 Month - $10
+                        </option>
+                        <option value="3" data-price="27">
+                            3 Months - $27
+                        </option>
+                        <option value="6" data-price="48">
+                            6 Months - $48
+                        </option>
+                        <option value="12" data-price="90">
+                            12 Months - $90
+                        </option>
+                    </select>
+                </div>
+                <button id="activateBotButton" class="text-md rounded bg-blue-500 px-3 py-1 text-white">
+                    Activate
+                </button>
             </div>
         </div>
     </div>
@@ -126,20 +171,31 @@
 
                 // Hiển thị chi tiết bot lên trang
                 $('#botDetails').html(`
-                        <div class="mb-3 border-[1px] rounded border-solid border-gray-300 p-3">
-                            <p class="block text-sm font-medium text-gray-700"><strong>ID:</strong> ${data.id}</p>
+                        <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
+                            <img src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" 
+                                class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
                             <p class="block text-sm font-medium text-gray-700"><strong>Token:</strong> ${data.token}</p>
-                            <p class="block text-sm font-medium text-gray-700"><strong>Name:</strong> ${data.name}</p>
+                            <p class="block text-sm font-medium text-gray-700"><strong>Username:</strong> @${data.username}</p>
+                            <p class="block text-sm font-medium text-gray-700"><strong>Firstname:</strong> ${data.firstname}</p>
                             <p class="block text-sm font-medium text-gray-700"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
                             <p class="block text-sm font-medium text-gray-700"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
+                            <div class="mt-2">
+                                ${data.status === '0' ? 
+                                    `<button class="text-green-500 text-[14px] italic hover:underline activate-btn" onClick="openActivateBotModal(${data.id})">active</button>
+                                    <span>/</span>`
+                                : 
+                                    ''
+                                }
+                                <button class="text-red-500 text-[14px] italic hover:underline" onClick="deleteBot(${data.id})">delete</button>
+                            </div>
                         </div>
                     `);
 
                 // Hiển thị các nút thiết lập schedule
                 if (data.schedule_delete_message) {
                     $('#botDetails').append(`
-                            <div class="mt-5">
-                                <form id="scheduleForm" class="flex space-x-4">
+                            <div class="">
+                                <form id="scheduleForm" class="flex space-x-4 mb-0">
                                     <div class="flex-1 self-end">
                                         <label for="delay_time" class="block text-sm font-medium text-gray-700">Độ trễ xoá tin (phút)</label>
                                         <input
@@ -163,10 +219,10 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-600 hover:border-gray-600 transform duration-200"
+                                        class="self-end px-3 py-2 border font-medium rounded text-white bg-gray-400 border-gray-400 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
                                     >
-                                        Cập nhật
+                                        <i class="fa-solid fa-wrench"></i>
                                     </button>
                                 </form>
                             </div>
@@ -179,8 +235,8 @@
 
                 if (data.schedule_config) {
                     $('#botDetails').append(`
-                             <div class="mb-5">
-                                <form id="scheduleConfigForm" class="flex space-x-4">
+                             <div class="">
+                                <form id="scheduleConfigForm" class="flex space-x-4 mb-0">
                                     <div class="flex-1">
                                         <label for="config_delay_time" class="block text-sm font-medium text-gray-700">Lịch chạy user (phút)</label>
                                         <input
@@ -215,10 +271,10 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-600 hover:border-gray-600 transform duration-200"
+                                        class="self-end px-3 py-2 border font-medium rounded text-white bg-gray-400 border-gray-400 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
                                     >
-                                        Cập nhật
+                                        <i class="fa-solid fa-wrench"></i>
                                     </button>
                                 </form>
                             </div>
@@ -231,8 +287,8 @@
 
                 if (data.schedule_group_config) {
                     $('#botDetails').append(`
-                            <div class="mb-5">
-                                <form id="scheduleGroupConfigForm" class="flex space-x-4">
+                            <div>
+                                <form id="scheduleGroupConfigForm" class="flex space-x-4 mb-0">
                                     <div class="flex-1">
                                         <label for="group_config_delay_time" class="block text-sm font-medium text-gray-700">Lịch chạy group (phút)</label>
                                         <input
@@ -267,10 +323,10 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="self-end px-4 py-1 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-600 hover:border-gray-600 transform duration-200"
+                                        class="self-end px-3 py-2 border font-medium rounded text-white bg-gray-400 border-gray-400 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
                                     >
-                                        Cập nhật
+                                        <i class="fa-solid fa-wrench"></i>
                                     </button>
                                 </form>
                             </div>
@@ -366,7 +422,7 @@
             }
         }
 
-        $('#scheduleForm').on('submit', async (e) => {
+        $('#scheduleUpdateForm').on('submit', async (e) => {
             e.preventDefault();
 
             const type = $('#scheduleType').val();
@@ -394,8 +450,8 @@
                     method: 'POST',
                     body: formData,
                 });
+
                 $('#scheduleModal').addClass('hidden');
-                // window.location.reload();
                 await getDetailBot();
             } catch (e) {
                 console.log(e);
@@ -426,8 +482,54 @@
         $('#newCommandModal').on('hidden.bs.modal', function() {
             $('#commandForm')[0].reset();
             $('#contentList').val('');
-            // $('#newCommandModalLabel').text('Add Group');
         });
+
+        {
+            window.openActivateBotModal = (id) => {
+                $('#activateBotModal').removeClass('hidden');
+                $('#activateBotModal').data('botId', id);
+            };
+
+            $('#monthQty').on('change', function() {
+                const price = $(this).find(':selected').data('price');
+                $('#totalPrice').text(price);
+            });
+
+            $('#activateBotButton').on('click', async () => {
+                const botId = $('#activateBotModal').data('botId');
+                const monthQty = $('#monthQty').val();
+                const formData = new FormData();
+                formData.append('month_qty', monthQty);
+
+                try {
+                    const response = await fetchClient(
+                        `/api/admin/bot/${botId}`, {
+                            method: 'POST',
+                            body: formData,
+                        },
+                    );
+                    $('#activateBotModal').addClass('hidden');
+                    location.reload();
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            window.deleteBot = async (id) => {
+                if (confirm('Are you sure you want to delete this bot?')) {
+                    try {
+                        const response = await fetchClient(
+                            `/api/admin/bot/${id}`, {
+                                method: 'DELETE',
+                            },
+                        );
+                        window.location.href = '/bot';
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            };
+        }
     });
 </script>
 @endpush

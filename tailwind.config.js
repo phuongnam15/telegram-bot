@@ -5,6 +5,7 @@ export default {
         extend: {
             fontFamily: {
                 ubuntu: ["Ubuntu", "sans-serif"],
+                popi: ["Poppins", "sans-serif"],
             },
         },
     },

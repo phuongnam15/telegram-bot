@@ -39,7 +39,10 @@ class ContentConfigService extends BaseService
     }
     public function list($request)
     {
-        $contents = ContentConfig::where('admin_id', auth()->user()->id)->paginate(DEFAULT_PAGINATE);
+        $contents = ContentConfig::where([
+            'admin_id' => auth()->user()->id, 
+            'bot_id' => $request->bot_id
+        ])->paginate(DEFAULT_PAGINATE);
 
         return response()->json($contents);
     }

@@ -1,74 +1,53 @@
 <!-- resources/views/components/navbar.blade.php -->
 
-<nav class="sticky left-0 top-0 z-10 h-lvh bg-gray-700 py-4">
-    <div class="flex h-full flex-col">
-        <div class="flex flex-1 flex-col">
-            <div class="flex w-full">
-                <a href="/" id="homeLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:bg-gray-600">
-                <i class="fa-solid fa-house mr-4"></i> <span>Home</span>
-                </a>
-            </div>
-            <div class="flex w-full">
-                <a href="/group" id="groupLink" class="h-full w-full py-2 pl-5 font-medium text-white hover:bg-gray-600">
-                <i class="fa-solid fa-user-group mr-4"></i> <span>Group</span>
-                </a>
-            </div>
-            <div class="flex w-full">
-                <a href="/bot" id="botLink" class="h-full w-full px-[60px] py-2 pl-5 font-medium text-white hover:bg-gray-600">
-                <i class="fa-solid fa-robot mr-4"></i> <span>Bot</span>
-                </a>
-            </div>
-        </div>
-        <div>
-            <a href="#" id="logoutButton" class="transition-bg px-[60px] py-2 font-bold text-white duration-200 hover:bg-[#fafbfb] hover:text-gray-700">
-                Logout
+<nav class="sticky top-0 z-10 w-lvw bg-[#f8f9fa] py-2 flex justify-center">
+    <div class="container flex w-full items-center justify-between font-popi text-sm">
+        <div class="flex gap-2">
+            <a href="/bot" id="botLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
+                <span>Bot</span>
             </a>
+            <a href="/content" id="contentLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
+                <span>Content</span>
+            </a>
+            <a href="/group" id="groupLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
+                <span>Group</span>
+            </a>
+        </div>
+        <div class="relative">
+            <button id="userMenuButton" class="transition-bg py-2 text-gray-500 flex items-center">
+                <span id="username"></span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="userMenu" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg hidden overflow-hidden border-[1px] border-solid border-gray-300">
+                <a href="#" id="logoutButton" class="block px-3 py-2 text-gray-800 hover:bg-gray-200 space-x-1"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+            </div>
         </div>
     </div>
 </nav>
 
 <script>
-    //div cha của 2 element a trên và dưới sẽ thêm bg-white và rounded-s-2xl, còn phần tử a ở dưới sẽ thêm rounded-tr-2xl còn ở trên sẽ thêm rounded-br-2xl
-    document.addEventListener('DOMContentLoaded', () => {
-        const currentPath = window.location.pathname;
-        const links = {
-            '/': document.getElementById('homeLink'),
-            '/group': document.getElementById('groupLink'),
-            '/bot': document.getElementById('botLink'),
-        };
-
-        if (links[currentPath]) {
-            const currentLink = links[currentPath];
-            currentLink.classList.add(
-                'bg-[#fafbfb]',
-                'text-gray-700',
-                'rounded-s-2xl',
-            );
-            currentLink.classList.remove('text-white', 'hover:bg-gray-600');
-
-            // Get keys as an array
-            const paths = Object.keys(links);
-
-            // Find the index of the current path
-            const currentIndex = paths.indexOf(currentPath);
-
-            // Add rounded corners to the parent elements before and after the current path element
-            if (currentIndex > 0) {
-                const previousLink = links[paths[currentIndex - 1]];
-                if (previousLink && previousLink.parentElement) {
-                    previousLink.parentElement.classList.add('bg-[#fafbfb]', 'rounded-s-2xl');
-                    previousLink.classList.add('rounded-br-2xl', 'bg-gray-700');
-                }
-            }
-
-            if (currentIndex < paths.length - 1) {
-                const nextLink = links[paths[currentIndex + 1]];
-                if (nextLink && nextLink.parentElement) {
-                    nextLink.parentElement.classList.add('bg-[#fafbfb]', 'rounded-s-2xl');
-                    nextLink.classList.add('rounded-tr-2xl', 'bg-gray-700');
-                }
-            }
+    $(document).ready(async () => {
+        try {
+            const response = await fetchClient('/api/admin/me');
+            document.getElementById('username').innerText = response.data.name;
+        } catch (error) {
+            console.log(error);
         }
+
+        document.getElementById('userMenuButton').addEventListener('click', function() {
+            var userMenu = document.getElementById('userMenu');
+            userMenu.classList.toggle('hidden');
+        });
+
+        window.addEventListener('click', function(e) {
+            var userMenu = document.getElementById('userMenu');
+            var userMenuButton = document.getElementById('userMenuButton');
+            if (!userMenuButton.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
     });
 
     document.getElementById('logoutButton').addEventListener('click', () => {

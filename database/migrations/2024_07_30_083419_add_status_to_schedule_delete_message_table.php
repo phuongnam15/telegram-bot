@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bots', function (Blueprint $table) {
-            $table->id();
-            $table->string('token');
-            $table->string('username');
-            $table->string('firstname');
-            $table->string('status')->default(false);
-            $table->timestamps();
+        Schema::table('schedule_delete_message', function (Blueprint $table) {
+            $table->string('status')->default('off');
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bots');
+        Schema::table('schedule_delete_message', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
     }
 };

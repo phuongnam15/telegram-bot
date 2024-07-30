@@ -3,7 +3,7 @@
 @section("title", "Group Page")
 
 @section("content")
-    <div class="container mt-5 px-5">
+    <div class="container mt-5">
         <h2 class="mb-4 text-[23px] font-bold text-gray-700">
             Group Management
         </h2>

@@ -3,7 +3,7 @@
 @section("title", "Home Page")
 
 @section("content")
-    <div class="relative mx-5 mt-5">
+    <div class="relative mx-5 mt-5 container">
         <div class="absolute right-0 flex">
             <div class="flex w-48 filter">
                 <select

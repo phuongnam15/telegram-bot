@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Api\Admin\AdminController;
 use App\Http\Controllers\Api\Admin\Customer\AuthController;
 use App\Http\Controllers\Api\Admin\BotController;
 use App\Http\Controllers\Api\Admin\CloneDataController;
@@ -23,6 +25,8 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:admin')->group(function () {
+    Route::get('/me', [AdminController::class, 'me']);
+    
     Route::prefix('command')->group(function () {
         Route::post('/', [CommandController::class, 'store']);
         Route::get('/', [CommandController::class, 'list']);

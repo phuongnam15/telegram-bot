@@ -3,7 +3,7 @@
 @section("title", "Config Content")
 
 @section("content")
-<div class="container relative mx-auto rounded bg-white p-5 shadow">
+<div class="container relative mx-auto rounded bg-white p-5">
     <h2 class="mb-5 text-2xl font-bold">Create new post</h2>
     <form action="{{ url("/api/posts") }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
         @csrf

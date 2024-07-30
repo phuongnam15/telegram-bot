@@ -17,10 +17,10 @@
 </head>
 
 <body class="font-ubuntu">
-    <div class="flex bg-[#fafbfb]">
+    <div class="">
         @include("layouts.navbar")
 
-        <main class="w-full p-2">
+        <main class="w-full flex justify-center">
             @yield("content")
         </main>
     </div>

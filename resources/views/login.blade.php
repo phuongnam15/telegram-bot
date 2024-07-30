@@ -117,7 +117,7 @@
                                 'access_token',
                                 data?.data?.token,
                             );
-                            window.location.href = '/';
+                            window.location.href = '/bot';
                         } else {
                             const data = await response.json();
                             errorMessageElement.textContent = data.message;

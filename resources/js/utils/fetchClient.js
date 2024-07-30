@@ -7,7 +7,7 @@ export async function fetchClient(url, options = {}) {
     };
 
     try {
-        const response = await fetch(url, options);
+        const response = await fetch(window.location.origin + url, options);
 
         if (response.status === 401) {
             window.location.href = "/login";

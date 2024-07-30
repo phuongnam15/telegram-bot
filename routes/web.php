@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/config', function () {
     return view('config_content');
 });
-Route::get('/', function () {
+Route::get('/content', function () {
     return view('list_content');
 });
 Route::get('/update/{id}', function () {

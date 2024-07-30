@@ -369,11 +369,13 @@ class BotService extends BaseService
             $response = $client->get("https://api.telegram.org/bot{$token}/getMe");
 
             $data = json_decode($response->getBody(), true);
+            // logger($data);
 
             if ($data['ok']) {
                 $bot = Bot::create([
                     'token' => $request->token,
-                    "name" => $data['result']['username'],
+                    "username" => $data['result']['username'],
+                    "firstname" => $data['result']['first_name'],
                     "admin_id" => auth()->user()->id
                 ]);
 
