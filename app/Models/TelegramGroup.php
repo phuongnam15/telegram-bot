@@ -13,5 +13,7 @@ class TelegramGroup extends Model
         'telegram_id', 
         'name',
         'admin_id',
+        'avatar',
+        'title'
     ];
 }

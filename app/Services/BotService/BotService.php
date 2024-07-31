@@ -5,6 +5,7 @@ namespace App\Services\BotService;
 use App\Jobs\DeleteTelegramMessage;
 use App\Models\Bot;
 use App\Models\BotCommandContent;
+use App\Models\BotGroup;
 use App\Models\BotUser;
 use App\Models\Command;
 use App\Models\ContentConfig;
@@ -15,9 +16,6 @@ use App\Models\TelegramGroup;
 use App\Models\TelegramMessage;
 use App\Models\User;
 use App\Models\UserPassword;
-use App\Repositories\ScheduleConfig\IScheduleConfigRepo;
-use App\Repositories\ScheduleDeleteMessage\IScheduleDeleteMessageRepo;
-use App\Repositories\ScheduleGroupConfig\IScheduleGroupConfigRepo;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use GuzzleHttp\Client;
@@ -47,24 +45,12 @@ class BotService extends BaseService
                 'base_uri' => "https://api.telegram.org/bot{$botToken}/",
             ]);
 
+            // logger($update);
+            $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
+
             if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
                 $message = $update['chat_member'] ?? $update['message'];
                 $chatId = $message['chat']['id'];
-                $chatType = $message['chat']['type'] ?? null;
-
-                // Check group info
-                if (in_array($chatType, ['group', 'supergroup', 'channel'])) {
-                    $name = $message['chat']['title'] ?? $message['chat']['username'] ?? "";
-
-                    TelegramGroup::firstOrCreate(
-                        ['telegram_id' => $chatId],
-                        [
-                            'name' => $name,
-                            'telegram_id' => $chatId,
-                            'admin_id' => $adminId
-                        ]
-                    );
-                }
 
                 $name = "";
 
@@ -104,7 +90,7 @@ class BotService extends BaseService
 
                         $command = Command::where('command', $message['text'])->first();
 
-                        if($message['text'] === '/start') {
+                        if ($message['text'] === '/start') {
                             if (isset($message['from']['first_name'])) {
                                 $name .= $message['from']['first_name'] . " ";
                             }
@@ -114,7 +100,7 @@ class BotService extends BaseService
                             if ($name === '') {
                                 $name = $message['from']['username'];
                             }
-    
+
                             $user = User::firstOrCreate(
                                 ['telegram_id' => $chatId],
                                 [
@@ -123,9 +109,9 @@ class BotService extends BaseService
                                     'telegram_id' => $chatId,
                                 ]
                             );
-    
+
                             $botUserExists = BotUser::where([
-                                'user_id' => $user->id, 
+                                'user_id' => $user->id,
                                 'bot_id' => $botId
                             ])->exists();
 
@@ -135,15 +121,14 @@ class BotService extends BaseService
                                     'bot_id' => $botId
                                 ]);
                             }
-
                         }
 
                         $bCC = BotCommandContent::where([
                             'bot_id' => $botId,
                             'command_id' => $command->id
                         ])->first();
-                        
-                        if($bCC) {
+
+                        if ($bCC) {
                             $content = ContentConfig::where('id', $bCC->content_id)->first();
                             $this->send([$chatId], $content->id, $botToken);
                         }
@@ -506,5 +491,101 @@ class BotService extends BaseService
 
             return $bot;
         });
+    }
+    public function getGroupImage($botToken, $chatId)
+    {
+        try {
+            $client = new Client();
+            $response = $client->get("https://api.telegram.org/bot{$botToken}/getChat", [
+                'query' => [
+                    'chat_id' =>  $chatId
+                ]
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            if ($data['ok']) {
+                $chat = $data['result'];
+                $photo = null;
+
+                if (isset($chat['photo'])) {
+                    $photoFileId = $chat['photo']['big_file_id'];
+
+                    // Get the file path
+                    $fileResponse = $client->get("https://api.telegram.org/bot{$botToken}/getFile", [
+                        'query' => [
+                            'file_id' => $photoFileId
+                        ]
+                    ]);
+
+                    $fileData = json_decode($fileResponse->getBody(), true);
+
+                    if ($fileData['ok']) {
+                        $filePath = $fileData['result']['file_path'];
+                        $photo = "https://api.telegram.org/file/bot{$botToken}/{$filePath}";
+                    }
+                }
+
+                return $photo;
+            }
+
+            return "";
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function checkJoinLeftGroup($update, $botId, $botToken, $adminId)
+    {
+        try {
+            if (isset($update['my_chat_member'])) {
+                
+                $myChatMember = $update['my_chat_member'];
+                $chatId = $myChatMember['chat']['id'];
+
+                if (isset($myChatMember['new_chat_member']['status']) && $myChatMember['new_chat_member']['status'] === 'left') {
+                    
+                    $telegramGroup = TelegramGroup::where('telegram_id', $chatId)->first();
+                    
+                    if ($telegramGroup) {
+                        BotGroup::where([
+                            'bot_id' => $botId,
+                            'group_id' => $telegramGroup->id
+                        ])->delete();
+                    }
+                }
+
+                if (isset($myChatMember['new_chat_member']['status']) && $myChatMember['new_chat_member']['status'] === 'member') {
+                    
+                    $groupName = $myChatMember['chat']['username'];
+                    $groupTitle = $myChatMember['chat']['title'];
+
+                    $teleGroup = TelegramGroup::firstOrCreate(
+                        ['telegram_id' => $chatId],
+                        [
+                            'name' => $groupName,
+                            'title' => $groupTitle,
+                            'telegram_id' => $chatId,
+                            'admin_id' => $adminId
+                        ]
+                    );
+
+
+                    if (!BotGroup::where(['group_id' => $teleGroup->id, 'bot_id' => $botId])->exists()) {
+
+                        $teleGroup->avatar = $this->getGroupImage($botToken, $chatId);
+                        $teleGroup->save();
+
+                        BotGroup::create([
+                            'group_id' => $teleGroup->id,
+                            'bot_id' => $botId
+                        ]);
+                    }
+                }
+            }
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
     }
 }

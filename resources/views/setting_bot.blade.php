@@ -21,6 +21,11 @@
                     Content
                 </a>
             </li>
+            <li class="me-2">
+                <a href="#" onclick="showTab('group'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-group">
+                    Group
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -84,6 +89,8 @@
             </div>
         </div>
     </div>
+
+    <!-- content tab list -->
     <div id="content" class="hidden">
         <div class="relative container">
             <div class="right-0 flex flex-row-reverse">
@@ -112,9 +119,11 @@
             <!-- <h2 class="text-2xl font-bold">Content List</h2> -->
             <div id="contentData" class="mt-3 w-full overflow-x-auto shadow"></div>
             <div id="pagination" class="mt-3"></div>
-            <div class="w-full text-center hidden" id="thinkOutOfTheBox">
-                <img src="{{asset('assets/images/think-out-of-the-box.png')}}" alt="" class="w-[230px] mx-auto">
-                <p class="mt-3 font-bold text-2xl text-gray-800">There are no posts to show.</p>
+            <div class="w-full text-center hidden my-auto" id="thinkOutOfTheBox">
+                <a href="#" class="cursor-pointer">
+                    <img src="{{asset('assets/images/new.png')}}" alt="" class="w-[80px] mx-auto">
+                </a>
+                <p class="mt-3 font-bold text-xl text-gray-200">There are no posts to show.</p>
             </div>
         </div>
 
@@ -163,6 +172,42 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- group tab list -->
+    <div id="group" class="hidden">
+        <div class="container mt-5">
+            <table class="min-w-full shadow rounded" id="groupTable">
+                <thead class="text-sm text-gray-600 font-mono border-b-[1px] border-solid border-gray-300">
+                    <tr class="w-full">
+                        <th class="px-4 py-2">Infomation</th>
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">Created At</th>
+                        <th class="px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-gray-600 text-center">
+                    <!-- Rows will be added by jQuery -->
+                    <tr class="bg-gray-100">
+                        <td class="flex items-center gap-2 flex-1 hover:bg-[#ced3dc] p-4">
+                            <img class="size-12 rounded-full" src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" alt="">
+                            <div class="flex flex-col leading-5">
+                                <p class="text-left">
+                                    <span class="font-medium">test</span>
+                                </p>
+                                <p class="text-gray-500 flex items-center gap-1">
+                                    <span class="text-sm">@uzimaki</span>
+                                    <i class="fa-brands fa-telegram"></i>
+                                </p>
+                            </div>
+                        </td>
+                        <td class="p-4">8375687358</td>
+                        <td class="p-4">24/10/37 34:23:12</td>
+                        <td class="p-4">24/10/37 34:23:12</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -225,10 +270,10 @@
             </div>
             <div class="bg-white px-4 py-5 sm:p-6">
                 <div class="mb-4">
-                    <label for="monthQty" class="text-sm font-medium text-gray-700">
-                        Select Number of Months
+                    <label for="monthQty" class="text-sm text-gray-700">
+                        Select num of months
                     </label>
-                    <select id="monthQty" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
+                    <select id="monthQty" class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
                         <option value="1" data-price="10">
                             1 Month - $10
                         </option>
@@ -516,22 +561,23 @@
                 }
 
                 //GROUP
-                // try {
-                //     const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
+                try {
+                    const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
 
-                //     response.forEach((user) => {
-                //         userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
-                //     });
+                    response.data.forEach((user) => {
+                        userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
+                    });
 
-                //     document.getElementById('userList').innerHTML =
-                //         userListHTML;
+                    console.log(response);
 
-                //     $('#userModal').modal('show');
+                    document.getElementById('userList').innerHTML = userListHTML;
 
-                //     attachSelectAllHandler();
-                // } catch (error) {
-                //     console.log(error);
-                // }
+                    $('#userModal').modal('show');
+
+                    attachSelectAllHandler();
+                } catch (error) {
+                    console.log(error);
+                }
             };
 
             // // Add search functionality
@@ -662,8 +708,46 @@
             });
         }
 
+        window.groupScript = async () => {
+            const listGroup = async () => {
+                $('#groupTable tbody').html('');
+
+                try {
+                    const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
+
+                    response.data.forEach((group) => {
+                        $('#groupTable tbody').append(`
+                            <tr>
+                                <td class="flex items-center justify-center gap-2 py-4">
+                                    <img class="size-12 rounded-full" src="${group.avatar}" alt="">
+                                    <div class="flex flex-col leading-5">
+                                        <p class="text-left">
+                                            <span class="font-medium">${group?.title}</span>
+                                        </p>
+                                        <p class="text-gray-500 flex items-center gap-1">
+                                            <span class="text-sm">@${group.name}</span>
+                                            <i class="fa-brands fa-telegram"></i>
+                                        </p>
+                                    </div>
+                                </td>
+                                <td class="py-4">8375687358</td>
+                                <td class="py-4">${formatDate(group.created_at)}</td>
+                                <td class="py-4"></td>
+                            </tr>
+                        `);
+                    });
+
+
+                    attachSelectAllHandler();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            await listGroup();
+        }
+
         window.showTab = async (tabId) => {
-            const tabIds = ['command', 'content'];
+            const tabIds = ['command', 'content', 'group'];
             tabIds.forEach(function(id) {
                 document.getElementById(id).classList.add('hidden');
             });
@@ -672,6 +756,8 @@
                 await contentScript();
             } else if (tabId === 'command') {
                 await commandScript();
+            } else if (tabId === 'group') {
+                await groupScript();
             }
 
             // Đổi class của tablist để thể hiện tab được chọn
@@ -682,7 +768,7 @@
             document.getElementById('tab-' + tabId).classList.add('bg-gray-500', 'text-white');
             document.getElementById('tab-' + tabId).classList.remove('hover:border-gray-400');
         }
-        await showTab('content');
+        await showTab('group');
 
         window.getDetailBot = async () => {
             try {

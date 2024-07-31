@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('bot_groups', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bot_id');
-            $table->unsignedBigInteger('group_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
+            $table->foreignId('group_id')->constrained('telegram_groups')->onDelete('cascade');
             $table->timestamps();
         });
     }

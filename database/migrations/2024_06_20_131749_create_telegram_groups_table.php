@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('telegram_groups', function (Blueprint $table) {
             $table->id();
             $table->string('telegram_id');          
-            $table->string('name');       
+            $table->string('name');
+            $table->string('avatar')->nullable();       
+            $table->string('title')->nullable();       
             $table->timestamps();
         });
     }

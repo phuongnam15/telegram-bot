@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('bot_users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bot_id');
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
