@@ -119,12 +119,12 @@
                 $('#botList').empty();
                 response.forEach((bot) => {
                     $('#botList').append(`
-                        <div class="cursor-pointer border-[1px] border-solid border-[#e5e7eb] rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" id="botItem" data-id="${bot.id}">
+                        <div class="cursor-pointer border-[1px] border-solid border-[#e5e7eb] rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
                             <div class="flex items-center gap-2 flex-1 hover:bg-[#ced3dc] py-2 px-3">
                                 <img class="size-12 rounded-full" src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" alt="">
                                 <div class="flex flex-col leading-5">
                                     <p class="">
-                                        <span class="font-medium">${bot.firstname}</span>
+                                        <span class="font-medium text-[15px] tracking-wide font-sans">${bot.firstname}</span>
                                         ${bot.status === '1' ? 
                                             `<span class="py-[3px] px-2 bg-green-400 text-white rounded-full text-[12px]">actived</span>`
                                         : 
@@ -148,6 +148,10 @@
 
         await fetchBots();
 
+        window.showDetailBot = (botId) => {
+            window.location.href = `/setting-bot/${botId}`;
+        };
+
         $('#createBotForm').on('submit', async (e) => {
             e.preventDefault();
             let token = $('#botToken').val();
@@ -160,63 +164,11 @@
                 });
                 $('#createBotModal').modal('hide');
                 await fetchBots();
+                showNotification('Bot created successfully', 'success');
             } catch (e) {
                 console.log(e);
             }
         });
-
-
-        $('#botItem').on('click', function() {
-            const botId = $(this).data('id');
-            window.location.href = `/setting-bot/${botId}`;
-        });
-
-        {
-            window.openActivateBotModal = (id) => {
-                $('#activateBotModal').removeClass('hidden');
-                $('#activateBotModal').data('botId', id);
-            };
-
-            $('#monthQty').on('change', function() {
-                const price = $(this).find(':selected').data('price');
-                $('#totalPrice').text(price);
-            });
-
-            $('#activateBotButton').on('click', async () => {
-                const botId = $('#activateBotModal').data('botId');
-                const monthQty = $('#monthQty').val();
-                const formData = new FormData();
-                formData.append('month_qty', monthQty);
-
-                try {
-                    const response = await fetchClient(
-                        `/api/admin/bot/${botId}`, {
-                            method: 'POST',
-                            body: formData,
-                        },
-                    );
-                    $('#activateBotModal').addClass('hidden');
-                    // await fetchBots();
-                } catch (e) {
-                    console.log(e);
-                }
-            });
-
-            window.deleteBot = async (id) => {
-                if (confirm('Are you sure you want to delete this bot?')) {
-                    try {
-                        const response = await fetchClient(
-                            `/api/admin/bot/${id}`, {
-                                method: 'DELETE',
-                            },
-                        );
-                        // await fetchBots();
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            };
-        }
     });
 </script>
 @endpush

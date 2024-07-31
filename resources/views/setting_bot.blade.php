@@ -4,7 +4,7 @@
 
 @section("content")
 <div class="container mt-5">
-    <div id="botDetails" class="space-y-3 bg-white font-sans mb-5">
+    <div id="botDetails" class="space-y-1 bg-white font-sans mb-5">
         <!-- Bot details will be populated here -->
     </div>
     <input type="text" id="botToken" class="hidden">
@@ -416,7 +416,7 @@
             $('#typeFilter, #kindFilter').change(filterTable);
 
             //get list content
-            {
+            const fetchContent = async () => {
                 try {
                     const response = await fetchClient(`/api/admin/list?bot_id=${botId}`, {
                         method: "GET",
@@ -427,9 +427,12 @@
                 } catch (error) {
                     console.error(error);
                 }
+            }
 
-                function renderContentList(data) {
-                    let contentHTML = `
+            await fetchContent();
+
+            function renderContentList(data) {
+                let contentHTML = `
                             <table class="min-w-full bg-white overflow-hidden">
                                 <thead class="text-gray-600 border-b-[1px] border-solid border-gray-300 font-mono text-[14px]">
                                     <tr>
@@ -443,59 +446,59 @@
                                 </thead>
                                 <tbody id="listContentBody">`;
 
-                    if (data.data.length === 0) {
-                        document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
-                    }
+                if (data.data.length === 0) {
+                    document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
+                }
 
-                    data.data.forEach((content, index) => {
-                        let mediaHTML = '';
-                        let buttonSetDefault = '';
+                data.data.forEach((content, index) => {
+                    let mediaHTML = '';
+                    let buttonSetDefault = '';
 
-                        if (content.type === 'photo') {
-                            mediaHTML = `<img src="${content.media}" class="max-w-[200px] max-h-[200px] mx-auto rounded">`;
-                        } else if (content.type === 'video') {
-                            mediaHTML = `<video controls class="max-w-[200px] max-h-[200px] mx-auto rounded">
+                    if (content.type === 'photo') {
+                        mediaHTML = `<img src="${content.media}" class="max-w-[200px] max-h-[200px] mx-auto rounded">`;
+                    } else if (content.type === 'video') {
+                        mediaHTML = `<video controls class="max-w-[200px] max-h-[200px] mx-auto rounded">
                                                 <source src="${content.media}" type="video/mp4">
                                                 Your browser does not support the video tag.
                                             </video>`;
-                        }
+                    }
 
-                        if (
-                            (content.kind === 'introduce' ||
-                                content.kind === 'start') &&
-                            !content.is_default
-                        ) {
-                            buttonSetDefault = `<button class="bg-blue-500 text-white text-xs py-1 px-2 rounded" onclick="setDefault(${content.id})">Default</button>`;
-                        }
+                    if (
+                        (content.kind === 'introduce' ||
+                            content.kind === 'start') &&
+                        !content.is_default
+                    ) {
+                        buttonSetDefault = `<button class="bg-blue-500 text-white text-xs py-1 px-2 rounded" onclick="setDefault(${content.id})">Default</button>`;
+                    }
 
-                        let typeBadge = '';
-                        if (content.type === 'photo') {
-                            typeBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">photo</span>';
-                        } else if (content.type === 'video') {
-                            typeBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">video</span>';
-                        } else if (content.type === 'text') {
-                            typeBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded-full">text</span>';
-                        }
+                    let typeBadge = '';
+                    if (content.type === 'photo') {
+                        typeBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">photo</span>';
+                    } else if (content.type === 'video') {
+                        typeBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">video</span>';
+                    } else if (content.type === 'text') {
+                        typeBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded-full">text</span>';
+                    }
 
-                        let kindBadge = '';
-                        if (content.kind === 'introduce') {
-                            kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">Giới thiệu</span>';
-                        } else if (content.kind === 'button') {
-                            kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">Click button</span>';
-                        } else if (content.kind === 'start') {
-                            kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">Start</span>';
-                        } else {
-                            kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">Other</span>';
-                        }
+                    let kindBadge = '';
+                    if (content.kind === 'introduce') {
+                        kindBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">Giới thiệu</span>';
+                    } else if (content.kind === 'button') {
+                        kindBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">Click button</span>';
+                    } else if (content.kind === 'start') {
+                        kindBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">Start</span>';
+                    } else {
+                        kindBadge =
+                            '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">Other</span>';
+                    }
 
-                        contentHTML += `
+                    contentHTML += `
                                 <tr class="${index !== data.data.length - 1 ? 'border-b-[1px] border-solid border-gray-100' : ''}">
                                     <td class="px-4 py-2 text-center text-gray-600 text-sm">${content.name + (content.is_default ? ' <strong>(mặc định)</strong>' : '')}</td>
                                     <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words font-sans text-gray-600 text-sm">${content.content}</td>
@@ -509,34 +512,34 @@
                                         ${buttonSetDefault}
                                     </td>
                                 </tr>`;
-                    });
-                    contentHTML += '</tbody></table>';
-                    document.getElementById('contentData').innerHTML =
-                        contentHTML;
+                });
+                contentHTML += '</tbody></table>';
+                document.getElementById('contentData').innerHTML =
+                    contentHTML;
 
-                    // Render pagination
-                    let paginationHTML = '';
-                    for (let i = 1; i <= data.last_page; i++) {
-                        paginationHTML += `<button class="bg-gray-200 text-gray-700 py-1 px-3 rounded-full mx-1" onclick="fetchPage(${i})">${i}</button>`;
-                    }
-                    document.getElementById('pagination').innerHTML =
-                        paginationHTML;
+                // Render pagination
+                let paginationHTML = '';
+                for (let i = 1; i <= data.last_page; i++) {
+                    paginationHTML += `<button class="bg-gray-200 text-gray-700 py-1 px-3 rounded-full mx-1" onclick="fetchPage(${i})">${i}</button>`;
                 }
-
-                // Fetch specific page
-                window.fetchPage = async (page) => {
-                    try {
-                        const response = await fetchClient(
-                            `/api/admin/list?page=${page}`,
-                        );
-                        if (response) {
-                            renderContentList(response);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                };
+                document.getElementById('pagination').innerHTML =
+                    paginationHTML;
             }
+
+            // Fetch specific page
+            window.fetchPage = async (page) => {
+                try {
+                    const response = await fetchClient(
+                        `/api/admin/list?page=${page}`,
+                    );
+                    if (response) {
+                        renderContentList(response);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+
 
             // // LIST USER & GROUP
             window.showUsers = async (contentId) => {
@@ -567,8 +570,6 @@
                     response.data.forEach((user) => {
                         userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
                     });
-
-                    console.log(response);
 
                     document.getElementById('userList').innerHTML = userListHTML;
 
@@ -623,7 +624,7 @@
                             },
                         );
 
-                        // location.reload();
+                        await fetchContent();
                     } catch (error) {
                         console.error('Error:', error);
                     }
@@ -653,6 +654,11 @@
                         ),
                     ).map((cb) => cb.value);
 
+                    if (telegramIds.length === 0) {
+                        showNotification('Please select at least one user or group', 'warning');
+                        return;
+                    }
+
                     const formData = new FormData();
                     formData.append('botToken', botToken);
                     formData.append('configId', contentId);
@@ -666,10 +672,8 @@
                             body: formData,
                         });
 
-                        console.log(response);
-
-                        $('#botModal').modal('hide');
-                        alert(response.message);
+                        $('#userModal').modal('hide');
+                        showNotification(response.message, 'success');
                     } catch (error) {
                         console.error('Error:', error);
                     }
@@ -736,9 +740,6 @@
                             </tr>
                         `);
                     });
-
-
-                    attachSelectAllHandler();
                 } catch (error) {
                     console.log(error);
                 }
@@ -787,11 +788,11 @@
                         <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
                             <img src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" 
                                 class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
-                            <p class="block text-sm font-medium text-gray-700"><strong>Token:</strong> ${data.token}</p>
-                            <p class="block text-sm font-medium text-gray-700"><strong>Username:</strong> @${data.username}</p>
-                            <p class="block text-sm font-medium text-gray-700"><strong>Firstname:</strong> ${data.firstname}</p>
-                            <p class="block text-sm font-medium text-gray-700"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
-                            <p class="block text-sm font-medium text-gray-700"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
+                            <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> ${data.token}</p>
+                            <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
+                            <p class="block text-sm font-medium text-gray-600"><strong>Firstname:</strong> ${data.firstname}</p>
+                            <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
+                            <p class="block text-sm font-medium text-gray-600"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
                             <div class="mt-2">
                                 ${data.status === '0' ? 
                                     `<button class="text-green-500 text-[14px] italic hover:underline activate-btn" onClick="openActivateBotModal(${data.id})">active</button>
@@ -810,7 +811,7 @@
                             <div class="">
                                 <form id="scheduleForm" class="flex space-x-4 mb-0">
                                     <div class="flex-1 self-end">
-                                        <label for="delay_time" class="block text-sm font-medium text-gray-700">Độ trễ xoá tin (phút)</label>
+                                        <label for="delay_time" class="block text-xs font-medium text-gray-700">Độ trễ xoá tin (phút)</label>
                                         <input
                                             type="number"
                                             id="delay_time"
@@ -820,7 +821,7 @@
                                         />
                                     </div>
                                     <div class="flex-1 flex flex-col">
-                                        <label for="status" class="text-sm font-medium text-gray-700">Trạng thái</label>
+                                        <label for="status" class="text-xs font-medium text-gray-700">Trạng thái</label>
                                         <select
                                             id="status"
                                             name="status"
@@ -851,7 +852,7 @@
                              <div class="">
                                 <form id="scheduleConfigForm" class="flex space-x-4 mb-0">
                                     <div class="flex-1">
-                                        <label for="config_delay_time" class="block text-sm font-medium text-gray-700">Lịch chạy user (phút)</label>
+                                        <label for="config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy user (phút)</label>
                                         <input
                                             type="number"
                                             id="config_delay_time"
@@ -861,7 +862,7 @@
                                         />
                                     </div>
                                     <div class="flex-1 flex flex-col">
-                                        <label for="config_status" class="text-sm font-medium text-gray-700">Trạng thái</label>
+                                        <label for="config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
                                         <select
                                             id="config_status"
                                             name="status"
@@ -872,7 +873,7 @@
                                         </select>
                                     </div>
                                     <div class="flex-1">
-                                        <label for="config_lastime" class="text-sm font-medium text-gray-700">Lần cuối chạy</label>
+                                        <label for="config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
                                         <input
                                             type="text"
                                             id="config_lastime"
@@ -903,7 +904,7 @@
                             <div>
                                 <form id="scheduleGroupConfigForm" class="flex space-x-4 mb-0">
                                     <div class="flex-1">
-                                        <label for="group_config_delay_time" class="block text-sm font-medium text-gray-700">Lịch chạy group (phút)</label>
+                                        <label for="group_config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy group (phút)</label>
                                         <input
                                             type="number"
                                             id="group_config_delay_time"
@@ -913,7 +914,7 @@
                                         />
                                     </div>
                                     <div class="flex-1 flex flex-col">
-                                        <label for="group_config_status" class="text-sm font-medium text-gray-700">Trạng thái</label>
+                                        <label for="group_config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
                                         <select
                                             id="group_config_status"
                                             name="status"
@@ -924,7 +925,7 @@
                                         </select>
                                     </div>
                                     <div class="flex-1">
-                                        <label for="group_config_lastime" class="text-sm font-medium text-gray-700">Lần cuối chạy</label>
+                                        <label for="group_config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
                                         <input
                                             type="text"
                                             id="group_config_lastime"

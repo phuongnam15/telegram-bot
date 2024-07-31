@@ -235,40 +235,7 @@
         //GET CONTENT BY ID
         var pathArray = window.location.pathname.split('/');
         var id = pathArray[pathArray.length - 1];
-        // fetch(`/api/admin/detail/${id}`)
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('Network response was not ok');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         var responseData = data;
-
-        //         $('#name').val(responseData.name);
-        //         $('#type').val(responseData.type);
-        //         $('#kind').val(responseData.kind);
-
-        //         if (CKEDITOR.instances['content']) {
-        //             CKEDITOR.instances['content'].setData(responseData.content);
-        //         }
-        //         if (responseData.type !== 'text') {
-        //             $('#preview').attr('src', responseData.media);
-        //             $('#preview').closest('.mb-3').removeClass('d-none');
-        //             $('#preview').show();
-        //         }
-
-        //         if (JSON.parse(responseData.buttons)?.inline_keyboard) {
-        //             $('#keyboardType').val('inline_keyboard');
-        //         } else {
-        //             $('#keyboardType').val('keyboard');
-        //         }
-
-        //         updateButtonOptions(JSON.parse(responseData.buttons));
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //     });
+      
         try {
             const response = await fetchClient(
                 `/api/admin/detail/${id}`,
@@ -396,29 +363,6 @@
                 );
             }
 
-            // const formValues = {};
-            // formData.forEach((value, key) => formValues[key] = value);
-            // console.log('Form values:', formValues);
-
-            // const url = `{{ url("/api/admin/update/") }}/${id}`;
-
-            // fetch(url, {
-            //         method: 'POST',
-            //         body: formData,
-            //         headers: {
-            //             'Accept': 'application/json',
-            //             // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')  // CSRF token để bảo mật
-            //         }
-            //     })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         console.log('Success:', data);
-            //         alert('Post created successfully!');
-            //     })
-            //     .catch((error) => {
-            //         console.error('Error:', error);
-            //         alert('Error creating post');
-            //     });
             try {
                 const response = await fetchClient(
                     `/api/admin/update/${id}`, {
@@ -427,7 +371,7 @@
                     },
                 );
 
-                alert('Post created successfully!');
+                showNotification('Post updated successfully', 'success');
             } catch (error) {
                 console.error('Error:', error);
             }

@@ -1,3 +1,5 @@
+import { showNotification } from "./showNotification";
+
 export async function fetchClient(url, options = {}) {
     const token = localStorage.getItem("access_token");
 
@@ -21,7 +23,7 @@ export async function fetchClient(url, options = {}) {
 
         return response.json();
     } catch (error) {
-        console.error("Fetch error:", error);
+        showNotification(error.message, "error");
         throw error;
     }
 }

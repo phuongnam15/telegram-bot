@@ -286,12 +286,10 @@
                     body: formData,
                 });
 
-                if (response.status === 200) {
-                    alert('Post created successfully!');
-                }
+                showNotification('Post created successfully', 'success');
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error creating post');
+                showNotification(error, 'error');
             }
         });
 

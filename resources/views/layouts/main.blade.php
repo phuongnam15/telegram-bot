@@ -17,6 +17,9 @@
 </head>
 
 <body class="font-ubuntu">
+    <div id="notification" class="hidden fixed left-[50%] -translate-x-[50%] z-20 top-10 rounded-md text-white py-1 px-5 w-fitmx-auto">
+        <p class="text-sm">phuong nam</p>
+    </div>
     <div class="">
         @include("layouts.navbar")
 
