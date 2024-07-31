@@ -19,8 +19,8 @@ class User extends Authenticatable
         'status'
     ];
 
-    public function admins()
+    public function bots()
     {
-        return $this->belongsToMany(AdminModel::class, 'admin_user', 'user_id', 'admin_id');
+        return $this->belongsToMany(Bot::class, 'bot_users', 'user_id', 'bot_id');
     }
 }

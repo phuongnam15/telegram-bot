@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdminUser extends Model
+class BotGroup extends Model
 {
     use HasFactory;
-    protected $table = 'admin_user';
+    protected $table = 'bot_groups';
     protected $fillable = [
-        'admin_id',
-        'user_id'
+        'group_id',
+        'bot_id'
     ];
 }

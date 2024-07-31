@@ -37,4 +37,12 @@ class Bot extends Model
     {
         return $this->belongsToMany(Command::class, 'bot_command_content', 'bot_id', 'command_id');
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'bot_users', 'bot_id', 'user_id');
+    }
+    public function groups()
+    {
+        return $this->belongsToMany(TelegramGroup::class, 'bot_groups', 'bot_id', 'group_id');
+    }
 }

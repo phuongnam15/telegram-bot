@@ -2,6 +2,7 @@
 
 namespace App\Services\GroupService;
 
+use App\Models\Bot;
 use App\Models\TelegramGroup;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
@@ -14,7 +15,11 @@ class GroupService extends BaseService
 
     public function list()
     {
-        return TelegramGroup::where('admin_id', auth()->user()->id)->get();
+        return DbTransactions()->addCallBackJson(function () {
+            $bot = Bot::where('id', request()->bot_id)->first();
+            $groups = $bot->groups;
+            return $groups;
+        });
     }
     public function create($input)
     {

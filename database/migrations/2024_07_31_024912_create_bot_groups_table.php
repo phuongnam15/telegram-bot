@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admin_user', function (Blueprint $table) {
+        Schema::create('bot_groups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->foreignId('admin_id');
+            $table->unsignedBigInteger('bot_id');
+            $table->unsignedBigInteger('group_id');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admin_user');
+        Schema::dropIfExists('bot_groups');
     }
 };

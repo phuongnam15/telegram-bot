@@ -7,16 +7,17 @@
     <div id="botDetails" class="space-y-3 bg-white font-sans mb-5">
         <!-- Bot details will be populated here -->
     </div>
-
-    <div class="mb-5 bg-gray-400">
+    <input type="text" id="botToken" class="hidden">
+    <input type="text" id="botStatus" class="hidden">
+    <div class="mb-5 border-b-[1px] border-solid border-gray-200">
         <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
             <li class="me-2">
-                <a href="#" onclick="showTab('command'); return false;" class="inline-flex items-center justify-center px-3 py-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group" id="tab-command">
+                <a href="#" onclick="showTab('command'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-command">
                     Command
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" onclick="showTab('content'); return false;" class="inline-flex items-center justify-center px-3 py-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group" id="tab-content">
+                <a href="#" onclick="showTab('content'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-content">
                     Content
                 </a>
             </li>
@@ -25,8 +26,8 @@
 
     <div id="command">
         <div id="botCommands" class="space-y-2 rounded bg-white">
-            <table class="w-full">
-                <thead class="border-b-[1px] border-solid border-gray-200">
+            <table class="w-full shadow">
+                <thead class="border-b-[1px] border-solid border-gray-300">
                     <tr class="text-sm font-medium text-gray-600">
                         <td class="px-4 py-2 text-center">Command</td>
                         <td class="px-4 py-2 text-center">Content Name</td>
@@ -36,8 +37,8 @@
                 </thead>
                 <tbody id="botCommandsBody"></tbody>
             </table>
-            <button class="transform mb-1 rounded border border-gray-400 bg-gray-400 px-4 py-[7px] text-sm font-popi text-white duration-200 hover:border-gray-500 hover:bg-gray-50 hover:text-gray-500" data-toggle="modal" data-target="#newCommandModal">
-                New
+            <button class="transform mb-1 rounded border border-gray-500 bg-gray-500 w-full py-[5px] text-sm font-popi text-white duration-200 hover:border-gray-500 hover:bg-gray-50 hover:text-gray-500" data-toggle="modal" data-target="#newCommandModal">
+                New command
             </button>
         </div>
 
@@ -85,17 +86,12 @@
     </div>
     <div id="content" class="hidden">
         <div class="relative container">
-            <div class="right-0 flex">
-                <div class="flex w-48 filter">
-                    <select id="typeFilter" class="form-control w-full rounded border pl-2 border-gray-300 outline-none">
-                        <option value="">-- Type --</option>
-                        <option value="text">Text</option>
-                        <option value="photo">Ảnh</option>
-                        <option value="video">Video</option>
-                    </select>
-                </div>
+            <div class="right-0 flex flex-row-reverse">
+                <button class="text-sm py-[5px] ml-2 rounded border border-gray-500 px-2 bg-gray-500 text-white transition-all duration-200 hover:bg-gray-50 hover:text-gray-700" id="createNew">
+                    Create
+                </button>
                 <div class="ml-2 flex w-48 filter">
-                    <select id="kindFilter" class="form-control w-full rounded border pl-2 border-gray-300 outline-none">
+                    <select id="kindFilter" class="form-control w-full rounded border pl-2 border-gray-300 outline-none text-sm">
                         <option value="">-- Kind --</option>
                         <option value="Giới thiệu">Giới thiệu</option>
                         <option value="Click button">Click Button</option>
@@ -103,13 +99,18 @@
                         <option value="Other">Khác</option>
                     </select>
                 </div>
-                <button class="ml-2 rounded border border-gray-900 px-2 bg-gray-900 text-white transition-all duration-200 hover:bg-gray-50 hover:text-gray-700" id="createNew">
-                    Create
-                </button>
+                <div class="flex w-48 filter">
+                    <select id="typeFilter" class="form-control w-full rounded border pl-2 border-gray-300 outline-none text-sm">
+                        <option value="">-- Type --</option>
+                        <option value="text">Text</option>
+                        <option value="photo">Ảnh</option>
+                        <option value="video">Video</option>
+                    </select>
+                </div>
             </div>
 
             <!-- <h2 class="text-2xl font-bold">Content List</h2> -->
-            <div id="contentData" class="mt-3 w-full overflow-x-auto"></div>
+            <div id="contentData" class="mt-3 w-full overflow-x-auto shadow"></div>
             <div id="pagination" class="mt-3"></div>
             <div class="w-full text-center hidden" id="thinkOutOfTheBox">
                 <img src="{{asset('assets/images/think-out-of-the-box.png')}}" alt="" class="w-[230px] mx-auto">
@@ -148,42 +149,6 @@
                                     </div>
                                     <div id="userList" class="text-sm"></div>
                                     <!-- </form> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 bg-gray-50 px-4 py-3">
-                        <button type="button" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" data-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white" id="nextToBots">
-                            Next to select bot
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bot Selection Modal -->
-        <div class="fixed inset-0 z-10 hidden overflow-y-auto" id="botModal" tabindex="-1" role="dialog" aria-labelledby="botModalLabel" aria-hidden="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-                </div>
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">
-                    &#8203;
-                </span>
-                <div class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                                <h5 class="text-lg font-medium leading-6 text-gray-900" id="botModalLabel">
-                                    Select Bot
-                                </h5>
-                                <div class="mt-2">
-                                    <form id="selectBotForm">
-                                        <select id="botList" class="text-sm"></select>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -331,9 +296,7 @@
                     });
 
                     response.data.forEach(element => {
-                        $("#contentList").append(`
-                                    <option value="${element.id}">${element.id} - ${element.name}</option>
-                                `);
+                        $("#contentList").append(`<option value="${element.id}">${element.id} - ${element.name}</option>`);
                     });
                 } catch (error) {
                     console.log(error)
@@ -423,14 +386,14 @@
                 function renderContentList(data) {
                     let contentHTML = `
                             <table class="min-w-full bg-white overflow-hidden">
-                                <thead class="text-gray-500 border-b-[1px] border-solid border-gray-200">
+                                <thead class="text-gray-600 border-b-[1px] border-solid border-gray-300 font-mono text-[14px]">
                                     <tr>
-                                        <th class="py-2 px-4 text-sm">Name</th>
-                                        <th class="py-2 px-4 text-sm">Content</th>
-                                        <th class="py-2 px-4 text-sm">Type</th>
-                                        <th class="py-2 px-4 text-sm">Kind</th>
-                                        <th class="py-2 px-4 text-sm">Media</th>
-                                        <th class="py-2 px-4 text-sm">Actions</th>
+                                        <th class="py-2 px-4">Name</th>
+                                        <th class="py-2 px-4">Content</th>
+                                        <th class="py-2 px-4">Type</th>
+                                        <th class="py-2 px-4">Kind</th>
+                                        <th class="py-2 px-4">Media</th>
+                                        <th class="py-2 px-4">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="listContentBody">`;
@@ -463,34 +426,34 @@
                         let typeBadge = '';
                         if (content.type === 'photo') {
                             typeBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">photo</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">photo</span>';
                         } else if (content.type === 'video') {
                             typeBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">video</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">video</span>';
                         } else if (content.type === 'text') {
                             typeBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">text</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded-full">text</span>';
                         }
 
                         let kindBadge = '';
                         if (content.kind === 'introduce') {
                             kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Giới thiệu</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">Giới thiệu</span>';
                         } else if (content.kind === 'button') {
                             kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Click button</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">Click button</span>';
                         } else if (content.kind === 'start') {
                             kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">Start</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">Start</span>';
                         } else {
                             kindBadge =
-                                '<span class="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Other</span>';
+                                '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">Other</span>';
                         }
 
                         contentHTML += `
                                 <tr class="${index !== data.data.length - 1 ? 'border-b-[1px] border-solid border-gray-100' : ''}">
                                     <td class="px-4 py-2 text-center text-gray-600 text-sm">${content.name + (content.is_default ? ' <strong>(mặc định)</strong>' : '')}</td>
-                                    <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words text-[14px] font-sans text-gray-600">${content.content}</td>
+                                    <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words font-sans text-gray-600 text-sm">${content.content}</td>
                                     <td class="px-4 py-2 text-center">${typeBadge}</td>
                                     <td class="px-4 py-2 text-center">${kindBadge}</td>
                                     <td class="px-4 py-2">${mediaHTML}</td>
@@ -536,9 +499,9 @@
                 let userListHTML = '';
                 //USER
                 try {
-                    const response = await fetchClient('/api/admin/users');
+                    const response = await fetchClient(`/api/admin/users?bot_id=${botId}`);
 
-                    response.forEach((user) => {
+                    response.data.forEach((user) => {
                         userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name} - ${user.telegram_id}</label><br>`;
                     });
 
@@ -553,22 +516,22 @@
                 }
 
                 //GROUP
-                try {
-                    const response = await fetchClient('/api/admin/group');
+                // try {
+                //     const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
 
-                    response.forEach((user) => {
-                        userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
-                    });
+                //     response.forEach((user) => {
+                //         userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
+                //     });
 
-                    document.getElementById('userList').innerHTML =
-                        userListHTML;
+                //     document.getElementById('userList').innerHTML =
+                //         userListHTML;
 
-                    $('#userModal').modal('show');
+                //     $('#userModal').modal('show');
 
-                    attachSelectAllHandler();
-                } catch (error) {
-                    console.log(error);
-                }
+                //     attachSelectAllHandler();
+                // } catch (error) {
+                //     console.log(error);
+                // }
             };
 
             // // Add search functionality
@@ -625,41 +588,18 @@
                 location.href = `/update/${contentId}`;
             };
 
-            //Get active bots
-            document
-                .getElementById('nextToBots')
-                .addEventListener('click', async (event) => {
-                    event.preventDefault();
-
-                    let checkboxes = document.querySelectorAll(
-                        '#userList input[type="checkbox"]:checked',
-                    );
-                    if (checkboxes.length === 0) {
-                        alert('Please select at least one user');
-                        return;
-                    }
-
-                    $('#userModal').modal('hide');
-                    $('#botModal').modal('show');
-
-                    try {
-                        const response = await fetchClient('/api/admin/bot');
-                        let botListHTML = '';
-                        response.forEach((bot) => {
-                            botListHTML += `<option value="${bot.token}">${bot.name}</option>`;
-                        });
-                        document.getElementById('botList').innerHTML =
-                            botListHTML;
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                });
-
             //Send
             document
                 .getElementById('sendContent')
                 .addEventListener('click', async () => {
-                    let botToken = document.getElementById('botList').value;
+                    let botStatus = document.getElementById('botStatus').value;
+
+                    if (botStatus !== '1') {
+                        alert('BOT IS INACTIVE');
+                        return;
+                    }
+
+                    let botToken = document.getElementById('botToken').value;
                     let contentId = document.getElementById('contentId').value;
                     let telegramIds = Array.from(
                         document.querySelectorAll(
@@ -712,7 +652,7 @@
                 location.href = '/group';
             });
             $('#manageBot').click(() => {
-                location.href = '/bot';
+                location.href = '/';
             });
             $('#managePhone').click(() => {
                 location.href = '/phone';
@@ -736,10 +676,11 @@
 
             // Đổi class của tablist để thể hiện tab được chọn
             document.querySelectorAll('a[id^="tab-"]').forEach(function(tabLink) {
-                tabLink.classList.remove('text-blue-600', 'border-blue-600', 'dark:text-blue-500', 'dark:border-blue-500');
-                tabLink.classList.add('hover:text-gray-600', 'hover:border-gray-300', 'dark:hover:text-gray-300');
+                tabLink.classList.remove('bg-gray-500', 'text-white');
+                tabLink.classList.add('hover:border-gray-400');
             });
-            document.getElementById('tab-' + tabId).classList.add('text-blue-600', 'border-blue-600', 'dark:text-blue-500', 'dark:border-blue-500');
+            document.getElementById('tab-' + tabId).classList.add('bg-gray-500', 'text-white');
+            document.getElementById('tab-' + tabId).classList.remove('hover:border-gray-400');
         }
         await showTab('content');
 
@@ -752,6 +693,8 @@
                 );
 
                 const data = response.data;
+                document.getElementById('botToken').value = data.token;
+                document.getElementById('botStatus').value = data.status;
 
                 // Hiển thị chi tiết bot lên trang
                 $('#botDetails').html(`
@@ -786,7 +729,7 @@
                                             type="number"
                                             id="delay_time"
                                             name="delay_time"
-                                            class="mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                            class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
                                             value="${data.schedule_delete_message.delay_time}"
                                         />
                                     </div>
@@ -795,7 +738,7 @@
                                         <select
                                             id="status"
                                             name="status"
-                                            class="mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                            class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
                                         >
                                             <option value="on" ${data.schedule_delete_message.status === 'on' ? 'selected' : ''}>On</option>
                                             <option value="off" ${data.schedule_delete_message.status === 'off' ? 'selected' : ''}>Off</option>
@@ -803,7 +746,7 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="self-end px-3 py-2 border font-medium rounded text-white bg-gray-400 border-gray-400 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                        class="text-sm self-end px-3 py-2 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
                                     >
                                         <i class="fa-solid fa-wrench"></i>
@@ -827,7 +770,7 @@
                                             type="number"
                                             id="config_delay_time"
                                             name="delay_time"
-                                            class="mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                            class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
                                             value="${data.schedule_config.time}"
                                         />
                                     </div>
@@ -836,7 +779,7 @@
                                         <select
                                             id="config_status"
                                             name="status"
-                                            class="mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                            class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
                                         >
                                             <option value="on" ${data.schedule_config.status === 'on' ? 'selected' : ''}>On</option>
                                             <option value="off" ${data.schedule_config.status === 'off' ? 'selected' : ''}>Off</option>
@@ -848,14 +791,14 @@
                                             type="text"
                                             id="config_lastime"
                                             name="lastime"
-                                            class="outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
+                                            class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
                                             value="${data.schedule_config.lastime}"
                                             readonly
                                         />
                                     </div>
                                     <button
                                         type="button"
-                                        class="self-end px-3 py-2 border font-medium rounded text-white bg-gray-400 border-gray-400 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                        class="text-sm self-end px-3 py-2 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
                                     >
                                         <i class="fa-solid fa-wrench"></i>
@@ -865,7 +808,7 @@
                         `);
                 } else {
                     $('#botDetails').append(`
-                            <button class="bg-green-400 text-white py-1 px-3 rounded mt-2 text-sm" onclick="openScheduleModal('config', ${botId})">User Config</button>
+                            <button class="bg-green-400 hover:bg-green-500 transition-bg duration-200 text-white py-1 px-3 rounded mt-2 text-sm" onclick="openScheduleModal('config', ${botId})">User Config</button>
                         `);
                 }
 
@@ -879,7 +822,7 @@
                                             type="number"
                                             id="group_config_delay_time"
                                             name="delay_time"
-                                            class="mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                            class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
                                             value="${data.schedule_group_config.time}"
                                         />
                                     </div>
@@ -888,7 +831,7 @@
                                         <select
                                             id="group_config_status"
                                             name="status"
-                                            class="mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                            class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
                                         >
                                             <option value="on" ${data.schedule_group_config.status === 'on' ? 'selected' : ''}>On</option>
                                             <option value="off" ${data.schedule_group_config.status === 'off' ? 'selected' : ''}>Off</option>
@@ -900,14 +843,14 @@
                                             type="text"
                                             id="group_config_lastime"
                                             name="lastime"
-                                            class="outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
+                                            class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
                                             value="${data.schedule_group_config.lastime}"
                                             readonly
                                         />
                                     </div>
                                     <button
                                         type="button"
-                                        class="self-end px-3 py-2 border font-medium rounded text-white bg-gray-400 border-gray-400 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                        class="text-sm self-end px-3 py-2 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
                                     >
                                         <i class="fa-solid fa-wrench"></i>
@@ -917,7 +860,7 @@
                         `);
                 } else {
                     $('#botDetails').append(`
-                            <button class="bg-green-400 text-white py-1 px-3 rounded mt-2 text-sm" onclick="openScheduleModal('group_config', ${botId})">Group Config</button>
+                            <button class="bg-green-400 hover:bg-green-500 transition-bg duration-200 text-white py-1 px-3 rounded mt-2 text-sm" onclick="openScheduleModal('group_config', ${botId})">Group Config</button>
                         `);
                 }
             } catch (e) {
@@ -1018,7 +961,7 @@
                                 method: 'DELETE',
                             },
                         );
-                        window.location.href = '/bot';
+                        window.location.href = '/';
                     } catch (e) {
                         console.log(e);
                     }

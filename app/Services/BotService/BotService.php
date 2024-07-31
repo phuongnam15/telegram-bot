@@ -3,9 +3,9 @@
 namespace App\Services\BotService;
 
 use App\Jobs\DeleteTelegramMessage;
-use App\Models\AdminUser;
 use App\Models\Bot;
 use App\Models\BotCommandContent;
+use App\Models\BotUser;
 use App\Models\Command;
 use App\Models\ContentConfig;
 use App\Models\Password;
@@ -124,15 +124,15 @@ class BotService extends BaseService
                                 ]
                             );
     
-                            $adminUserExists = AdminUser::where([
+                            $botUserExists = BotUser::where([
                                 'user_id' => $user->id, 
-                                'admin_id' => $adminId
+                                'bot_id' => $botId
                             ])->exists();
 
-                            if (!$adminUserExists) {
-                                AdminUser::create([
+                            if (!$botUserExists) {
+                                BotUser::create([
                                     'user_id' => $user->id,
-                                    'admin_id' => $adminId,
+                                    'bot_id' => $botId
                                 ]);
                             }
 
