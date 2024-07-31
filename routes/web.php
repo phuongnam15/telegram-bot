@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/config', function () {
+Route::get('/config/{id}', function () {
     return view('config_content');
 });
 Route::get('/content', function () {
@@ -25,7 +25,7 @@ Route::get('/update/{id}', function () {
 Route::get('/group', function () {
     return view('group');
 });
-Route::get('/bot', function () {
+Route::get('/', function () {
     return view('bot');
 });
 Route::get('/phone', function () {

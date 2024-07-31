@@ -3,12 +3,12 @@
 <nav class="sticky top-0 z-10 w-lvw bg-[#f8f9fa] py-2 flex justify-center">
     <div class="container flex w-full items-center justify-between font-popi text-sm">
         <div class="flex gap-2">
-            <a href="/bot" id="botLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
+            <a href="/" id="botLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
                 <span>Bot</span>
             </a>
-            <a href="/content" id="contentLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
+            <!-- <a href="/content" id="contentLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
                 <span>Content</span>
-            </a>
+            </a> -->
             <a href="/group" id="groupLink" class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
                 <span>Group</span>
             </a>

@@ -119,6 +119,8 @@
         });
 
     $(document).ready(function() {
+        const botId = window.location.pathname.split('/').pop();
+
         $('#type').change(function() {
             var selectedType = $(this).val();
             if (selectedType === 'text') {
@@ -187,122 +189,121 @@
             // Function to add more button fields based on the type of keyboard selected
             updateButtonOptions();
         }
-    });
-    //submit
-    const form = document.querySelector('form');
+        //submit
+        const form = document.querySelector('form');
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Ngăn chặn hành vi submit form mặc định
-        const keyboard = [];
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Ngăn chặn hành vi submit form mặc định
+            const keyboard = [];
 
-        // Lấy tất cả các nhóm nút
-        document.querySelectorAll('.button-group').forEach((group) => {
-            const text = group.querySelector(
-                '[name="buttons[][text]"]',
-            ).value;
-            const action = group.querySelector(
-                '[name="buttons[][action]"]',
-            )?.value;
-            const url = group.querySelector(
-                '[name="buttons[][url]"]',
-            )?.value;
-            const callBackData = group.querySelector(
-                '[name="buttons[][callback_data]"]',
-            )?.value;
-            const switchInlineQuery = group.querySelector(
-                '[name="buttons[][switch_inline_query]"]',
-            )?.value;
+            // Lấy tất cả các nhóm nút
+            document.querySelectorAll('.button-group').forEach((group) => {
+                const text = group.querySelector(
+                    '[name="buttons[][text]"]',
+                ).value;
+                const action = group.querySelector(
+                    '[name="buttons[][action]"]',
+                )?.value;
+                const url = group.querySelector(
+                    '[name="buttons[][url]"]',
+                )?.value;
+                const callBackData = group.querySelector(
+                    '[name="buttons[][callback_data]"]',
+                )?.value;
+                const switchInlineQuery = group.querySelector(
+                    '[name="buttons[][switch_inline_query]"]',
+                )?.value;
 
-            let button = {
-                text: text,
-            };
+                let button = {
+                    text: text,
+                };
 
-            // Thêm các tùy chọn vào nút dựa trên loại action được chọn
-            if (action === 'contact') {
-                button.request_contact = true;
-            } else if (action === 'location') {
-                button.request_location = true;
-            }
+                // Thêm các tùy chọn vào nút dựa trên loại action được chọn
+                if (action === 'contact') {
+                    button.request_contact = true;
+                } else if (action === 'location') {
+                    button.request_location = true;
+                }
 
-            if (url) {
-                button.url = url;
-            }
+                if (url) {
+                    button.url = url;
+                }
 
-            if (callBackData) {
-                button.callback_data = callBackData;
-            }
+                if (callBackData) {
+                    button.callback_data = callBackData;
+                }
 
-            if (switchInlineQuery) {
-                button.switch_inline_query = switchInlineQuery;
-            }
+                if (switchInlineQuery) {
+                    button.switch_inline_query = switchInlineQuery;
+                }
 
-            // Đưa nút vào một hàng mới của keyboard
-            keyboard.push([button]);
-        });
-
-        // Đóng gói dữ liệu nút thành đối tượng gửi đi
-        const dataToSend =
-            $('#keyboardType').val() === 'inline_keyboard' ||
-            $('#keyboardType').val() === 'inline_keyboard_phone_number' ?
-            {
-                inline_keyboard: keyboard,
-            } :
-            {
-                keyboard: keyboard,
-            };
-
-        for (instance in CKEDITOR.instances) {
-            CKEDITOR.instances[instance].updateElement();
-        }
-
-        const formData = new FormData();
-        formData.append(
-            'name',
-            document.querySelector('input[name="name"]').value,
-        );
-        formData.append(
-            'type',
-            document.querySelector('select[name="type"]').value,
-        );
-        formData.append(
-            'kind',
-            document.querySelector('select[name="kind"]').value,
-        );
-        formData.append(
-            'content',
-            document.querySelector('textarea[name="content"]').value,
-        );
-        formData.append('buttons', JSON.stringify(dataToSend));
-        if (document.querySelector('input[name="media"]').files[0]) {
-            formData.append(
-                'media',
-                document.querySelector('input[name="media"]').files[0],
-            );
-        }
-
-        try {
-            const response = await fetchClient('/api/admin/config', {
-                method: 'POST',
-                body: formData,
+                // Đưa nút vào một hàng mới của keyboard
+                keyboard.push([button]);
             });
 
-            if (response.status === 200) {
-                alert('Post created successfully!');
+            // Đóng gói dữ liệu nút thành đối tượng gửi đi
+            const dataToSend =
+                $('#keyboardType').val() === 'inline_keyboard' ||
+                $('#keyboardType').val() === 'inline_keyboard_phone_number' ? {
+                    inline_keyboard: keyboard,
+                } : {
+                    keyboard: keyboard,
+                };
+
+            for (instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error creating post');
-        }
-    });
 
-    //remove button
-    $(document).on('click', '.remove-button', function() {
-        $(this).closest('.button-group').remove(); // Remove the button group from DOM
-    });
+            const formData = new FormData();
+            formData.append('bot_id', botId);
+            formData.append(
+                'name',
+                document.querySelector('input[name="name"]').value,
+            );
+            formData.append(
+                'type',
+                document.querySelector('select[name="type"]').value,
+            );
+            formData.append(
+                'kind',
+                document.querySelector('select[name="kind"]').value,
+            );
+            formData.append(
+                'content',
+                document.querySelector('textarea[name="content"]').value,
+            );
+            formData.append('buttons', JSON.stringify(dataToSend));
+            if (document.querySelector('input[name="media"]').files[0]) {
+                formData.append(
+                    'media',
+                    document.querySelector('input[name="media"]').files[0],
+                );
+            }
 
-    //watch list
-    $('#watchList').click(function() {
-        window.location.href = '{{ url("/") }}';
+            try {
+                const response = await fetchClient('/api/admin/config', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.status === 200) {
+                    alert('Post created successfully!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating post');
+            }
+        });
+
+        //remove button
+        $(document).on('click', '.remove-button', function() {
+            $(this).closest('.button-group').remove(); // Remove the button group from DOM
+        });
+
+        //watch list
+        $('#watchList').click(function() {
+            window.location.href = '{{ url("/") }}';
+        });
     });
 </script>
 @endpush
