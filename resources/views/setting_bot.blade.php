@@ -464,9 +464,9 @@
                                 </thead>
                                 <tbody id="listContentBody">`;
 
-                if (data.data.length === 0) {
-                    document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
-                }
+                // if (data.data.length === 0) {
+                //     document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
+                // }
 
                 data.data.forEach((content, index) => {
                     let mediaHTML = '';
