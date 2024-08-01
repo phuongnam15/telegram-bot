@@ -357,11 +357,15 @@ class BotService extends BaseService
             // logger($data);
 
             if ($data['ok']) {
+                $avatar = $this->getUserOrBotImage($token, $data['result']['id']);
+
                 $bot = Bot::create([
                     'token' => $request->token,
                     "username" => $data['result']['username'],
                     "firstname" => $data['result']['first_name'],
-                    "admin_id" => auth()->user()->id
+                    "admin_id" => auth()->user()->id,
+                    "telegram_id" => $data['result']['id'],
+                    "avatar" => $avatar,
                 ]);
 
                 ScheduleDeleteMessage::create([
@@ -539,14 +543,14 @@ class BotService extends BaseService
     {
         try {
             if (isset($update['my_chat_member'])) {
-                
+
                 $myChatMember = $update['my_chat_member'];
                 $chatId = $myChatMember['chat']['id'];
 
                 if (isset($myChatMember['new_chat_member']['status']) && $myChatMember['new_chat_member']['status'] === 'left') {
-                    
+
                     $telegramGroup = TelegramGroup::where('telegram_id', $chatId)->first();
-                    
+
                     if ($telegramGroup) {
                         BotGroup::where([
                             'bot_id' => $botId,
@@ -556,7 +560,7 @@ class BotService extends BaseService
                 }
 
                 if (isset($myChatMember['new_chat_member']['status']) && $myChatMember['new_chat_member']['status'] === 'member') {
-                    
+
                     $groupName = $myChatMember['chat']['username'];
                     $groupTitle = $myChatMember['chat']['title'];
 
@@ -585,6 +589,47 @@ class BotService extends BaseService
             }
         } catch (\Exception $error) {
             logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function getUserOrBotImage($botToken = "6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc", $chatId = 6618205269)
+    {
+        try {
+            $client = new Client();
+
+            $response = $client->get("https://api.telegram.org/bot{$botToken}/getUserProfilePhotos", [
+                'query' => [
+                    'user_id' => $chatId,
+                    'limit' => 1,
+                ]
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            // logger($data);
+
+            $fileUrl = null;
+
+            if($data['result']['total_count'] === 0) {
+                return $fileUrl;
+            }
+
+            $fileId = $data['result']['photos'][0][0]['file_id'];
+
+            $fileResponse = $client->get("https://api.telegram.org/bot{$botToken}/getFile", [
+                'query' => [
+                    'file_id' => $fileId
+                ]
+            ]);
+
+            $data2 = json_decode($fileResponse->getBody(), true);
+            $filePath = $data2['result']['file_path'];
+
+            $fileUrl = "https://api.telegram.org/file/bot{$botToken}/{$filePath}";
+
+
+            return $fileUrl;
+        } catch (\Exception $error) {
             throw new AppServiceException($error->getMessage());
         }
     }

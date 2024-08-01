@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('username');
             $table->string('firstname');
             $table->string('status')->default(false);
+            $table->string('telegram_id');
+            $table->string('avatar');
             $table->timestamps();
         });
     }

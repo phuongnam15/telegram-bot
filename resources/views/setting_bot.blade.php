@@ -786,7 +786,7 @@
                 // Hiển thị chi tiết bot lên trang
                 $('#botDetails').html(`
                         <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
-                            <img src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" 
+                            <img src="${data.avatar ?? "{{ asset('assets/images/bot.png') }}"}" 
                                 class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
                             <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> ${data.token}</p>
                             <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
@@ -833,7 +833,7 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="text-sm self-end px-3 py-2 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                        class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
                                     >
                                         <i class="fa-solid fa-wrench"></i>
@@ -843,8 +843,11 @@
                         `);
                 } else {
                     $('#botDetails').append(`
-                            <button class="bg-blue-400 text-white py-2 px-4 rounded mt-2" onclick="openScheduleModal('config', ${botId})">Create Schedule Delete Message</button>
-                        `);
+                        <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
+                            <i class="fa-solid fa-plus text-[12px]"></i>
+                            <span class="text-[12px] font-medium">Create schedule auto delete message</span>
+                        </div>
+                    `);
                 }
 
                 if (data.schedule_config) {
@@ -885,7 +888,7 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="text-sm self-end px-3 py-2 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                        class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
                                     >
                                         <i class="fa-solid fa-wrench"></i>
@@ -895,9 +898,12 @@
                         `);
                 } else {
                     $('#botDetails').append(`
-                            <button class="bg-green-400 hover:bg-green-500 transition-bg duration-200 text-white py-1 px-3 rounded mt-2 text-sm" onclick="openScheduleModal('config', ${botId})">User Config</button>
-                        `);
-                }
+                        <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('config', ${botId})">
+                            <i class="fa-solid fa-plus text-[12px]"></i>
+                            <span class="text-[12px] font-medium">Create schedule auto for user</span>
+                        </div>
+                    `);
+            }
 
                 if (data.schedule_group_config) {
                     $('#botDetails').append(`
@@ -937,7 +943,7 @@
                                     </div>
                                     <button
                                         type="button"
-                                        class="text-sm self-end px-3 py-2 border font-medium rounded text-white bg-gray-500 border-gray-500 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                        class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
                                         onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
                                     >
                                         <i class="fa-solid fa-wrench"></i>
@@ -947,8 +953,11 @@
                         `);
                 } else {
                     $('#botDetails').append(`
-                            <button class="bg-green-400 hover:bg-green-500 transition-bg duration-200 text-white py-1 px-3 rounded mt-2 text-sm" onclick="openScheduleModal('group_config', ${botId})">Group Config</button>
-                        `);
+                        <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('group_config', ${botId})">
+                            <i class="fa-solid fa-plus text-[12px]"></i>
+                            <span class="text-[12px] font-medium">Create schedule auto for group</span>
+                        </div>
+                    `);
                 }
             } catch (e) {
                 console.log(e);
@@ -1034,7 +1043,7 @@
                         },
                     );
                     $('#activateBotModal').addClass('hidden');
-                    // location.reload();
+                    await getDetailBot();
                 } catch (e) {
                     console.log(e);
                 }

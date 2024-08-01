@@ -3,32 +3,6 @@
 @section("title", "Bot Page")
 
 @section("content")
-<!-- <div class="container mt-5">
-        <h2 class="mb-3 text-[23px] font-bold text-gray-700">Bot Management</h2>
-        <button
-            class="mb-3 rounded bg-gray-400 px-3 py-2 text-sm text-white"
-            data-toggle="modal"
-            data-target="#createBotModal"
-        >
-            New bot
-        </button>
-        <table
-            class="min-w-full overflow-x-auto border border-gray-300 bg-white"
-        >
-            <thead>
-                <tr class="w-full bg-gray-200">
-                    <th class="border-b px-4 py-2">ID</th>
-                    <th class="border-b px-4 py-2">Token</th>
-                    <th class="border-b px-4 py-2">Name</th>
-                    <th class="border-b px-4 py-2">Status</th>
-                    <th class="border-b px-4 py-2">Expire</th>
-                    <th class="border-b px-4 py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="botTableBody" class="w-full">
-            </tbody>
-        </table>
-    </div> -->
 <div class="container h-8 mt-3 space-y-2">
     <div class="flex flex-col gap-2" id="botList"></div>
     <div class="bg-[#e5e9f4] border-[1px] border-solid border-[#e5e7eb] rounded-md py-[7px] pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" data-toggle="modal" data-target="#createBotModal">
@@ -121,7 +95,7 @@
                     $('#botList').append(`
                         <div class="cursor-pointer border-[1px] border-solid border-[#e5e7eb] rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
                             <div class="flex items-center gap-2 flex-1 hover:bg-[#ced3dc] py-2 px-3">
-                                <img class="size-12 rounded-full" src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" alt="">
+                                <img class="size-12 rounded-full" src="${bot.avatar ?? "{{ asset('assets/images/bot.png') }}"}" alt="">
                                 <div class="flex flex-col leading-5">
                                     <p class="">
                                         <span class="font-medium text-[15px] tracking-wide font-sans">${bot.firstname}</span>

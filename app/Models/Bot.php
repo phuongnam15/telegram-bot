@@ -11,12 +11,14 @@ class Bot extends Model
 
     protected $table = 'bots';
     protected $fillable = [
+        'telegram_id',
         'username',
         'firstname',
         'token',
         'status',
         'admin_id',
-        'expired_at'
+        'expired_at',
+        'avatar',
     ];
     const STATUS_ACTIVE = true;
     const STATUS_INACTIVE = false;
