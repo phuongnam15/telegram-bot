@@ -93,31 +93,49 @@
     <!-- content tab list -->
     <div id="content" class="hidden">
         <div class="relative container">
-            <div class="right-0 flex flex-row-reverse">
-                <button class="text-sm py-[5px] ml-2 rounded border border-gray-500 px-2 bg-gray-500 text-white transition-all duration-200 hover:bg-gray-50 hover:text-gray-700" id="createNew">
-                    Create
-                </button>
-                <div class="ml-2 flex w-48 filter">
-                    <select id="kindFilter" class="form-control w-full rounded border pl-2 border-gray-300 outline-none text-sm">
-                        <option value="">-- Kind --</option>
-                        <option value="Giới thiệu">Giới thiệu</option>
-                        <option value="Click button">Click Button</option>
-                        <option value="Start">Start</option>
-                        <option value="Other">Khác</option>
-                    </select>
+            <div class="flex gap-2">
+                <div id="contentData" class="w-full overflow-x-auto shadow"></div>
+                <div class="text-left">
+                    <div>
+                        <button type="button" class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" id="menu-button">
+                            <svg class="h-3 w-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="menu-content" class="max-h-0 overflow-auto absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-black focus:outline-none">
+                        <div class="p-2">
+                            <select id="kindFilter" class="hover:bg-gray-50 cursor-pointer form-control w-full px-4 py-2 outline-none text-sm text-gray-700 border-b border-gray-200">
+                                <option value="" class="hidden">Kind</option>
+                                <option value="Giới thiệu">Introduce</option>
+                                <option value="Click button">Click Button</option>
+                                <option value="Start">Start</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <select id="typeFilter" class="hover:bg-gray-50 cursor-pointer form-control w-full px-4 py-2 outline-none text-sm text-gray-700">
+                                <option value="" class="hidden">Type</option>
+                                <option value="text">Text</option>
+                                <option value="photo">Image</option>
+                                <option value="video">Video</option>
+                            </select>
+                            <button class="w-full px-4 py-2 outline-none text-sm text-gray-700 bg-gray-200" id="createNew">
+                                New content
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex w-48 filter">
-                    <select id="typeFilter" class="form-control w-full rounded border pl-2 border-gray-300 outline-none text-sm">
-                        <option value="">-- Type --</option>
-                        <option value="text">Text</option>
-                        <option value="photo">Ảnh</option>
-                        <option value="video">Video</option>
-                    </select>
-                </div>
-            </div>
+                <script>
+                    $('#menu-button').on('click', function() {
+                        $('#menu-content').toggleClass('max-h-0');
+                    });
 
-            <!-- <h2 class="text-2xl font-bold">Content List</h2> -->
-            <div id="contentData" class="mt-3 w-full overflow-x-auto shadow"></div>
+                    $(document).on('click', function(event) {
+                        if (!$(event.target).closest('#menu-content, #menu-button').length) {
+                            $('#menu-content').addClass('max-h-0');
+                        }
+                    });
+                </script>
+            </div>
             <div id="pagination" class="mt-3"></div>
             <div class="w-full text-center hidden my-auto" id="thinkOutOfTheBox">
                 <a href="#" class="cursor-pointer">
@@ -519,11 +537,14 @@
 
                 // Render pagination
                 let paginationHTML = '';
-                for (let i = 1; i <= data.last_page; i++) {
-                    paginationHTML += `<button class="bg-gray-200 text-gray-700 py-1 px-3 rounded-full mx-1" onclick="fetchPage(${i})">${i}</button>`;
+
+                if (data.last_page > 1) {
+                    for (let i = 1; i <= data.last_page; i++) {
+                        paginationHTML += `<button class="bg-gray-200 text-gray-500 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
+                    }
+                    document.getElementById('pagination').innerHTML = paginationHTML;
                 }
-                document.getElementById('pagination').innerHTML =
-                    paginationHTML;
+
             }
 
             // Fetch specific page
@@ -769,7 +790,7 @@
             document.getElementById('tab-' + tabId).classList.add('bg-gray-500', 'text-white');
             document.getElementById('tab-' + tabId).classList.remove('hover:border-gray-400');
         }
-        await showTab('group');
+        await showTab('command');
 
         window.getDetailBot = async () => {
             try {
@@ -903,7 +924,7 @@
                             <span class="text-[12px] font-medium">Create schedule auto for user</span>
                         </div>
                     `);
-            }
+                }
 
                 if (data.schedule_group_config) {
                     $('#botDetails').append(`
