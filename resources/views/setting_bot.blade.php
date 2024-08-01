@@ -137,12 +137,12 @@
                 </script>
             </div>
             <div id="pagination" class="mt-3"></div>
-            <div class="w-full text-center hidden my-auto" id="thinkOutOfTheBox">
+            <!-- <div class="w-full text-center hidden my-auto" id="thinkOutOfTheBox">
                 <a href="#" class="cursor-pointer">
                     <img src="{{asset('assets/images/new.png')}}" alt="" class="w-[80px] mx-auto">
                 </a>
                 <p class="mt-3 font-bold text-xl text-gray-200">There are no posts to show.</p>
-            </div>
+            </div> -->
         </div>
 
         <!-- Modal -->
