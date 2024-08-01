@@ -4,78 +4,64 @@
 
 @section("content")
 <div class="container relative mx-auto rounded bg-white p-5">
-    <h2 class="mb-5 text-2xl font-bold">Create new post</h2>
     <form action="{{ url("/api/posts") }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
         @csrf
-        <div class="mb-4">
-            <label for="name" class="mb-2 block font-bold text-gray-700">
-                Name
-            </label>
-            <input type="text" class="form-input w-full rounded border px-3 py-2" id="name" name="name" required placeholder="vd: tuyen_nguoi_yeu" />
-        </div>
-        <div class="mb-4">
-            <label for="type" class="mb-2 block font-bold text-gray-700">
-                Type
-            </label>
-            <select class="form-select w-full rounded border px-3 py-2" id="type" name="type" required>
-                <option value="">-- Select type --</option>
-                <option value="text">Text</option>
-                <option value="photo">Ảnh</option>
-                <option value="video">Video</option>
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label for="kind" class="mb-2 block font-bold text-gray-700">
-                Kind
-            </label>
-            <select class="form-select w-full rounded border px-3 py-2" id="kind" name="kind" required>
-                <option value="">-- Select kind --</option>
-                <option value="introduce">Tin nhắn Chào Mừng</option>
-                <option value="button">Click Button</option>
-                <option value="start">Start</option>
-                <option value="other">Khác</option>
-            </select>
+        <div class="flex gap-2 items-stretch h-[50px]">
+            <div class="mb-4 flex-1">
+                <input type="text" class="text-gray-500 text-sm h-full form-input w-full rounded border outline-none pl-3" id="name" name="name" required placeholder="name" />
+            </div>
+            <div class="mb-4">
+                <select class="px-2 h-full form-select w-full rounded border text-sm text-gray-500 outline-none" id="type" name="type" required>
+                    <option value="" class="hidden">type content</option>
+                    <option value="text">Text</option>
+                    <option value="photo">Image</option>
+                    <option value="video">Video</option>
+                </select>
+            </div>
+    
+            <div class="mb-4">
+                <select class="px-2 h-full form-select w-full rounded border text-sm text-gray-500 outline-none" id="kind" name="kind" required>
+                    <option value="" class="hidden">topic content</option>
+                    <option value="introduce">Welcome</option>
+                    <option value="button">Click Button</option>
+                    <option value="start">Start</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
         </div>
 
         <div class="mb-4">
-            <label for="content" class="mb-2 block font-bold text-gray-700">
-                Content
-            </label>
             <textarea class="form-input w-full rounded border px-3 py-2" id="content" name="content"></textarea>
         </div>
 
         <div class="mb-4">
-            <label for="media" class="mb-2 block font-bold text-gray-700">
-                Media (Image/Video)
+            <label for="media" class="font-popi mb-4 text-gray-500 text-xs py-1 px-2 border-[1px] border-solid border-gray-200 rounded-lg">
+                <input type="file" class="form-input w-full rounded border px-3 py-2 hidden" id="media" name="media" />
+                <i class="fa-solid fa-image"></i>
+                Upload media
             </label>
-            <input type="file" class="form-input w-full rounded border px-3 py-2" id="media" name="media" />
-            <img id="preview" src="#" alt="Media preview" class="max-h-xs mt-2 hidden max-w-xs" />
-            <video id="previewVideo" controls class="max-h-xs mt-2 hidden max-w-xs">
+            <img id="preview" src="#" alt="Media preview" class="max-h-xs mt-2 hidden max-w-xs rounded" />
+            <video id="previewVideo" controls class="max-h-xs mt-2 hidden max-w-xs rounded">
                 <source id="videoSource" src="#" type="video/mp4" />
                 Your browser does not support the video tag.
             </video>
         </div>
 
         <div class="mb-4">
-            <label for="keyboardType" class="mb-2 block font-bold text-gray-700">
-                Type Button
-            </label>
-            <select class="form-select w-full rounded border px-3 py-2" id="keyboardType" name="keyboardType">
-                <option value="">-- Select type button --</option>
-                <option value="inline_keyboard">Đi kèm bài viết</option>
-                <option value="inline_keyboard_phone_number">
-                    Đi kèm bài viết (để lấy SĐT)
-                </option>
+            <select class="form-select w-full rounded border px-3 py-2 text-sm text-gray-500 outline-none" id="keyboardType" name="keyboardType">
+                <option value="" class="hidden">type button</option>
+                <option value="inline_keyboard">Inline keyboard</option>
+                <option value="keyboard">Keyboard</option>
+                
             </select>
         </div>
         <div id="buttonsContainer" class="mb-4">
             <!-- Dynamic buttons will be added here -->
         </div>
-        <button type="button" id="addButton" class="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
+        <button type="button" id="addButton" class="mb-4 rounded  py-2 border border-gray-500 px-2 text-sm">
             More button
         </button>
-        <button type="submit" class="rounded bg-green-500 px-4 py-2 text-white">
+        <button type="submit" class="rounded bg-gray-600 px-2 border border-gray-600 py-2 text-white text-sm">
             Create
         </button>
     </form>
@@ -155,22 +141,22 @@
             if (type === 'inline_keyboard') {
                 $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex gap-2">
-                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-input w-full border rounded py-2 px-3">
-                            <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-input w-full border rounded py-2 px-3">
-                            <input type="text" name="buttons[][callback_data]" placeholder="Dữ liệu gửi đi (tuỳ chọn)" class="form-input w-full border rounded py-2 px-3">
-                            <button type="button" class="bg-red-500 text-white px-2 rounded remove-button">Xóa</button>
+                            <input type="text" name="buttons[][text]" placeholder="text" class="form-input w-full border rounded py-1 px-3 text-sm outline-none">
+                            <input type="text" name="buttons[][url]" placeholder="url (optional)" class="form-input w-full border rounded py-1 px-3 text-sm outline-none">
+                            <input type="text" name="buttons[][callback_data]" placeholder="callback data (optional)" class="form-input w-full border rounded py-1 px-3 text-sm outline-none">
+                            <button type="button" class="text-red-500 px-2 rounded remove-button"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `);
             } else if (type === 'keyboard') {
                 $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex gap-2">
-                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-input w-full border rounded py-2 px-3">
-                            <select name="buttons[][action]" class="form-select w-full border rounded py-2 px-3">
-                                <option value="">Chọn hành động</option>
-                                <option value="contact">Yêu cầu liên hệ</option>
-                                <option value="location">Yêu cầu vị trí</option>
+                            <input type="text" name="buttons[][text]" placeholder="text" class="form-input w-full border rounded py-1 px-3 outline-none text-sm text-gray-500">
+                            <select name="buttons[][action]" class="form-select w-full border rounded py-1 px-3 outline-none text-sm text-gray-500">
+                                <option value="" class="hidden">select action</option>
+                                <option value="contact">request contact</option>
+                                <option value="location">request location</option>
                             </select>
-                            <button type="button" class="bg-red-500 text-white px-2 rounded remove-button">Xóa</button>
+                            <button type="button" class="text-red-500 px-2 rounded remove-button"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `);
             } else if (type === 'inline_keyboard_phone_number') {
@@ -179,7 +165,7 @@
                             <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-input w-full border rounded py-2 px-3">
                             <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-input w-full border rounded py-2 px-3">
                             <input type="text" name="buttons[][callback_data]" value="get_phone_number" readOnly class="form-input w-full border rounded py-2 px-3">
-                            <button type="button" class="bg-red-500 text-white px-2 rounded remove-button">Xóa</button>
+                            <button type="button" class="text-red-500 px-2 rounded remove-button"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `);
             }
