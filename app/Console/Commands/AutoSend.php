@@ -35,9 +35,8 @@ class AutoSend extends Command
                 $scheduleConfig = $bot->scheduleConfig;
                 $scheduleGroupConfig = $bot->scheduleGroupConfig;
 
-                $configIds = ContentConfig::where('kind', '!=', ContentConfig::KIND_INTRO)
-                    ->where('kind', '!=', ContentConfig::KIND_BUTTON)
-                    ->where('kind', '!=', ContentConfig::KIND_START)
+                $configIds = ContentConfig::where('bot_id', $bot->id)    
+                    ->where('kind', ContentConfig::KIND_OTHER)
                     ->where('admin_id', $bot->admin_id)
                     ->pluck('id')
                     ->toArray();
@@ -54,8 +53,8 @@ class AutoSend extends Command
                         $scheduleConfig->lastime = now();
                         $scheduleConfig->save();
 
-                        $userTelegramIds = User::whereHas('admins', function ($q) use ($bot) {
-                            $q->where('admin_id', $bot->admin_id);
+                        $userTelegramIds = User::whereHas('bots', function ($q) use ($bot) {
+                            $q->where('bot_id', $bot->id);
                         })->pluck('telegram_id')->toArray();
 
                         foreach ($userTelegramIds as $telegramId) {
@@ -73,7 +72,9 @@ class AutoSend extends Command
                         $scheduleGroupConfig->lastime = now();
                         $scheduleGroupConfig->save();
 
-                        $groupTelegramIds = TelegramGroup::where('admin_id', $bot->admin_id)->pluck('telegram_id')->toArray();
+                        $groupTelegramIds = TelegramGroup::whereHas('bots', function($q) use ($bot) {
+                            $q->where('bot_id', $bot->id);
+                        })->pluck('telegram_id')->toArray();
 
                         foreach ($groupTelegramIds as $telegramId) {
                             $randomConfigId = Arr::random($configIds);
