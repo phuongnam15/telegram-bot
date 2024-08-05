@@ -608,7 +608,7 @@ class BotService extends BaseService
 
             // logger($data);
 
-            $fileUrl = "";
+            $fileUrl = null;
 
             if($data['result']['total_count'] === 0) {
                 return $fileUrl;
