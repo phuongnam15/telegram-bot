@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('schedule_delete_message', function (Blueprint $table) {
-            $table->string('bot_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
         });
         Schema::table('schedule_config', function (Blueprint $table) {
-            $table->string('bot_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
         });
         Schema::table('telegram_messages', function (Blueprint $table) {
-            $table->string('bot_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
         });
         Schema::table('schedule_group_config', function (Blueprint $table) {
-            $table->string('bot_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
         });
         Schema::table('content_configs', function (Blueprint $table) {
-            $table->unsignedBigInteger('bot_id');
+            $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
         });
     }
 

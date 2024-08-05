@@ -12,25 +12,20 @@
     <div class="mb-5 border-b-[1px] border-solid border-gray-200">
         <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
             <li class="me-2">
-                <a href="#" onclick="showTab('command'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-command">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-command">
                     Command
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" onclick="showTab('content'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-content">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-content">
                     Content
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" onclick="showTab('group'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-group">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-group">
                     Group
                 </a>
             </li>
-            <!-- <li class="me-2">
-                <a href="#" onclick="showTab('testTab'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-testTab">
-                    Test tab
-                </a>
-            </li> -->
         </ul>
     </div>
 
@@ -228,10 +223,6 @@
             </table>
         </div>
     </div>
-
-    <div id="testTab" class="hidden">
-        <p>Test tab</p>
-    </div>
 </div>
 
 <!-- Modal for creating or updating schedule -->
@@ -257,7 +248,7 @@
                         <label for="scheduleStatus" class="text-sm font-mono tracking-tighter text-gray-700">
                             Status
                         </label>
-                        <select id="scheduleStatus" name="status" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
+                        <select id="scheduleStatus" name="status" required class="w-full rounded border-[1px] text-sm border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
                             <option value="on">On</option>
                             <option value="off">Off</option>
                         </select>
@@ -266,7 +257,7 @@
                         <label for="scheduleTime" class="text-sm font-mono tracking-tighter text-gray-700">
                             Delay Time (minutes)
                         </label>
-                        <input type="number" id="scheduleTime" name="delay_time" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" />
+                        <input type="number" id="scheduleTime" name="delay_time" required class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" />
                     </div>
                     <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white">
                         Save
@@ -322,73 +313,80 @@
 
 @push("scripts")
 <script>
-    $(document).ready(async () => {
-        const botId = window.location.pathname.split('/').pop();
+    const botId = window.location.pathname.split('/').pop();
 
-        window.commandScript = async () => {
-            const listCommand = async () => {
-                try {
-                    $("#botCommandsBody").html("");
+    const scripts = {
 
-                    const formData = new FormData();
+        //COMMAND script
+        async listCommand() {
+            try {
+                $("#botCommandsBody").html("");
 
-                    formData.append('bot_id', botId);
+                const response = await fetchClient(`/api/admin/command?bot_id=${botId}`, {
+                    method: "GET"
+                });
 
-                    const response = await fetchClient(`/api/admin/command?bot_id=${botId}`, {
-                        method: "GET",
-                    });
+                response.data.forEach(element => {
+                    $("#botCommandsBody").append(`
+                        <tr class="border-b-[1px] border-solid border-gray-200">
+                            <td class="px-4 py-2 text-center">${element.command.command}</td>
+                            <td class="px-4 py-2 text-center">${element.content.name}</td>
+                            <td class="px-4 py-2 text-center">${formatDate(element.created_at)}</td>
+                            <td class="px-4 py-2 text-center">
+                                <button class="rounded-md border-[1px] border-solid border-gray-500 px-3 py-1 text-gray-500" data-command-id="${element.id}">
+                                    delete
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
 
-                    response.data.forEach(element => {
-                        $("#botCommandsBody").append(`
-                            <tr class="border-b-[1px] border-solid border-gray-200">
-                                <td class="px-4 py-2 text-center">${element.command.command}</td>
-                                <td class="px-4 py-2 text-center">${element.content.name}</td>
-                                <td class="px-4 py-2 text-center">${formatDate(element.created_at)}</td>
-                                <td class="px-4 py-2 text-center">
-                                    <button class="rounded-md border-[1px] border-solid border-gray-500 px-3 py-1 text-gray-500" onClick="deleteCommand(${element.id})">
-                                        delete
-                                    </button>
-                                </td>
-                            </tr>
-                        `);
-                    });
+                // Add event listeners for delete buttons
+                $("#botCommandsBody").find("button").on("click", async function() {
+                    const commandId = $(this).data("command-id");
+                    await scripts.deleteCommand(commandId);
+                });
 
-                } catch (error) {
-                    console.log(error)
-                }
+            } catch (error) {
+                console.log(error);
             }
-            const listContentName = async () => {
-                try {
-                    const response = await fetchClient(`/api/admin/list?bot_id=${botId}`, {
-                        method: "GET",
-                    });
+        },
 
-                    response.data.forEach(element => {
-                        $("#contentList").append(`<option value="${element.id}">${element.id} - ${element.name}</option>`);
-                    });
-                } catch (error) {
-                    console.log(error)
-                }
+        async listContentName() {
+            try {
+                $("#contentList").html('<option value="">-----content----</option>');
+
+                const response = await fetchClient(`/api/admin/list?bot_id=${botId}`, {
+                    method: "GET"
+                });
+
+                response.data.forEach(element => {
+                    $("#contentList").append(`<option value="${element.id}">${element.id} - ${element.name}</option>`);
+                });
+            } catch (error) {
+                console.log(error);
             }
-            window.deleteCommand = async (commandId) => {
-                try {
-                    if (!confirm("Are you sure to delete this command?")) {
-                        return;
-                    }
-                    const response = await fetchClient(`/api/admin/command/${commandId}`, {
-                        method: "DELETE",
-                    });
+        },
 
-                    await listCommand();
-                } catch (error) {
-                    console.log(error)
+        async deleteCommand(commandId) {
+            try {
+                if (!confirm("Are you sure to delete this command?")) {
+                    return;
                 }
+                await fetchClient(`/api/admin/command/${commandId}`, {
+                    method: "DELETE"
+                });
+                await scripts.listCommand();
+            } catch (error) {
+                console.log(error);
             }
+        },
 
-            await listCommand();
-            await listContentName();
+        async commandScript() {
+            await scripts.listCommand();
+            await scripts.listContentName();
 
-            $('#commandForm').on('submit', async (e) => {
+            $('#commandForm').off('submit').on('submit', async (e) => {
                 e.preventDefault();
 
                 const formData = new FormData();
@@ -397,13 +395,12 @@
                 formData.append('content_id', $('#contentList').val());
 
                 try {
-                    const response = await fetchClient('/api/admin/command', {
+                    await fetchClient('/api/admin/command', {
                         method: 'POST',
-                        body: formData,
+                        body: formData
                     });
-
                     $('#newCommandModal').modal('hide');
-                    await listCommand();
+                    await scripts.listCommand();
                 } catch (error) {
                     console.log(error);
                 }
@@ -413,49 +410,32 @@
                 $('#commandForm')[0].reset();
                 $('#contentList').val('');
             });
-        }
+        },
 
-        window.contentScript = async () => {
-            function filterTable() {
-                var selectedType = $('#typeFilter').val();
-                var selectedKind = $('#kindFilter').val();
+        //CONTENT script
+        filterTable() {
+            var selectedType = $('#typeFilter').val();
+            var selectedKind = $('#kindFilter').val();
 
-                $('#listContentBody tr').each(function() {
-                    var rowType = $(this).find('td:nth-child(3)').text(); // Giả sử cột 'Hình thức' là cột thứ 4
-                    var rowKind = $(this).find('td:nth-child(4)').text(); // Giả sử cột 'Loại' là cột thứ 5
+            $('#listContentBody tr').each(function() {
+                var rowType = $(this).find('td:nth-child(3)').text(); // Giả sử cột 'Hình thức' là cột thứ 4
+                var rowKind = $(this).find('td:nth-child(4)').text(); // Giả sử cột 'Loại' là cột thứ 5
 
-                    var typeMatch =
-                        selectedType === '' || rowType === selectedType;
-                    var kindMatch =
-                        selectedKind === '' || rowKind === selectedKind;
+                var typeMatch =
+                    selectedType === '' || rowType === selectedType;
+                var kindMatch =
+                    selectedKind === '' || rowKind === selectedKind;
 
-                    if (typeMatch && kindMatch) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            }
-            $('#typeFilter, #kindFilter').change(filterTable);
-
-            //get list content
-            const fetchContent = async () => {
-                try {
-                    const response = await fetchClient(`/api/admin/list?bot_id=${botId}`, {
-                        method: "GET",
-                    });
-                    if (response) {
-                        renderContentList(response);
-                    }
-                } catch (error) {
-                    console.error(error);
+                if (typeMatch && kindMatch) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
                 }
-            }
+            });
+        },
 
-            await fetchContent();
-
-            function renderContentList(data) {
-                let contentHTML = `
+        renderContentList(data) {
+            let contentHTML = `
                             <table class="min-w-full bg-white overflow-hidden">
                                 <thead class="text-gray-600 border-b-[1px] border-solid border-gray-300 font-mono text-[14px]">
                                     <tr>
@@ -469,59 +449,59 @@
                                 </thead>
                                 <tbody id="listContentBody">`;
 
-                // if (data.data.length === 0) {
-                //     document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
-                // }
+            // if (data.data.length === 0) {
+            //     document.getElementById('thinkOutOfTheBox').classList.remove('hidden');
+            // }
 
-                data.data.forEach((content, index) => {
-                    let mediaHTML = '';
-                    let buttonSetDefault = '';
+            data.data.forEach((content, index) => {
+                let mediaHTML = '';
+                let buttonSetDefault = '';
 
-                    if (content.type === 'photo') {
-                        mediaHTML = `<img src="${content.media}" class="max-w-[200px] max-h-[200px] mx-auto rounded">`;
-                    } else if (content.type === 'video') {
-                        mediaHTML = `<video controls class="max-w-[200px] max-h-[200px] mx-auto rounded">
+                if (content.type === 'photo') {
+                    mediaHTML = `<img src="${content.media}" class="max-w-[200px] max-h-[200px] mx-auto rounded">`;
+                } else if (content.type === 'video') {
+                    mediaHTML = `<video controls class="max-w-[200px] max-h-[200px] mx-auto rounded">
                                                 <source src="${content.media}" type="video/mp4">
                                                 Your browser does not support the video tag.
                                             </video>`;
-                    }
+                }
 
-                    if (
-                        (content.kind === 'introduce' ||
-                            content.kind === 'start') &&
-                        !content.is_default
-                    ) {
-                        buttonSetDefault = `<button class="bg-blue-500 text-white text-xs py-1 px-2 rounded" onclick="setDefault(${content.id})">Default</button>`;
-                    }
+                if (
+                    (content.kind === 'introduce' ||
+                        content.kind === 'start') &&
+                    !content.is_default
+                ) {
+                    buttonSetDefault = `<button class="bg-blue-500 text-white text-xs py-1 px-2 rounded" id="setDefaultButton" data-content-id="${content.id}">Default</button>`;
+                }
 
-                    let typeBadge = '';
-                    if (content.type === 'photo') {
-                        typeBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">photo</span>';
-                    } else if (content.type === 'video') {
-                        typeBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">video</span>';
-                    } else if (content.type === 'text') {
-                        typeBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded-full">text</span>';
-                    }
+                let typeBadge = '';
+                if (content.type === 'photo') {
+                    typeBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">photo</span>';
+                } else if (content.type === 'video') {
+                    typeBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">video</span>';
+                } else if (content.type === 'text') {
+                    typeBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded-full">text</span>';
+                }
 
-                    let kindBadge = '';
-                    if (content.kind === 'introduce') {
-                        kindBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">Giới thiệu</span>';
-                    } else if (content.kind === 'button') {
-                        kindBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">Click button</span>';
-                    } else if (content.kind === 'start') {
-                        kindBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">Start</span>';
-                    } else {
-                        kindBadge =
-                            '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">Other</span>';
-                    }
+                let kindBadge = '';
+                if (content.kind === 'introduce') {
+                    kindBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full">Giới thiệu</span>';
+                } else if (content.kind === 'button') {
+                    kindBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-blue-800 bg-blue-100 rounded-full">Click button</span>';
+                } else if (content.kind === 'start') {
+                    kindBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-purple-800 bg-purple-100 rounded-full">Start</span>';
+                } else {
+                    kindBadge =
+                        '<span class="inline-block px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full">Other</span>';
+                }
 
-                    contentHTML += `
+                contentHTML += `
                                 <tr class="${index !== data.data.length - 1 ? 'border-b-[1px] border-solid border-gray-100' : ''}">
                                     <td class="px-4 py-2 text-center text-gray-600 text-sm">${content.name + (content.is_default ? ' <strong>(mặc định)</strong>' : '')}</td>
                                     <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words font-sans text-gray-600 text-sm">${content.content}</td>
@@ -529,224 +509,228 @@
                                     <td class="px-4 py-2 text-center">${kindBadge}</td>
                                     <td class="px-4 py-2">${mediaHTML}</td>
                                     <td class="px-4 py-2 text-center space-y-1">
-                                        <button class="bg-blue-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="showUsers(${content.id})">Gửi</button>
-                                        <button class="bg-red-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="deleteConfig(${content.id})">Xoá</button>
-                                        <button class="bg-yellow-500 text-white py-1 px-2 rounded text-xs font-medium" onclick="updateConfig(${content.id})">Sửa</button>
+                                        <button class="bg-blue-500 text-white py-1 px-2 rounded text-xs font-medium" id="showUsersButton" data-content-id="${content.id}">Gửi</button>
+                                        <button class="bg-red-500 text-white py-1 px-2 rounded text-xs font-medium" id="deleteConfigButton" data-content-id="${content.id}">Xoá</button>
+                                        <button class="bg-yellow-500 text-white py-1 px-2 rounded text-xs font-medium" id="updateConfigButton" data-content-id="${content.id}">Sửa</button>
                                         ${buttonSetDefault}
                                     </td>
                                 </tr>`;
-                });
-                contentHTML += '</tbody></table>';
-                document.getElementById('contentData').innerHTML =
-                    contentHTML;
+            });
+            contentHTML += '</tbody></table>';
+            document.getElementById('contentData').innerHTML =
+                contentHTML;
 
-                // Render pagination
-                let paginationHTML = '';
+            // Render pagination
+            let paginationHTML = '';
 
-                if (data.last_page > 1) {
-                    for (let i = 1; i <= data.last_page; i++) {
-                        paginationHTML += `<button class="bg-gray-200 text-gray-500 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
-                    }
-                    document.getElementById('pagination').innerHTML = paginationHTML;
+            if (data.last_page > 1) {
+                for (let i = 1; i <= data.last_page; i++) {
+                    paginationHTML += `<button class="bg-gray-200 text-gray-500 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
                 }
-
+                document.getElementById('pagination').innerHTML = paginationHTML;
             }
 
-            // Fetch specific page
-            window.fetchPage = async (page) => {
-                try {
-                    const response = await fetchClient(
-                        `/api/admin/list?page=${page}`,
-                    );
-                    if (response) {
-                        renderContentList(response);
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            };
+        },
 
-
-            // // LIST USER & GROUP
-            window.showUsers = async (contentId) => {
-                document.getElementById('contentId').value = contentId;
-                let userListHTML = '';
-                //USER
-                try {
-                    const response = await fetchClient(`/api/admin/users?bot_id=${botId}`);
-
-                    response.data.forEach((user) => {
-                        userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name} - ${user.telegram_id}</label><br>`;
-                    });
-
-                    document.getElementById('userList').innerHTML =
-                        userListHTML;
-
-                    $('#userModal').modal('show');
-
-                    attachSelectAllHandler();
-                } catch (error) {
-                    console.log(error);
-                }
-
-                //GROUP
-                try {
-                    const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
-
-                    response.data.forEach((user) => {
-                        userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
-                    });
-
-                    document.getElementById('userList').innerHTML = userListHTML;
-
-                    $('#userModal').modal('show');
-
-                    attachSelectAllHandler();
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-
-            // // Add search functionality
-            document
-                .getElementById('userSearch')
-                .addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    document
-                        .querySelectorAll('#userList label')
-                        .forEach((label) => {
-                            const telegramId = label.textContent.toLowerCase();
-                            if (telegramId.includes(searchTerm)) {
-                                label.style.display = 'inline-block';
-                            } else {
-                                label.style.display = 'none';
-                            }
-                        });
+        async fetchContent() {
+            try {
+                const response = await fetchClient(`/api/admin/list?bot_id=${botId}`, {
+                    method: "GET",
                 });
-
-            // // CHECK ALL USER
-            function attachSelectAllHandler() {
-                document
-                    .getElementById('selectAllUsers')
-                    .addEventListener('click', function() {
-                        const isChecked = this.checked;
-                        const checkboxes =
-                            document.querySelectorAll('.user-checkbox');
-                        checkboxes.forEach((checkbox) => {
-                            checkbox.checked = isChecked;
-                        });
-                    });
+                if (response) {
+                    scripts.renderContentList(response);
+                }
+            } catch (error) {
+                console.error(error);
             }
+        },
 
-            window.deleteConfig = async (contentId) => {
-                const confirm = window.confirm(
-                    'Are you sure to delete this config?',
+        async fetchPage(page) {
+            try {
+                const response = await fetchClient(
+                    `/api/admin/list?page=${page}`,
                 );
-                if (confirm) {
-                    try {
-                        const response = await fetchClient(
-                            `/api/admin/delete/${contentId}`, {
-                                method: 'DELETE',
-                            },
-                        );
-
-                        await fetchContent();
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
+                if (response) {
+                    scripts.renderContentList(response);
                 }
-            };
+            } catch (error) {
+                console.error(error);
+            }
+        },
 
-            window.updateConfig = function(contentId) {
-                location.href = `/update/${contentId}`;
-            };
+        async showUsers(contentId) {
+            document.getElementById('contentId').value = contentId;
+            let userListHTML = '';
+            //USER
+            try {
+                const response = await fetchClient(`/api/admin/users?bot_id=${botId}`);
 
-            //Send
-            document
-                .getElementById('sendContent')
-                .addEventListener('click', async () => {
-                    let botStatus = document.getElementById('botStatus').value;
-
-                    if (botStatus !== '1') {
-                        alert('BOT IS INACTIVE');
-                        return;
-                    }
-
-                    let botToken = document.getElementById('botToken').value;
-                    let contentId = document.getElementById('contentId').value;
-                    let telegramIds = Array.from(
-                        document.querySelectorAll(
-                            '#userList input[type="checkbox"]:checked',
-                        ),
-                    ).map((cb) => cb.value);
-
-                    if (telegramIds.length === 0) {
-                        showNotification('Please select at least one user or group', 'warning');
-                        return;
-                    }
-
-                    const formData = new FormData();
-                    formData.append('botToken', botToken);
-                    formData.append('configId', contentId);
-                    telegramIds.forEach((id) =>
-                        formData.append('telegramIds[]', id),
-                    );
-
-                    try {
-                        const response = await fetchClient(`/api/admin/send`, {
-                            method: 'POST',
-                            body: formData,
-                        });
-
-                        $('#userModal').modal('hide');
-                        showNotification(response.message, 'success');
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
+                response.data.forEach((user) => {
+                    userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name} - ${user.telegram_id}</label><br>`;
                 });
 
-            // //SET DEFAULT
-            window.setDefault = async (contentId) => {
+                document.getElementById('userList').innerHTML =
+                    userListHTML;
+
+                $('#userModal').modal('show');
+
+                scripts.attachSelectAllHandler();
+            } catch (error) {
+                console.log(error);
+            }
+
+            //GROUP
+            try {
+                const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
+
+                response.data.forEach((user) => {
+                    userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
+                });
+
+                document.getElementById('userList').innerHTML = userListHTML;
+
+                $('#userModal').modal('show');
+
+                scripts.attachSelectAllHandler();
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
+        attachSelectAllHandler() {
+            document
+                .getElementById('selectAllUsers')
+                .addEventListener('click', function() {
+                    const isChecked = this.checked;
+                    const checkboxes =
+                        document.querySelectorAll('.user-checkbox');
+                    checkboxes.forEach((checkbox) => {
+                        checkbox.checked = isChecked;
+                    });
+                });
+        },
+
+        async deleteConfig(contentId) {
+            const confirm = window.confirm(
+                'Are you sure to delete this config?',
+            );
+            if (confirm) {
                 try {
                     const response = await fetchClient(
-                        `/api/admin/set-default/${contentId}`, {
-                            method: 'POST',
+                        `/api/admin/delete/${contentId}`, {
+                            method: 'DELETE',
                         },
                     );
 
-                    console.log('Success:', response);
-                    // location.reload();
+                    await scripts.fetchContent();
                 } catch (error) {
                     console.error('Error:', error);
                 }
-            };
+            }
+        },
 
+        async setDefault(contentId) {
+            try {
+                const response = await fetchClient(
+                    `/api/admin/set-default/${contentId}`, {
+                        method: 'POST',
+                    },
+                );
+
+                console.log('Success:', response);
+                await scripts.fetchContent();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+
+        async contentScript() {
+            $('#typeFilter, #kindFilter').change(scripts.filterTable);
+            await scripts.fetchContent();
+
+            // Add search functionality
+            $('#userSearch').on('input', function() {
+                const searchTerm = $(this).val().toLowerCase();
+
+                $('#userList label').each(function() {
+                    const telegramId = $(this).text().toLowerCase();
+                    $(this).toggle(telegramId.includes(searchTerm));
+                });
+            });
+
+            $('#showUsersButton').on('click', function() {
+                const contentId = $(this).data('content-id');
+                scripts.showUsers(contentId);
+            });
+            $('#deleteConfigButton').on('click', function() {
+                const contentId = $(this).data('content-id');
+                scripts.deleteConfig(contentId);
+            });
+            $('#updateConfigButton').on('click', function() {
+                const contentId = $(this).data('content-id');
+                location.href = `/update/${contentId}`;
+            });
+            $('#setDefaultButton').on('click', function() {
+                const contentId = $(this).data('content-id');
+                scripts.setDefault(contentId);
+            });
             $('#createNew').click(() => {
                 location.href = `/config/${botId}`;
             });
-            $('#manageGroup').click(() => {
-                location.href = '/group';
-            });
-            $('#manageBot').click(() => {
-                location.href = '/';
-            });
-            $('#managePhone').click(() => {
-                location.href = '/phone';
-            });
-            $('#managePass').click(() => {
-                location.href = '/password';
-            });
-        }
 
-        window.groupScript = async () => {
-            const listGroup = async () => {
-                $('#groupTable tbody').html('');
+            //Send
+            $('#sendContent').on('click', async () => {
+                let botStatus = document.getElementById('botStatus').value;
+
+                if (botStatus !== '1') {
+                    alert('BOT IS INACTIVE');
+                    return;
+                }
+
+                let botToken = document.getElementById('botToken').value;
+                let contentId = document.getElementById('contentId').value;
+                let telegramIds = Array.from(
+                    document.querySelectorAll(
+                        '#userList input[type="checkbox"]:checked',
+                    ),
+                ).map((cb) => cb.value);
+
+                if (telegramIds.length === 0) {
+                    showNotification('Please select at least one user or group', 'warning');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('botToken', botToken);
+                formData.append('configId', contentId);
+                telegramIds.forEach((id) =>
+                    formData.append('telegramIds[]', id),
+                );
 
                 try {
-                    const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
+                    const response = await fetchClient(`/api/admin/send`, {
+                        method: 'POST',
+                        body: formData,
+                    });
 
-                    response.data.forEach((group) => {
-                        $('#groupTable tbody').append(`
+                    $('#userModal').modal('hide');
+                    showNotification(response.message, 'success');
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+
+        },
+
+        //GROUP script
+        async listGroup() {
+            $('#groupTable tbody').html('');
+
+            try {
+                const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
+
+                response.data.forEach((group) => {
+                    $('#groupTable tbody').append(`
                             <tr>
                                 <td class="flex items-center justify-center gap-2 py-4">
                                     <img class="size-12 rounded-full" src="${group.avatar}" alt="">
@@ -765,44 +749,40 @@
                                 <td class="py-4"></td>
                             </tr>
                         `);
-                    });
-                } catch (error) {
-                    console.log(error);
-                }
+                });
+            } catch (error) {
+                console.log(error);
             }
-            await listGroup();
-        }
+        },
+        async groupScript() {
+            await scripts.listGroup();
+        },
 
-        window.testScript = async () => {
-            console.log('Test tab');
-        }
-        window.showTab = async (tabId) => {
-            const tabIds = ['command', 'content', 'group', 'testTab'];
-            tabIds.forEach(function(id) {
-                document.getElementById(id).classList.add('hidden');
-            });
+        ////////////////////////////////////////////
+        async showTab(tabId) {
+            const tabIds = ['command', 'content', 'group'];
+            tabIds.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
-            if (tabId === 'content') {
-                await contentScript();
-            } else if (tabId === 'command') {
-                await commandScript();
+
+            if (tabId === 'command') {
+                await scripts.commandScript();
+            } else if (tabId === 'content') {
+                await scripts.contentScript();
             } else if (tabId === 'group') {
-                await groupScript();
-            } else if (tabId === 'testTab') {
-                await testScript();
+                await scripts.groupScript();
             }
 
-            // Đổi class của tablist để thể hiện tab được chọn
-            document.querySelectorAll('a[id^="tab-"]').forEach(function(tabLink) {
+            // Update tab styles
+            document.querySelectorAll('a[id^="tab-"]').forEach(tabLink => {
                 tabLink.classList.remove('bg-gray-500', 'text-white');
                 tabLink.classList.add('hover:border-gray-400');
             });
             document.getElementById('tab-' + tabId).classList.add('bg-gray-500', 'text-white');
             document.getElementById('tab-' + tabId).classList.remove('hover:border-gray-400');
-        }
-        await showTab('command');
+        },
 
-        window.getDetailBot = async () => {
+        //BOT script
+        async getDetailBot() {
             try {
                 const response = await fetchClient(
                     `/api/admin/bot/${botId}`, {
@@ -816,186 +796,254 @@
 
                 // Hiển thị chi tiết bot lên trang
                 $('#botDetails').html(`
-                        <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
-                            <img src="${data.avatar ?? "{{ asset('assets/images/bot.png') }}"}" 
-                                class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
-                            <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> ${data.token}</p>
-                            <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
-                            <p class="block text-sm font-medium text-gray-600"><strong>Firstname:</strong> ${data.firstname}</p>
-                            <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
-                            <p class="block text-sm font-medium text-gray-600"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
-                            <div class="mt-2">
-                                ${data.status === '0' ? 
-                                    `<button class="text-green-500 text-[14px] italic hover:underline activate-btn" onClick="openActivateBotModal(${data.id})">active</button>
-                                    <span>/</span>`
-                                : 
-                                    ''
-                                }
-                                <button class="text-red-500 text-[14px] italic hover:underline" onClick="deleteBot(${data.id})">delete</button>
+                            <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
+                                <img src="${data.avatar ?? "{{ asset('assets/images/bot.png') }}"}" 
+                                    class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
+                                <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> ${data.token}</p>
+                                <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
+                                <p class="block text-sm font-medium text-gray-600"><strong>Firstname:</strong> ${data.firstname}</p>
+                                <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
+                                <p class="block text-sm font-medium text-gray-600"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
+                                <div class="mt-2">
+                                    ${data.status === '0' ? 
+                                        `<button class="text-green-500 text-[14px] italic hover:underline" id="openActivateBotModal">active</button>
+                                        <span>/</span>`
+                                    : 
+                                        ''
+                                    }
+                                    <button class="text-red-500 text-[14px] italic hover:underline" id="deleteBotButton">delete</button>
+                                </div>
                             </div>
-                        </div>
-                    `);
+                        `);
 
                 // Hiển thị các nút thiết lập schedule
                 if (data.schedule_delete_message) {
                     $('#botDetails').append(`
-                            <div class="">
-                                <form id="scheduleForm" class="flex space-x-4 mb-0">
-                                    <div class="flex-1 self-end">
-                                        <label for="delay_time" class="block text-xs font-medium text-gray-700">Độ trễ xoá tin (phút)</label>
-                                        <input
-                                            type="number"
-                                            id="delay_time"
-                                            name="delay_time"
-                                            class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
-                                            value="${data.schedule_delete_message.delay_time}"
-                                        />
-                                    </div>
-                                    <div class="flex-1 flex flex-col">
-                                        <label for="status" class="text-xs font-medium text-gray-700">Trạng thái</label>
-                                        <select
-                                            id="status"
-                                            name="status"
-                                            class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                <div class="">
+                                    <form id="scheduleForm" class="flex space-x-4 mb-0">
+                                        <div class="flex-1 self-end">
+                                            <label for="delay_time" class="block text-xs font-medium text-gray-700">Độ trễ xoá tin (phút)</label>
+                                            <input
+                                                type="number"
+                                                id="delay_time"
+                                                name="delay_time"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                                value="${data.schedule_delete_message.delay_time}"
+                                            />
+                                        </div>
+                                        <div class="flex-1 flex flex-col">
+                                            <label for="status" class="text-xs font-medium text-gray-700">Trạng thái</label>
+                                            <select
+                                                id="status"
+                                                name="status"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                            >
+                                                <option value="on" ${data.schedule_delete_message.status === 'on' ? 'selected' : ''}>On</option>
+                                                <option value="off" ${data.schedule_delete_message.status === 'off' ? 'selected' : ''}>Off</option>
+                                            </select>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                            onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
                                         >
-                                            <option value="on" ${data.schedule_delete_message.status === 'on' ? 'selected' : ''}>On</option>
-                                            <option value="off" ${data.schedule_delete_message.status === 'off' ? 'selected' : ''}>Off</option>
-                                        </select>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
-                                        onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
-                                    >
-                                        <i class="fa-solid fa-wrench"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        `);
+                                            <i class="fa-solid fa-wrench"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            `);
                 } else {
                     $('#botDetails').append(`
-                        <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
-                            <i class="fa-solid fa-plus text-[12px]"></i>
-                            <span class="text-[12px] font-medium">Create schedule auto delete message</span>
-                        </div>
-                    `);
+                            <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
+                                <i class="fa-solid fa-plus text-[12px]"></i>
+                                <span class="text-[12px] font-medium">Create schedule auto delete message</span>
+                            </div>
+                        `);
                 }
 
                 if (data.schedule_config) {
                     $('#botDetails').append(`
-                             <div class="">
-                                <form id="scheduleConfigForm" class="flex space-x-4 mb-0">
-                                    <div class="flex-1">
-                                        <label for="config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy user (phút)</label>
-                                        <input
-                                            type="number"
-                                            id="config_delay_time"
-                                            name="delay_time"
-                                            class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
-                                            value="${data.schedule_config.time}"
-                                        />
-                                    </div>
-                                    <div class="flex-1 flex flex-col">
-                                        <label for="config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
-                                        <select
-                                            id="config_status"
-                                            name="status"
-                                            class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                 <div class="">
+                                    <form id="scheduleConfigForm" class="flex space-x-4 mb-0">
+                                        <div class="flex-1">
+                                            <label for="config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy user (phút)</label>
+                                            <input
+                                                type="number"
+                                                id="config_delay_time"
+                                                name="delay_time"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                                value="${data.schedule_config.time}"
+                                            />
+                                        </div>
+                                        <div class="flex-1 flex flex-col">
+                                            <label for="config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
+                                            <select
+                                                id="config_status"
+                                                name="status"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                            >
+                                                <option value="on" ${data.schedule_config.status === 'on' ? 'selected' : ''}>On</option>
+                                                <option value="off" ${data.schedule_config.status === 'off' ? 'selected' : ''}>Off</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-1">
+                                            <label for="config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
+                                            <input
+                                                type="text"
+                                                id="config_lastime"
+                                                name="lastime"
+                                                class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
+                                                value="${data.schedule_config.lastime}"
+                                                readonly
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                            onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
                                         >
-                                            <option value="on" ${data.schedule_config.status === 'on' ? 'selected' : ''}>On</option>
-                                            <option value="off" ${data.schedule_config.status === 'off' ? 'selected' : ''}>Off</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex-1">
-                                        <label for="config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
-                                        <input
-                                            type="text"
-                                            id="config_lastime"
-                                            name="lastime"
-                                            class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
-                                            value="${data.schedule_config.lastime}"
-                                            readonly
-                                        />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
-                                        onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
-                                    >
-                                        <i class="fa-solid fa-wrench"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        `);
+                                            <i class="fa-solid fa-wrench"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            `);
                 } else {
                     $('#botDetails').append(`
-                        <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('config', ${botId})">
-                            <i class="fa-solid fa-plus text-[12px]"></i>
-                            <span class="text-[12px] font-medium">Create schedule auto for user</span>
-                        </div>
-                    `);
+                            <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('config', ${botId})">
+                                <i class="fa-solid fa-plus text-[12px]"></i>
+                                <span class="text-[12px] font-medium">Create schedule auto for user</span>
+                            </div>
+                        `);
                 }
 
                 if (data.schedule_group_config) {
                     $('#botDetails').append(`
-                            <div>
-                                <form id="scheduleGroupConfigForm" class="flex space-x-4 mb-0">
-                                    <div class="flex-1">
-                                        <label for="group_config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy group (phút)</label>
-                                        <input
-                                            type="number"
-                                            id="group_config_delay_time"
-                                            name="delay_time"
-                                            class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
-                                            value="${data.schedule_group_config.time}"
-                                        />
-                                    </div>
-                                    <div class="flex-1 flex flex-col">
-                                        <label for="group_config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
-                                        <select
-                                            id="group_config_status"
-                                            name="status"
-                                            class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                <div>
+                                    <form id="scheduleGroupConfigForm" class="flex space-x-4 mb-0">
+                                        <div class="flex-1">
+                                            <label for="group_config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy group (phút)</label>
+                                            <input
+                                                type="number"
+                                                id="group_config_delay_time"
+                                                name="delay_time"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                                value="${data.schedule_group_config.time}"
+                                            />
+                                        </div>
+                                        <div class="flex-1 flex flex-col">
+                                            <label for="group_config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
+                                            <select
+                                                id="group_config_status"
+                                                name="status"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                            >
+                                                <option value="on" ${data.schedule_group_config.status === 'on' ? 'selected' : ''}>On</option>
+                                                <option value="off" ${data.schedule_group_config.status === 'off' ? 'selected' : ''}>Off</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-1">
+                                            <label for="group_config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
+                                            <input
+                                                type="text"
+                                                id="group_config_lastime"
+                                                name="lastime"
+                                                class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
+                                                value="${data.schedule_group_config.lastime}"
+                                                readonly
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                            onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
                                         >
-                                            <option value="on" ${data.schedule_group_config.status === 'on' ? 'selected' : ''}>On</option>
-                                            <option value="off" ${data.schedule_group_config.status === 'off' ? 'selected' : ''}>Off</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex-1">
-                                        <label for="group_config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
-                                        <input
-                                            type="text"
-                                            id="group_config_lastime"
-                                            name="lastime"
-                                            class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
-                                            value="${data.schedule_group_config.lastime}"
-                                            readonly
-                                        />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
-                                        onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
-                                    >
-                                        <i class="fa-solid fa-wrench"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        `);
+                                            <i class="fa-solid fa-wrench"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            `);
                 } else {
                     $('#botDetails').append(`
-                        <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('group_config', ${botId})">
-                            <i class="fa-solid fa-plus text-[12px]"></i>
-                            <span class="text-[12px] font-medium">Create schedule auto for group</span>
-                        </div>
-                    `);
+                            <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('group_config', ${botId})">
+                                <i class="fa-solid fa-plus text-[12px]"></i>
+                                <span class="text-[12px] font-medium">Create schedule auto for group</span>
+                            </div>
+                        `);
                 }
             } catch (e) {
                 console.log(e);
             }
-        };
+        },
+        async deleteBot(id) {
+            if (confirm('Are you sure you want to delete this bot?')) {
+                try {
+                    const response = await fetchClient(
+                        `/api/admin/bot/${id}`, {
+                            method: 'DELETE',
+                        },
+                    );
+                    showNotification('Delete bot successfully', 'success');
+                    window.location.href = '/';
+                } catch (e) {
+                    console.log(e);
+                    showNotification(e, 'success');
+                }
+            }
+        },
+        async activeBot(id) {
+            const monthQty = $('#monthQty').val();
+            const formData = new FormData();
+            formData.append('month_qty', monthQty);
 
-        await getDetailBot();
+            try {
+                const response = await fetchClient(
+                    `/api/admin/bot/${id}`, {
+                        method: 'POST',
+                        body: formData,
+                    },
+                );
+                $('#activateBotModal').addClass('hidden');
+                showNotification('Active bot successfully', 'success');
+                await scripts.getDetailBot();
+            } catch (e) {
+                console.log(e);
+                showNotification(e, 'error');
+            }
+        }
+    };
+
+
+    $(document).ready(async () => {
+        // Initial load
+        await scripts.showTab('group');
+        await scripts.getDetailBot();
+
+        //event listeners
+        $('#tab-command').on('click', (e) => {
+            e.preventDefault();
+            scripts.showTab('command');
+        });
+        $('#tab-content').on('click', (e) => {
+            e.preventDefault();
+            scripts.showTab('content');
+        });
+        $('#tab-group').on('click', (e) => {
+            e.preventDefault();
+            scripts.showTab('group');
+        });
+        $('#deleteBotButton').on('click', async () => {
+            await scripts.deleteBot(botId);
+        });
+        $('#monthQty').on('change', function() {
+            const price = $(this).find(':selected').data('price');
+            $('#totalPrice').text(price);
+        });
+        $('#openActivateBotModal').on('click', function() {
+            $('#activateBotModal').removeClass('hidden');
+        });
+        $('#activateBotButton').on('click', async () => {
+            await scripts.activeBot(botId);
+        });
 
         window.openScheduleModal = (type, botId, schedule = {}) => {
             $('#scheduleModal').removeClass('hidden');
@@ -1013,6 +1061,7 @@
             }
         }
 
+        //update schedule bot
         $('#scheduleUpdateForm').on('submit', async (e) => {
             e.preventDefault();
 
@@ -1043,58 +1092,14 @@
                 });
 
                 $('#scheduleModal').addClass('hidden');
-                await getDetailBot();
+                showNotification(`Schedule ${type} update successfully`, 'success');
+                await scripts.getDetailBot();
             } catch (e) {
                 console.log(e);
+                showNotification(e, 'success');
             }
         });
-
-        {
-            window.openActivateBotModal = (id) => {
-                $('#activateBotModal').removeClass('hidden');
-                $('#activateBotModal').data('botId', id);
-            };
-
-            $('#monthQty').on('change', function() {
-                const price = $(this).find(':selected').data('price');
-                $('#totalPrice').text(price);
-            });
-
-            $('#activateBotButton').on('click', async () => {
-                const botId = $('#activateBotModal').data('botId');
-                const monthQty = $('#monthQty').val();
-                const formData = new FormData();
-                formData.append('month_qty', monthQty);
-
-                try {
-                    const response = await fetchClient(
-                        `/api/admin/bot/${botId}`, {
-                            method: 'POST',
-                            body: formData,
-                        },
-                    );
-                    $('#activateBotModal').addClass('hidden');
-                    await getDetailBot();
-                } catch (e) {
-                    console.log(e);
-                }
-            });
-
-            window.deleteBot = async (id) => {
-                if (confirm('Are you sure you want to delete this bot?')) {
-                    try {
-                        const response = await fetchClient(
-                            `/api/admin/bot/${id}`, {
-                                method: 'DELETE',
-                            },
-                        );
-                        window.location.href = '/';
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            };
-        }
     });
 </script>
+
 @endpush
