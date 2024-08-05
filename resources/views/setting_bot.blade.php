@@ -17,19 +17,15 @@
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" onclick="showTab('content'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-content">
-                    Content
-                </a>
-            </li>
-            <li class="me-2">
-                <a href="#" onclick="showTab('group'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-group">
-                    Group
+                <a href="#" onclick="showTab('testTab'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-testTab">
+                    Test tab
                 </a>
             </li>
         </ul>
     </div>
 
-    <div id="command">
+    <!-- command tab list -->
+    <div id="command" class="hidden">
         <div id="botCommands" class="space-y-2 rounded bg-white">
             <table class="w-full shadow">
                 <thead class="border-b-[1px] border-solid border-gray-300">
@@ -137,12 +133,6 @@
                 </script>
             </div>
             <div id="pagination" class="mt-3"></div>
-            <!-- <div class="w-full text-center hidden my-auto" id="thinkOutOfTheBox">
-                <a href="#" class="cursor-pointer">
-                    <img src="{{asset('assets/images/new.png')}}" alt="" class="w-[80px] mx-auto">
-                </a>
-                <p class="mt-3 font-bold text-xl text-gray-200">There are no posts to show.</p>
-            </div> -->
         </div>
 
         <!-- Modal -->
@@ -228,7 +218,12 @@
             </table>
         </div>
     </div>
+
+    <div id="testTab" class="hidden">
+        <p>Test tab</p>
+    </div>
 </div>
+
 <!-- Modal for creating or updating schedule -->
 <div class="fixed inset-0 z-10 overflow-y-auto hidden" id="scheduleModal">
     <div class="flex min-h-screen items-center justify-center">
@@ -768,8 +763,12 @@
             await listGroup();
         }
 
+        window.testScript = async () => {
+            console.log('Test tab');
+        }
+        
         window.showTab = async (tabId) => {
-            const tabIds = ['command', 'content', 'group'];
+            const tabIds = ['command', 'content', 'group', 'testTab'];
             tabIds.forEach(function(id) {
                 document.getElementById(id).classList.add('hidden');
             });
@@ -780,6 +779,8 @@
                 await commandScript();
             } else if (tabId === 'group') {
                 await groupScript();
+            }else if (tabId === 'testTab') {
+                await testScript();
             }
 
             // Đổi class của tablist để thể hiện tab được chọn
