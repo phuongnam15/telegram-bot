@@ -17,10 +17,20 @@
                 </a>
             </li>
             <li class="me-2">
+                <a href="#" onclick="showTab('content'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-content">
+                    Content
+                </a>
+            </li>
+            <li class="me-2">
+                <a href="#" onclick="showTab('group'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-group">
+                    Group
+                </a>
+            </li>
+            <!-- <li class="me-2">
                 <a href="#" onclick="showTab('testTab'); return false;" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-testTab">
                     Test tab
                 </a>
-            </li>
+            </li> -->
         </ul>
     </div>
 
@@ -766,7 +776,6 @@
         window.testScript = async () => {
             console.log('Test tab');
         }
-        
         window.showTab = async (tabId) => {
             const tabIds = ['command', 'content', 'group', 'testTab'];
             tabIds.forEach(function(id) {
@@ -779,7 +788,7 @@
                 await commandScript();
             } else if (tabId === 'group') {
                 await groupScript();
-            }else if (tabId === 'testTab') {
+            } else if (tabId === 'testTab') {
                 await testScript();
             }
 
