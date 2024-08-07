@@ -3,6 +3,8 @@
 namespace App\Services\BotService;
 
 use App\Jobs\DeleteTelegramMessage;
+use App\Models\AnalyticGroupMessage;
+use App\Models\AnalyticGroupUser;
 use App\Models\Bot;
 use App\Models\BotCommandContent;
 use App\Models\BotGroup;
@@ -40,154 +42,32 @@ class BotService extends BaseService
         $adminId = $bot->admin_id;
 
         try {
+            DB::beginTransaction();
             $update = $request->all();
             $client = new Client([
                 'base_uri' => "https://api.telegram.org/bot{$botToken}/",
             ]);
 
             // logger($update);
+            $this->checkIsUserMessage($update);
             $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
 
             if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
                 $message = $update['chat_member'] ?? $update['message'];
                 $chatId = $message['chat']['id'];
 
-                $name = "";
-
-                // New chat member
-                if (isset($message['new_chat_member'])) {
-                    if (!isset($message['new_chat_member']['status'])) {
-                        return;
-                    } elseif ($message['new_chat_member']['status'] !== 'member') {
-                        return;
-                    }
-
-                    $newChatMember = $message['new_chat_member']['user'] ?? $message['new_chat_member'];
-                    $firstName = $newChatMember['first_name'] ?? '';
-                    $lastName = $newChatMember['last_name'] ?? '';
-                    $username = $newChatMember['username'] ?? '';
-
-                    $name = trim("$firstName $lastName");
-                    $name = $name ?: $username;
-
-                    $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
-
-                    $configIntro = ContentConfig::where([
-                        'kind' => ContentConfig::KIND_INTRO,
-                        'is_default' => true,
-                        'admin_id' => $adminId
-                    ])->first();
-
-                    if ($configIntro) {
-                        $this->send([$chatId], $configIntro->id, $botToken, $text);
-                    }
-                }
-
-                // Check message
-                if (isset($message['text'])) {
-                    // Start bot
-                    if (Command::where('command', $message['text'])->exists()) {
-
-                        $command = Command::where('command', $message['text'])->first();
-
-                        if ($message['text'] === '/start') {
-                            if (isset($message['from']['first_name'])) {
-                                $name .= $message['from']['first_name'] . " ";
-                            }
-                            if (isset($message['from']['last_name'])) {
-                                $name .= $message['from']['last_name'];
-                            }
-                            if ($name === '') {
-                                $name = $message['from']['username'];
-                            }
-
-                            $user = User::firstOrCreate(
-                                ['telegram_id' => $chatId],
-                                [
-                                    'status' => 'start',
-                                    'name' => $name,
-                                    'telegram_id' => $chatId,
-                                ]
-                            );
-
-                            $botUserExists = BotUser::where([
-                                'user_id' => $user->id,
-                                'bot_id' => $botId
-                            ])->exists();
-
-                            if (!$botUserExists) {
-                                BotUser::create([
-                                    'user_id' => $user->id,
-                                    'bot_id' => $botId
-                                ]);
-                            }
-                        }
-
-                        $bCC = BotCommandContent::where([
-                            'bot_id' => $botId,
-                            'command_id' => $command->id
-                        ])->first();
-
-                        if ($bCC) {
-                            $content = ContentConfig::where('id', $bCC->content_id)->first();
-                            $this->send([$chatId], $content->id, $botToken);
-                        }
-                    } else {
-                        // Check status of user
-                        $user = User::where('telegram_id', $chatId)->first();
-
-                        if ($user && ($user->status !== 'start')) {
-                            $status = $user->status;
-
-                            switch ($status) {
-                                case "check_password":
-                                    $password = $message['text'];
-
-                                    if (Password::where('password', $password)->exists()) {
-                                        $userPass = UserPassword::where(['telegram_id' => $chatId, 'password' => $password])->first();
-
-                                        if ($userPass) {
-                                            if (Carbon::now()->diffInMinutes($userPass->updated_at) > PASS_VALID_TIME) {
-                                                $text = PhoneNumber::inRandomOrder()->first()->phone_number;
-                                                $user->status = 'start';
-                                                $user->save();
-                                                $userPass->updated_at = Carbon::now();
-                                                $userPass->save();
-                                            } else {
-                                                $text = "Mật khẩu không chính xác.";
-                                            }
-                                        } else {
-                                            $text = PhoneNumber::inRandomOrder()->first()->phone_number;
-                                            $user->status = 'start';
-                                            $user->save();
-                                            UserPassword::create([
-                                                'telegram_id' => $chatId,
-                                                'password' => $password,
-                                            ]);
-                                        }
-                                    } else {
-                                        $text = "Mật khẩu không chính xác.";
-                                    }
-
-                                    $client->post('sendMessage', [
-                                        'json' => [
-                                            'chat_id' => $chatId,
-                                            'text' => $text
-                                        ]
-                                    ]);
-
-                                    break;
-                            }
-                        }
-                    }
-                }
+                $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
+                $this->checkMessage($message, $chatId, $botId, $botToken, $client);
             }
-            // Reply callback data
+            
             if (array_key_exists('callback_query', $update)) {
                 return $this->replyCallback($update['callback_query']['from']['id'], $update['callback_query']['data'], $bot);
             }
+
+            DB::commit();
             return 1;
-        } catch (\Exception $error) {
+        } catch (AppServiceException | \Exception $error) {
+            DB::rollBack();
             logger($error->getMessage());
         }
     }
@@ -542,12 +422,13 @@ class BotService extends BaseService
     public function checkJoinLeftGroup($update, $botId, $botToken, $adminId)
     {
         try {
+            //check bot left or join group
             if (isset($update['my_chat_member'])) {
 
                 $myChatMember = $update['my_chat_member'];
                 $chatId = $myChatMember['chat']['id'];
 
-                if (isset($myChatMember['new_chat_member']['status']) && $myChatMember['new_chat_member']['status'] === 'left') {
+                if (isset($myChatMember['new_chat_member']['status']) && ($myChatMember['new_chat_member']['status'] === 'left' || $myChatMember['new_chat_member']['status'] === 'kicked')) {
 
                     $telegramGroup = TelegramGroup::where('telegram_id', $chatId)->first();
 
@@ -587,6 +468,65 @@ class BotService extends BaseService
                     }
                 }
             }
+
+            //check user left or join group
+            if (isset($update['message'])) {
+                $message = $update['message'];
+
+                if ($message['from']['is_bot']) {
+                    return;
+                }
+
+                $group = TelegramGroup::where('telegram_id', $message['chat']['id'])->first();
+
+                if (!$group) {
+                    return;
+                }
+
+                if (isset($message['left_chat_member']) && isset($message['left_chat_participant'])) {
+                    if ($message['left_chat_member']['is_bot']) {
+                        return;
+                    }
+
+                    $analyticGroupUser = AnalyticGroupUser::where([
+                        'group_id' => $group->id,
+                        'type' => AnalyticGroupUser::TYPE_LEFT
+                    ])->whereBetween('created_at', [Carbon::today(), Carbon::now()])->first();
+
+                    if ($analyticGroupUser) {
+                        $analyticGroupUser->total += 1;
+                        $analyticGroupUser->save();
+                    } else {
+                        AnalyticGroupUser::create([
+                            'total' => 1,
+                            'group_id' => $group->id,
+                            'type' => AnalyticGroupUser::TYPE_LEFT
+                        ]);
+                    }
+                }
+
+                if (isset($message['new_chat_member']) && isset($message['new_chat_participant'])) {
+                    if ($message['new_chat_member']['is_bot']) {
+                        return;
+                    }
+
+                    $analyticGroupUser = AnalyticGroupUser::where([
+                        'group_id' => $group->id,
+                        'type' => AnalyticGroupUser::TYPE_JOIN
+                    ])->whereBetween('created_at', [Carbon::today(), Carbon::now()])->first();
+
+                    if ($analyticGroupUser) {
+                        $analyticGroupUser->total += 1;
+                        $analyticGroupUser->save();
+                    } else {
+                        AnalyticGroupUser::create([
+                            'total' => 1,
+                            'group_id' => $group->id,
+                            'type' => AnalyticGroupUser::TYPE_JOIN
+                        ]);
+                    }
+                }
+            }
         } catch (\Exception $error) {
             logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
@@ -610,7 +550,7 @@ class BotService extends BaseService
 
             $fileUrl = null;
 
-            if($data['result']['total_count'] === 0) {
+            if ($data['result']['total_count'] === 0) {
                 return $fileUrl;
             }
 
@@ -630,6 +570,189 @@ class BotService extends BaseService
 
             return $fileUrl;
         } catch (\Exception $error) {
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function checkIsUserMessage($update)
+    {
+        try {
+            if (isset($update['message'])) {
+
+                if (isset($update['message']['from']['is_bot']) && $update['message']['from']['is_bot']) {
+                    return;
+                }
+
+                if (!isset($update['message']['text']) || isset($update['message']['new_chat_member']) || isset($update['message']['left_chat_member'])) {
+                    return;
+                }
+
+                $group = TelegramGroup::where('telegram_id', $update['message']['chat']['id'])->first();
+
+                if (!$group) {
+                    return;
+                }
+
+                $startOfDay = Carbon::today();
+                $now = Carbon::now();
+
+                $analyticGroupMessage = AnalyticGroupMessage::where('group_id', $group->id)
+                    ->whereBetween('created_at', [$startOfDay, $now])
+                    ->first();
+
+                if ($analyticGroupMessage) {
+                    $analyticGroupMessage->total += 1;
+                    $analyticGroupMessage->save();
+                } else {
+                    AnalyticGroupMessage::create([
+                        'total' => 1,
+                        'group_id' => $group->id
+                    ]);
+                }
+            }
+        } catch (AppServiceException | \Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function checkNewMemberToSayHi($message, $adminId, $chatId, $botToken)
+    {
+        try {
+            if (isset($message['new_chat_member'])) {
+                if (!isset($message['new_chat_member']['status'])) {
+                    return;
+                } elseif ($message['new_chat_member']['status'] !== 'member') {
+                    return;
+                }
+
+                $newChatMember = $message['new_chat_member']['user'] ?? $message['new_chat_member'];
+                $firstName = $newChatMember['first_name'] ?? '';
+                $lastName = $newChatMember['last_name'] ?? '';
+                $username = $newChatMember['username'] ?? '';
+
+                $name = trim("$firstName $lastName");
+                $name = $name ?: $username;
+
+                $text = "Chào mừng <strong>{$name}</strong> đến với group!\n\n";
+
+                $configIntro = ContentConfig::where([
+                    'kind' => ContentConfig::KIND_INTRO,
+                    'is_default' => true,
+                    'admin_id' => $adminId
+                ])->first();
+
+                if ($configIntro) {
+                    $this->send([$chatId], $configIntro->id, $botToken, $text);
+                }
+            }
+        } catch (AppServiceException | \Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function checkMessage($message, $chatId, $botId, $botToken, $client)
+    {
+        try {
+            $name = "";
+            // Check message
+            if (isset($message['text'])) {
+                // Start bot
+                if (Command::where('command', $message['text'])->exists()) {
+
+                    $command = Command::where('command', $message['text'])->first();
+
+                    if ($message['text'] === '/start') {
+                        if (isset($message['from']['first_name'])) {
+                            $name .= $message['from']['first_name'] . " ";
+                        }
+                        if (isset($message['from']['last_name'])) {
+                            $name .= $message['from']['last_name'];
+                        }
+                        if ($name === '') {
+                            $name = $message['from']['username'];
+                        }
+
+                        $user = User::firstOrCreate(
+                            ['telegram_id' => $chatId],
+                            [
+                                'status' => 'start',
+                                'name' => $name,
+                                'telegram_id' => $chatId,
+                            ]
+                        );
+
+                        $botUserExists = BotUser::where([
+                            'user_id' => $user->id,
+                            'bot_id' => $botId
+                        ])->exists();
+
+                        if (!$botUserExists) {
+                            BotUser::create([
+                                'user_id' => $user->id,
+                                'bot_id' => $botId
+                            ]);
+                        }
+                    }
+
+                    $bCC = BotCommandContent::where([
+                        'bot_id' => $botId,
+                        'command_id' => $command->id
+                    ])->first();
+
+                    if ($bCC) {
+                        $content = ContentConfig::where('id', $bCC->content_id)->first();
+                        $this->send([$chatId], $content->id, $botToken);
+                    }
+                } else {
+                    // Check status of user
+                    $user = User::where('telegram_id', $chatId)->first();
+
+                    if ($user && ($user->status !== 'start')) {
+                        $status = $user->status;
+
+                        switch ($status) {
+                            case "check_password":
+                                $password = $message['text'];
+
+                                if (Password::where('password', $password)->exists()) {
+                                    $userPass = UserPassword::where(['telegram_id' => $chatId, 'password' => $password])->first();
+
+                                    if ($userPass) {
+                                        if (Carbon::now()->diffInMinutes($userPass->updated_at) > PASS_VALID_TIME) {
+                                            $text = PhoneNumber::inRandomOrder()->first()->phone_number;
+                                            $user->status = 'start';
+                                            $user->save();
+                                            $userPass->updated_at = Carbon::now();
+                                            $userPass->save();
+                                        } else {
+                                            $text = "Mật khẩu không chính xác.";
+                                        }
+                                    } else {
+                                        $text = PhoneNumber::inRandomOrder()->first()->phone_number;
+                                        $user->status = 'start';
+                                        $user->save();
+                                        UserPassword::create([
+                                            'telegram_id' => $chatId,
+                                            'password' => $password,
+                                        ]);
+                                    }
+                                } else {
+                                    $text = "Mật khẩu không chính xác.";
+                                }
+
+                                $client->post('sendMessage', [
+                                    'json' => [
+                                        'chat_id' => $chatId,
+                                        'text' => $text
+                                    ]
+                                ]);
+
+                                break;
+                        }
+                    }
+                }
+            }
+        } catch (AppServiceException | \Exception $error) {
+            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }

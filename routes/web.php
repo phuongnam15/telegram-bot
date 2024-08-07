@@ -43,3 +43,6 @@ Route::get('/register', function () {
 Route::get('/setting-bot/{id}', function ($id) {
     return view('setting_bot');
 });
+Route::get('/analytic/{id}', function () {
+    return view('analytic');
+});

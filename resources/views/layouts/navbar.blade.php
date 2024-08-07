@@ -2,8 +2,8 @@
 
 <nav class="sticky top-0 z-10 w-lvw bg-[#f8f9fa] py-2 flex justify-center">
     <div class="container flex w-full items-center justify-between font-popi text-sm">
-        <div class="flex gap-5">
-            <img src="{{asset('/assets/images/telegram.png')}}" alt="" class="size-10">
+        <div class="flex gap-5 items-center">
+            <img src="{{asset('/assets/images/telegram.png')}}" alt="" class="size-7">
             <a href="/"class="h-full w-full py-2 font-medium text-gray-500 hover:text-gray-600">
                 <span>Home</span>
             </a>

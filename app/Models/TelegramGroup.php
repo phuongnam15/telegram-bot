@@ -20,4 +20,12 @@ class TelegramGroup extends Model
     {
         return $this->belongsToMany(Bot::class, 'bot_groups', 'group_id', 'bot_id');
     }
+    public function analyticMessages()
+    {
+        return $this->hasMany(AnalyticGroupMessage::class, 'group_id');
+    }
+    public function analyticUsers()
+    {
+        return $this->hasMany(AnalyticGroupUser::class, 'group_id');
+    }
 }

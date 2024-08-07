@@ -61,6 +61,11 @@ Route::middleware('auth:admin')->group(function () {
         Route::post('/', [GroupController::class, 'create']);
         Route::put('/{id}', [GroupController::class, 'update']);
         Route::delete('/{id}', [GroupController::class, 'delete']);
+
+        Route::prefix('analytic')->group(function () {
+            Route::get('/message', [GroupController::class, 'analyticMessage']);
+            Route::get('/user', [GroupController::class, 'analyticUser']);
+        });
     });
 
     Route::get('/users', [UserController::class, 'list']);

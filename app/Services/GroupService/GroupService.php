@@ -7,6 +7,7 @@ use App\Models\TelegramGroup;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use App\Services\_Trait\SaveFile;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 
 class GroupService extends BaseService
@@ -91,5 +92,39 @@ class GroupService extends BaseService
         return response()->json([
             'message' => 'Group deleted'
         ]);
+    }
+    public function analyticMessage($request)
+    {
+        return DbTransactions()->addCallBackJson(function () use ($request) {
+            $group = TelegramGroup::where('id', request()->group_id)->first();
+
+            if (!$group) {
+                throw new AppServiceException('Group not found');
+            }
+
+            $analytic = $group->analyticMessages->whereBetween('created_at', [
+                Carbon::parse($request->start_at),
+                Carbon::parse($request->end_at)
+            ]);
+
+            return $analytic;
+        });
+    }
+    public function analyticUser($request)
+    {
+        return DbTransactions()->addCallBackJson(function () use ($request) {
+            $group = TelegramGroup::where('id', $request->group_id)->first();
+
+            if (!$group) {
+                throw new AppServiceException('Group not found');
+            }
+
+            $analytic = $group->analyticUsers->where('type', $request->type)->whereBetween('created_at', [
+                Carbon::parse($request->start_at),
+                Carbon::parse($request->end_at)
+            ]);
+
+            return $analytic;
+        });
     }
 }

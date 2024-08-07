@@ -34,4 +34,12 @@ class GroupController extends Controller
     {
         return $this->service->delete($id);
     }
+    public function analyticMessage(Request $request)
+    {
+        return $this->service->analyticMessage($request);
+    }
+    public function analyticUser(Request $request)
+    {
+        return $this->service->analyticUser($request);
+    }
 }

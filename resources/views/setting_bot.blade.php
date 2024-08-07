@@ -93,7 +93,7 @@
 
     <!-- content tab list -->
     <div id="content" class="hidden">
-        <div class="relative container">
+        <div class="relative">
             <div class="flex gap-2">
                 <div id="contentData" class="w-full overflow-x-auto shadow"></div>
                 <div class="text-left">
@@ -190,7 +190,7 @@
 
     <!-- group tab list -->
     <div id="group" class="hidden">
-        <div class="container mt-5">
+        <div class="mt-5">
             <table class="min-w-full shadow rounded" id="groupTable">
                 <thead class="text-sm text-gray-600 font-mono border-b-[1px] border-solid border-gray-300">
                     <tr class="w-full">
@@ -202,23 +202,6 @@
                 </thead>
                 <tbody class="text-sm text-gray-600 text-center">
                     <!-- Rows will be added by jQuery -->
-                    <tr class="bg-gray-100">
-                        <td class="flex items-center gap-2 flex-1 hover:bg-[#ced3dc] p-4">
-                            <img class="size-12 rounded-full" src="https://th.bing.com/th/id/R.ac76a296e880e51f549d9d25865a2e0a?rik=K%2fWgSkaj2gB79Q&riu=http%3a%2f%2fimages4.fanpop.com%2fimage%2fphotos%2f22500000%2fkakashi-sensei-kakashi-22519264-1024-768.jpg&ehk=%2bv5GD7jfWuVq051pFdp%2f4Rs8Rxgnx0VSjNPzcLuXvC4%3d&risl=&pid=ImgRaw&r=0" alt="">
-                            <div class="flex flex-col leading-5">
-                                <p class="text-left">
-                                    <span class="font-medium">test</span>
-                                </p>
-                                <p class="text-gray-500 flex items-center gap-1">
-                                    <span class="text-sm">@uzimaki</span>
-                                    <i class="fa-brands fa-telegram"></i>
-                                </p>
-                            </div>
-                        </td>
-                        <td class="p-4">8375687358</td>
-                        <td class="p-4">24/10/37 34:23:12</td>
-                        <td class="p-4">24/10/37 34:23:12</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -746,7 +729,9 @@
                                 </td>
                                 <td class="py-4">8375687358</td>
                                 <td class="py-4">${formatDate(group.created_at)}</td>
-                                <td class="py-4"></td>
+                                <td class="py-4">
+                                    <button class="text-blue-500 text-[14px] italic hover:underline" id="analyticGroupButton" data-group-id="${group.id}">detail</button>
+                                </td>
                             </tr>
                         `);
                 });
@@ -756,6 +741,10 @@
         },
         async groupScript() {
             await scripts.listGroup();
+            $('#analyticGroupButton').on('click', async function() {
+                const groupId = $(this).data('group-id');
+                window.location.href = `/analytic/${groupId}`;
+            });
         },
 
         ////////////////////////////////////////////
