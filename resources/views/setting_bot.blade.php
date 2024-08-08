@@ -292,6 +292,69 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for ACB -->
+<div class="fixed inset-0 z-10 overflow-y-auto hidden" id="acbPaymentModal">
+    <div class="flex justify-center items-center fixed inset-0 font-popi">
+        <div class="fixed inset-0">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <div class="overflow-y-auto w-[90%] md:w-3/4 h-3/4 bg-[#f1f5f8] grid-cols-2 grid px-5 md:px-10 py-4 grid-rows-[auto_1fr] z-10 rounded-lg relative" id="acbPaymentInfo">
+            <button type="button" class="absolute right-2 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('acbPaymentModal').classList.add('hidden')">
+                <span aria-hidden="true" class="text-2xl">
+                    &times;
+                </span>
+            </button>
+            <div class="col-span-2 text-center pt-2 pb-5">
+                <h3 class="font-medium text-gray-800 text-sm">Chuyển khoản qua Ngân Hàng</h3>
+                <p class="text-xs text-gray-600">Thực hiện chuyển khoản ngân hàng vào STK bên dưới. Vui lòng nhập đúng nội dung chuyển khoản và chờ ở trang này cho đến khi hệ thống báo thành công</p>
+            </div>
+            <div class="col-span-2 grid-cols-1 lg:grid-cols-2 grid grid-rows-[auto_1fr] flex-1 gap-2 h-[98%]">
+                <div class="col-span-1 bg-white grid row-span-2 grid-rows-subgrid px-5 rounded">
+                    <div class="text-center py-4">
+                        <h1 class="font-medium text-gray-800 text-sm">Cách 1: CHuyển khoản bằng mã QR</h1>
+                        <p class="text-xs text-gray-600">Mở App Ngân Hàng quét mã QRCode và nhập số tiền cần chuyển</p>
+                    </div>
+                    <div class="flex justify-center bg-white">
+                        <img class="w-full sm:w-[70%] 2xl:w-[60%] h-[80%]" src="https://apiqr.web2m.com/api/generate/ACB/12515801/PHUNGPHUONGNAM?amount=10000&memo=TUVITHIENAN%20802273495&is_mask=0&bg=0" alt="">
+                    </div>
+                </div>
+                <div class="col-span-1 bg-white grid row-span-2 grid-rows-subgrid px-5 rounded pb-5">
+                    <div class="text-center py-4">
+                        <h1 class="font-medium text-gray-800 text-sm">Cách 2: Chuyển khoản thủ công theo thông tin</h1>
+                    </div>
+                    <div class="flex flex-col items-center gap-4">
+                        <img src="{{asset('/assets/images/Logo-ACB.webp')}}" alt="" class="w-[50%] lg:w-[40%]">
+                        <div class="w-full grid grid-rows-3 grid-cols-2">
+                            <div class="border-b border-gray-300 grid grid-cols-subgrid col-span-2 gap-2 py-1 md:py-2">
+                                <p class="text-xs flex items-center justify-end">Chủ tài khoản</p>
+                                <p class="text-sm flex items-center font-bold text-gray-500">PHÙNG PHƯƠNG NAM</p>
+                            </div>
+                            <div class="border-b border-gray-300 grid grid-cols-subgrid col-span-2 gap-2 py-1 md:py-2">
+                                <p class="text-xs flex items-center justify-end">Số tài khoản</p>
+                                <p class="text-sm flex items-center text-green-500">12515801</p>
+                            </div>
+                            <div class="grid grid-cols-subgrid col-span-2 gap-2 py-1 md:py-2">
+                                <p class="text-xs flex items-center justify-end">Nội dung chuyển tiền</p>
+                                <p class="text-sm flex items-center text-red-500 font-medium">TELEGRAMBOT 123123</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center gap-4">
+                            <p class="text-xs font-sans font-medium">Ngân Hàng: Á CHÂU (ACB)</p>
+                            <p class="text-[0.8rem] text-gray-600 font-bold">Đang chờ chuyển khoản</p>
+                            <svg aria-hidden="true" class="w-8 h-8 text-gray-100 animate-spin fill-gray-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                            </svg>
+                            <p class="text-center text-xs text-red-500">Lưu ý: Nếu sau 2 phút chưa nhận được thông báo vui lòng nhấn F5 để reload lại trang này</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push("scripts")
@@ -1001,8 +1064,8 @@
         }
     };
 
-
     $(document).ready(async () => {
+
         // Initial load
         await scripts.showTab('group');
         await scripts.getDetailBot();
@@ -1031,7 +1094,9 @@
             $('#activateBotModal').removeClass('hidden');
         });
         $('#activateBotButton').on('click', async () => {
-            await scripts.activeBot(botId);
+            // await scripts.activeBot(botId);
+            $('#activateBotModal').addClass('hidden');
+            $('#acbPaymentModal').removeClass('hidden');
         });
 
         window.openScheduleModal = (type, botId, schedule = {}) => {
