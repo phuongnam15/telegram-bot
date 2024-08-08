@@ -271,17 +271,17 @@
                         Select num of months
                     </label>
                     <select id="monthQty" class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
-                        <option value="1" data-price="10">
-                            1 Month - $10
+                        <option value="1" data-price="100000">
+                            1 Month - 100,000 đ
                         </option>
-                        <option value="3" data-price="27">
-                            3 Months - $27
+                        <option value="3" data-price="200000">
+                            3 Months - 200,000 đ
                         </option>
-                        <option value="6" data-price="48">
-                            6 Months - $48
+                        <option value="6" data-price="300000">
+                            6 Months - 300,000 đ
                         </option>
-                        <option value="12" data-price="90">
-                            12 Months - $90
+                        <option value="12" data-price="400000">
+                            12 Months - 400,000 đ
                         </option>
                     </select>
                 </div>
@@ -316,7 +316,7 @@
                         <p class="text-xs text-gray-600">Mở App Ngân Hàng quét mã QRCode và nhập số tiền cần chuyển</p>
                     </div>
                     <div class="flex justify-center bg-white">
-                        <img class="w-full sm:w-[70%] 2xl:w-[60%] h-[80%]" src="https://apiqr.web2m.com/api/generate/ACB/12515801/PHUNGPHUONGNAM?amount=10000&memo=TUVITHIENAN%20802273495&is_mask=0&bg=0" alt="">
+                        <img id="acbQrCode" class="w-full sm:w-[70%] 2xl:w-[60%] h-[80%]" src="" alt="">
                     </div>
                 </div>
                 <div class="col-span-1 bg-white grid row-span-2 grid-rows-subgrid px-5 rounded pb-5">
@@ -334,9 +334,13 @@
                                 <p class="text-xs flex items-center justify-end">Số tài khoản</p>
                                 <p class="text-sm flex items-center text-green-500">12515801</p>
                             </div>
+                            <div class="border-b border-gray-300 grid grid-cols-subgrid col-span-2 gap-2 py-1 md:py-2">
+                                <p class="text-xs flex items-center justify-end">Nội dung CK</p>
+                                <p class="text-sm flex items-center text-[#1f419b] font-medium" id="syntaxPayment"></p>
+                            </div>
                             <div class="grid grid-cols-subgrid col-span-2 gap-2 py-1 md:py-2">
-                                <p class="text-xs flex items-center justify-end">Nội dung chuyển tiền</p>
-                                <p class="text-sm flex items-center text-red-500 font-medium">TELEGRAMBOT 123123</p>
+                                <p class="text-xs flex items-center justify-end">Số tiền</p>
+                                <p class="text-sm flex items-center text-red-500 font-medium" id="amountPayment"></p>
                             </div>
                         </div>
                         <div class="flex flex-col items-center gap-4">
@@ -1061,7 +1065,38 @@
                 console.log(e);
                 showNotification(e, 'error');
             }
-        }
+        },
+        openAcbPaymentModal(amount, botId) {
+            console.log(amount, botId);
+
+            const acbQR = `https://apiqr.web2m.com/api/generate/ACB/12515801/PHUNGPHUONGNAM?amount=${amount}&memo=TELEGRAMBOT%${botId}&is_mask=0&bg=0`;
+            $('#acbQrCode').attr('src', acbQR);
+            $('#syntaxPayment').text(`TELEGRAMBOT ${botId}`);
+            $('#amountPayment').text(amount);
+            $('#acbPaymentModal').removeClass('hidden');
+        },
+        async checkActiveBot(botId) {
+            try {
+                const response = await fetchClient(
+                    `/api/admin/bot/${botId}`, {
+                        method: 'GET',
+                    },
+                );
+
+                const data = response.data;
+                console.log(data);
+
+                if (data.status === '1') {
+                    showNotification('Bot is active', 'success');
+                    $('#activateBotButton').addClass('hidden');
+
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.log(e);
+            }
+        },
     };
 
     $(document).ready(async () => {
@@ -1086,17 +1121,36 @@
         $('#deleteBotButton').on('click', async () => {
             await scripts.deleteBot(botId);
         });
-        $('#monthQty').on('change', function() {
-            const price = $(this).find(':selected').data('price');
-            $('#totalPrice').text(price);
-        });
+        // $('#monthQty').on('change', function() {
+        //     const price = $(this).find(':selected').data('price');
+        //     $('#totalPrice').text(price);
+        // });
         $('#openActivateBotModal').on('click', function() {
             $('#activateBotModal').removeClass('hidden');
         });
         $('#activateBotButton').on('click', async () => {
-            // await scripts.activeBot(botId);
-            $('#activateBotModal').addClass('hidden');
-            $('#acbPaymentModal').removeClass('hidden');
+            await scripts.activeBot(botId);
+            // $('#activateBotModal').addClass('hidden');
+
+            // const price = new Intl.NumberFormat('vi-VN', {
+            //     style: 'currency',
+            //     currency: 'VND'
+            // }).format($('#monthQty').find(':selected').data('price'));
+
+            // scripts.openAcbPaymentModal(price, botId);
+
+            // let attempts = 0;
+            // const maxAttempts = 24;
+
+            // const intervalId = setInterval(async () => {
+            //     attempts++;
+            //     const success = await scripts.checkActiveBot(botId);
+            //     if (success) {
+            //         clearInterval(intervalId);
+            //     } else if (attempts >= maxAttempts) {
+            //         clearInterval(intervalId);
+            //     }
+            // }, 5000);
         });
 
         window.openScheduleModal = (type, botId, schedule = {}) => {

@@ -22,6 +22,12 @@ class Bot extends Model
     ];
     const STATUS_ACTIVE = true;
     const STATUS_INACTIVE = false;
+    const MAP_DAY = [
+        100000 => 30,
+        200000 => 90,
+        300000 => 180,
+        400000 => 365,
+    ];
 
     function scheduleDeleteMessage()
     {

@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:auto-send')->everyMinute();
         $schedule->command('bot:check-expire')->everyMinute();
         $schedule->command('tele:update-avatar')->daily();
+        $schedule->command('app:bank-check')->everyMinute();
     }
 
     /**

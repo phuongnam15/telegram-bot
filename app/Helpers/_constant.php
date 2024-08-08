@@ -5,6 +5,7 @@ const KEY_AUTH_USER = 'user';
 const KEY_AUTH_ADMIN = 'admin';
 const DEFAULT_PAGINATE = 10;
 const PASS_VALID_TIME = 60;
+const BANK_STATEMENT = "TELEGRAMBOT ";
 
 const BOT_TOKEN = "6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc";
 
