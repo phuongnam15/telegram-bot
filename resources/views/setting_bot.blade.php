@@ -855,7 +855,16 @@
                             <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
                                 <img src="${data.avatar ?? "{{ asset('assets/images/bot.png') }}"}" 
                                     class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
-                                <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> ${data.token}</p>
+                                <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> 
+                                    ${data.token}
+                                    ${data.status === '1' ? 
+                                        `<button class="bg-gray-700 px-2 -skew-x-[20deg]" onClick="showCoinMode(${data.id})">
+                                            <span class="text-[#fbc31c] text-[14px] hover:underline">bitcoin</span>
+                                        </button>`
+                                    :
+                                        ""
+                                    }
+                                </p>
                                 <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
                                 <p class="block text-sm font-medium text-gray-600"><strong>Firstname:</strong> ${data.firstname}</p>
                                 <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
@@ -865,7 +874,7 @@
                                         `<button class="text-green-500 text-[14px] italic hover:underline" id="openActivateBotModal">active</button>
                                         <span>/</span>`
                                     : 
-                                        ''
+                                        ""
                                     }
                                     <button class="text-red-500 text-[14px] italic hover:underline" id="deleteBotButton">delete</button>
                                 </div>
@@ -1152,6 +1161,10 @@
             //     }
             // }, 5000);
         });
+
+        window.showCoinMode = (botId) => {
+            window.location.href = `/coin/${botId}`;
+        }
 
         window.openScheduleModal = (type, botId, schedule = {}) => {
             $('#scheduleModal').removeClass('hidden');

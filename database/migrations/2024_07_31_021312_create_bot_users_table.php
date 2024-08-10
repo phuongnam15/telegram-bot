@@ -15,6 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('bot_id')->constrained('bots')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+
+            $table->string('status');
+            $table->string('is_actived')->default(0);
+            $table->string('token')->nullable();
+            $table->timestamp('expired_at')->nullable();
+            $table->string('point_limit')->nullable();
+            
             $table->timestamps();
         });
     }

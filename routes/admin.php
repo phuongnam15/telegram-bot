@@ -72,6 +72,11 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/send', [BotController::class, 'send']);
 
     Route::prefix('bot')->group(function () {
+        Route::prefix('user')->group(function () {
+            Route::get('/', [BotController::class, 'listUser']);
+            Route::post('/', [UserController::class, 'update']);
+            Route::post('/active', [UserController::class, 'active']);
+        });
         Route::get('/', [BotController::class, 'list']);
         Route::get('/{id}', [BotController::class, 'detail']);
         Route::post('/{id}', [BotController::class, 'activeBot']);

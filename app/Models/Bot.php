@@ -47,7 +47,7 @@ class Bot extends Model
     }
     public function users()
     {
-        return $this->belongsToMany(User::class, 'bot_users', 'bot_id', 'user_id');
+        return $this->belongsToMany(User::class, 'bot_users', 'bot_id', 'user_id')->withPivot('id', 'status', 'is_actived', 'token', 'expired_at', 'point_limit');
     }
     public function groups()
     {

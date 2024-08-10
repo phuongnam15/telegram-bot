@@ -40,9 +40,15 @@ Route::get('/login', function () {
 Route::get('/register', function () {
     return view('register');
 });
-Route::get('/setting-bot/{id}', function ($id) {
+Route::get('/setting-bot/{id}', function () {
     return view('setting_bot');
 });
 Route::get('/analytic/{id}', function () {
     return view('analytic');
 });
+
+Route::prefix('coin')->group((function() {
+    Route::get('/{id}', function () {
+        return view('coin_user');
+    });
+}));

@@ -14,9 +14,11 @@ class User extends Authenticatable
 
     protected $table = 'users';
     protected $fillable = [
-        'name',
+        'username',
         'telegram_id',
-        'status'
+        'firstname',
+        'lastname',
+        'avatar',
     ];
 
     public function bots()

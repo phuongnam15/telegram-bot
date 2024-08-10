@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('username');
             $table->string('telegram_id');
-            $table->string('status');
+            $table->string('firstname')->nullable();
+            $table->string('lastname')->nullable();
+            $table->string('avatar')->nullable();
             $table->timestamps();
         });
     }

@@ -40,4 +40,7 @@ class BotController extends Controller
   public function detail($id) {
     return $this->botService->listScheduleBot($id);
   }
+  public function listUser() {
+    return $this->botService->listUser();
+  }
 }

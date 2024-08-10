@@ -19,4 +19,12 @@ class UserController extends Controller
   {
     return $this->service->list();
   }
+  public function active()
+  {
+    return $this->service->active();
+  }
+  public function update()
+  {
+    return $this->service->update();
+  } 
 }

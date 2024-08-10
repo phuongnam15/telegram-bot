@@ -24,15 +24,34 @@
     <div id="notification" class="hidden fixed left-[50%] -translate-x-[50%] z-20 top-10 rounded-md text-white py-1 px-5 w-fitmx-auto">
         <p class="text-sm">phuong nam</p>
     </div>
-    <div class="">
+    <div class="" id="root">
+        @if (Request::is('coin*'))
+        @include("layouts.coin-sidebar")
+        @else
         @include("layouts.navbar")
+        @endif
 
-        <main class="w-full flex justify-center">
-            @yield("content")
+        <main class="w-full">
+            @if (Request::is('coin*'))
+            @include("layouts.header")
+            @endif
+            <div class="w-full flex justify-center">
+                @yield("content")
+            </div>
         </main>
     </div>
 
     @stack("scripts")
 </body>
+<script>
+    const path = window.location.pathname;
+    const rootElement = document.getElementById('root');
+
+    if (path.startsWith('/coin')) {
+        rootElement.classList.add('flex', 'bg-[#161a1e]');
+    } else {
+        rootElement.classList.remove('flex', 'bg-[#161a1e]');
+    }
+</script>
 
 </html>

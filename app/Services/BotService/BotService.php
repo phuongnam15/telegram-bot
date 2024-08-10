@@ -28,9 +28,7 @@ use Illuminate\Support\Arr;
 
 class BotService extends BaseService
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function webhook($request, $botId)
     {
@@ -59,7 +57,7 @@ class BotService extends BaseService
                 $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
                 $this->checkMessage($message, $chatId, $botId, $botToken, $client);
             }
-            
+
             if (array_key_exists('callback_query', $update)) {
                 return $this->replyCallback($update['callback_query']['from']['id'], $update['callback_query']['data'], $bot);
             }
@@ -326,6 +324,17 @@ class BotService extends BaseService
 
         return response()->json(['message' => 'Deleted bot']);
     }
+    public function listUser()
+    {
+        return DbTransactions()->addCallBackJson(function () {
+
+            $bot = Bot::where('id', request()->bot_id)->first();
+
+            $users = $bot->users;
+
+            return $users;
+        });
+    }
     public function saveMessageAndScheduleDeletion($chatId, $response, $botToken)
     {
         $bot = Bot::where('token', $botToken)->first();
@@ -532,7 +541,7 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function getUserOrBotImage($botToken = "6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc", $chatId = 6618205269)
+    public function getUserOrBotImage($botToken, $chatId)
     {
         try {
             $client = new Client();
@@ -652,46 +661,51 @@ class BotService extends BaseService
     public function checkMessage($message, $chatId, $botId, $botToken, $client)
     {
         try {
-            $name = "";
             // Check message
             if (isset($message['text'])) {
                 // Start bot
+                if ($message['text'] === '/start') {
+
+                    if (isset($message['from']['first_name'])) {
+                        $firstname = $message['from']['first_name'] ?? null;
+                    }
+                    if (isset($message['from']['last_name'])) {
+                        $lastname = $message['from']['last_name'] ?? null;
+                    }
+                    if (isset($message['from']['username'])) {
+                        $username = $message['from']['username'] ?? null;
+                    }
+
+                    $avatar = $this->getUserOrBotImage($botToken, $chatId);
+
+                    $user = User::firstOrCreate(
+                        ['telegram_id' => $chatId],
+                        [
+                            'username' => $username,
+                            'firstname' => $firstname,
+                            'lastname' => $lastname,
+                            'telegram_id' => $chatId,
+                            'avatar' => $avatar
+                        ]
+                    );
+
+                    $botUserExists = BotUser::where([
+                        'user_id' => $user->id,
+                        'bot_id' => $botId
+                    ])->exists();
+
+                    if (!$botUserExists) {
+                        BotUser::create([
+                            'status' => 'start',
+                            'user_id' => $user->id,
+                            'bot_id' => $botId
+                        ]);
+                    }
+                }
+
                 if (Command::where('command', $message['text'])->exists()) {
 
                     $command = Command::where('command', $message['text'])->first();
-
-                    if ($message['text'] === '/start') {
-                        if (isset($message['from']['first_name'])) {
-                            $name .= $message['from']['first_name'] . " ";
-                        }
-                        if (isset($message['from']['last_name'])) {
-                            $name .= $message['from']['last_name'];
-                        }
-                        if ($name === '') {
-                            $name = $message['from']['username'];
-                        }
-
-                        $user = User::firstOrCreate(
-                            ['telegram_id' => $chatId],
-                            [
-                                'status' => 'start',
-                                'name' => $name,
-                                'telegram_id' => $chatId,
-                            ]
-                        );
-
-                        $botUserExists = BotUser::where([
-                            'user_id' => $user->id,
-                            'bot_id' => $botId
-                        ])->exists();
-
-                        if (!$botUserExists) {
-                            BotUser::create([
-                                'user_id' => $user->id,
-                                'bot_id' => $botId
-                            ]);
-                        }
-                    }
 
                     $bCC = BotCommandContent::where([
                         'bot_id' => $botId,

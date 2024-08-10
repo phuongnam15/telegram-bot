@@ -11,6 +11,14 @@ class BotUser extends Model
     protected $table = 'bot_users';
     protected $fillable = [
         'bot_id',
-        'user_id'
+        'user_id',
+        'status',
+        'is_actived',
+        'token',
+        'expired_at',
+        'point_limit',
     ];
+
+    const ACTIVE = 1;
+    const INACTIVE = 0;
 }

@@ -1,13 +1,25 @@
 <header>
-    <nav class="flex items-center justify-between bg-[#2d2d2d] text-white p-2">
-        <div>
-            <a href="/" class="font-bold text-lg">Laravel Blog</a>
-        </div>
-        <div>
-            <a href="/posts" class="mr-2">Posts</a>
-            <a href="/posts/create" class="mr-2">Create Post</a>
-            <a href="/categories" class="mr-2">Categories</a>
-            <a href="/categories/create" class="mr-2">Create Category</a>
-        </div>
-    </nav>
+    <div class="flex items-center py-3 gap-2 justify-end px-5 border-b border-gray-700">
+        <p class="text-[#eaecef] font-popi" id="botName"></p>
+        <img class="size-14 rounded-full" src="" alt="" id="botAvatar">
+    </div>
 </header>
+<script>
+    $(document).ready(async () => {
+        const botId = window.location.pathname.split('/').pop();
+
+        const getInfoBot = async () => {
+            try {
+                const response = await fetchClient(`/api/admin/bot/${botId}`, {
+                    method: 'GET',
+                });
+                $('#botAvatar').attr('src', response.data.avatar ?? "{{ asset('assets/images/bot.png') }}");
+                $('#botName').text("@" + response.data.username);
+            } catch (e) {
+                console.log(e);
+            }
+        };
+
+        await getInfoBot();
+    });
+</script>
