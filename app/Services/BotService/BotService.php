@@ -309,7 +309,8 @@ class BotService extends BaseService
                 throw new AppServiceException('Bot not found');
             }
 
-            $bot->update(request()->all());
+            $bot->is_notify_mode = !$bot->is_notify_mode;
+            $bot->save();
 
             return $bot;
         });

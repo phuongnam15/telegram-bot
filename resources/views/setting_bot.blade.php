@@ -871,12 +871,14 @@
                                 <p class="block text-sm font-medium text-gray-600"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
                                 <div class="mt-2">
                                     ${data.status === '0' ? 
-                                        `<button class="text-green-500 text-[14px] italic hover:underline" id="openActivateBotModal">active</button>
+                                        `<button class="text-green-500 text-sm italic hover:underline" id="openActivateBotModal">active</button>
                                         <span>/</span>`
                                     : 
                                         ""
                                     }
-                                    <button class="text-red-500 text-[14px] italic hover:underline" id="deleteBotButton">delete</button>
+                                    <button class="text-purple-500 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify-mode <strong>(${data.is_notify_mode === "1" ? "ON" : "OFF"})</strong></button>
+                                    <span>/</span>
+                                    <button class="text-red-500 text-sm italic hover:underline" id="deleteBotButton">delete</button>
                                 </div>
                             </div>
                         `);
@@ -1106,6 +1108,21 @@
                 console.log(e);
             }
         },
+        async toggleNotifyMode(botId) {
+            try {
+                if (!confirm('Are you sure to toggle notify mode?')) {
+                    return;
+                }
+                const response = await fetchClient(`/api/admin/bot/${botId}`, {
+                    method: 'PUT',
+                }, );
+                showNotification('Toggle notify mode successfully', 'success');
+                await scripts.getDetailBot();
+            } catch (e) {
+                console.log(e);
+                showNotification(e, 'error');
+            }
+        },
     };
 
     $(document).ready(async () => {
@@ -1164,6 +1181,9 @@
 
         window.showCoinMode = (botId) => {
             window.location.href = `/coin/${botId}`;
+        }
+        window.toggleNotifyMode = (botId) => {
+            scripts.toggleNotifyMode(botId);
         }
 
         window.openScheduleModal = (type, botId, schedule = {}) => {
