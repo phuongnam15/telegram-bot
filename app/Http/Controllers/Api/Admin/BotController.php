@@ -43,4 +43,7 @@ class BotController extends Controller
   public function listUser() {
     return $this->botService->listUser();
   }
+  public function update($id) {
+    return $this->botService->updateBot($id);
+  }
 }

@@ -17,4 +17,8 @@ class AdminController extends Controller
     {
         return $this->service->me();
     }
+    public function update() 
+    {
+        return $this->service->update();
+    }
 }

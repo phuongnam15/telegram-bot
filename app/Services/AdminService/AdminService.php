@@ -42,4 +42,15 @@ class AdminService extends BaseService
             return auth()->user();
         });
     }
+    public function update() 
+    {
+        return DbTransactions()->addCallBackJson(function () {
+            $adminId = auth()->user()->id;
+
+            $admin = AdminModel::find($adminId);
+            $admin->update(request()->all());
+            
+            return $admin;
+        });
+    }
 }

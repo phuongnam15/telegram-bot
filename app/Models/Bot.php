@@ -19,9 +19,12 @@ class Bot extends Model
         'admin_id',
         'expired_at',
         'avatar',
+        'is_notify_mode'
     ];
     const STATUS_ACTIVE = true;
     const STATUS_INACTIVE = false;
+    const NOTI_MODE_ON = true;
+    const NOTI_MODE_OFF = false;
     const MAP_DAY = [
         100000 => 30,
         200000 => 90,
@@ -52,5 +55,9 @@ class Bot extends Model
     public function groups()
     {
         return $this->belongsToMany(TelegramGroup::class, 'bot_groups', 'bot_id', 'group_id');
+    }
+    public function admin()
+    {
+        return $this->belongsTo(AdminModel::class, 'admin_id', 'id');
     }
 }

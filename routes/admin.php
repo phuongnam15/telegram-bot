@@ -26,6 +26,7 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:admin')->group(function () {
     Route::get('/me', [AdminController::class, 'me']);
+    Route::post('/', [AdminController::class, 'update']);
     
     Route::prefix('command')->group(function () {
         Route::post('/', [CommandController::class, 'store']);
@@ -81,6 +82,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('/{id}', [BotController::class, 'detail']);
         Route::post('/{id}', [BotController::class, 'activeBot']);
         Route::post('/', [BotController::class, 'saveBot']);
+        Route::put('/{id}', [BotController::class, 'update']);
         Route::delete('/{id}', [BotController::class, 'delete']);
     });
 

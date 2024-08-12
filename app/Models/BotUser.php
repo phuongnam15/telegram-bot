@@ -21,4 +21,13 @@ class BotUser extends Model
 
     const ACTIVE = 1;
     const INACTIVE = 0;
+
+    public function bot()
+    {
+        return $this->belongsTo(Bot::class, 'bot_id', 'id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

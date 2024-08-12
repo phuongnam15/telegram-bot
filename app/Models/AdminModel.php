@@ -16,7 +16,8 @@ class AdminModel extends Authenticatable implements JWTSubject
         "name",
         "password",
         "status",
-        "role"
+        "role",
+        "telegram_id"
     ];
 
     protected $hidden = [
@@ -42,5 +43,9 @@ class AdminModel extends Authenticatable implements JWTSubject
     public function users()
     {
         return $this->belongsToMany(User::class, 'admin_user', 'admin_id', 'user_id');
+    }
+    public function bots()
+    {
+        return $this->hasMany(Bot::class, 'admin_id', 'id');
     }
 }

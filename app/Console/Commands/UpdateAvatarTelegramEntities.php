@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Bot;
 use App\Models\TelegramGroup;
+use App\Models\User;
 use App\Services\BotService\BotService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class UpdateAvatarTelegramEntities extends Command
 
             $bots = Bot::get();
             $groups = TelegramGroup::get();
+            $users = User::get();
 
             foreach ($bots as $bot) {
                 $avatar = $this->service->getUserOrBotImage($bot->token, $bot->telegram_id);
@@ -42,6 +44,18 @@ class UpdateAvatarTelegramEntities extends Command
                 $avatar = $this->service->getGroupImage($bots[0]->token, $group->telegram_id);
                 $group->avatar = $avatar;
                 $group->save();
+            }
+
+            foreach ($users as $user) {
+                $bot = $user->bots;
+
+                if($bot->isEmpty()) {
+                    continue;
+                }
+
+                $avatar = $this->service->getUserOrBotImage($bots[0]->token, $user->telegram_id);
+                $user->avatar = $avatar;
+                $user->save();
             }
 
             DB::commit();

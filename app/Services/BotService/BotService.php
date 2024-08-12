@@ -24,6 +24,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 
 
 class BotService extends BaseService
@@ -47,19 +48,44 @@ class BotService extends BaseService
             ]);
 
             // logger($update);
-            $this->checkIsUserMessage($update);
-            $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
 
-            if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
-                $message = $update['chat_member'] ?? $update['message'];
-                $chatId = $message['chat']['id'];
-
-                $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
-                $this->checkMessage($message, $chatId, $botId, $botToken, $client);
-            }
-
-            if (array_key_exists('callback_query', $update)) {
-                return $this->replyCallback($update['callback_query']['from']['id'], $update['callback_query']['data'], $bot);
+            if($bot->is_notify_mode === Bot::NOTI_MODE_ON) {
+                if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
+                    $message = $update['chat_member'] ?? $update['message'];
+                    $chatId = $message['chat']['id'];
+                    if (isset($message['text'])) {
+                        $text = $message['text'];
+                        if($chatId === $bot->admin->telegram_id) {
+                            $users = $bot->users;
+                            foreach($users as $user) {
+                                $client->post('sendMessage', [
+                                    'json' => [
+                                        'text' => $text,
+                                        'chat_id' => $user->telegram_id
+                                    ]
+                                ]);
+                            }
+                        }else{
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => $text,
+                                    'chat_id' => $bot->admin->telegram_id
+                                ]
+                            ]);
+                        }
+                    }
+                }
+            }else{
+                $this->checkIsUserMessage($update);
+                $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
+    
+                if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
+                    $message = $update['chat_member'] ?? $update['message'];
+                    $chatId = $message['chat']['id'];
+    
+                    $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
+                    $this->checkMessageContent($message, $chatId, $botId, $botToken, $client);
+                }
             }
 
             DB::commit();
@@ -180,43 +206,7 @@ class BotService extends BaseService
     }
     public function replyCallback($chatId, $data, $bot)
     {
-        return DbTransactions()->addCallbackJson(function () use ($chatId, $data, $bot) {
-
-            $adminId = $bot->admin_id;
-            if ($data === 'get_phone_number') {
-
-                $ids = ContentConfig::where([
-                    'name' => $data,
-                    'admin_id' => $adminId
-                ])->get()->pluck('id')->toArray();
-
-                if (count($ids) === 0) {
-                    return 1;
-                }
-
-                $config = ContentConfig::where([
-                    'id' => Arr::random($ids),
-                    'admin_id' => $adminId
-                ])->first();
-            } else {
-                $config = ContentConfig::where([
-                    'name' => $data,
-                    'admin_id' => $adminId
-                ])->first();
-            }
-
-
-            if ($config) {
-                $this->send([$chatId], $config->id, $bot->token);
-
-                //update status user by callbackdata
-                if ($data === 'get_phone_number') {
-                    User::where('telegram_id', $chatId)->update(['status' => 'check_password']);
-                }
-            }
-
-            return 1;
-        });
+        return DbTransactions()->addCallbackJson(function () use ($chatId, $data, $bot) {});
     }
     public function saveBot($request)
     {
@@ -309,6 +299,20 @@ class BotService extends BaseService
 
             return response()->json(['error' => 'Failed to update bot status', 'details' => $e->getMessage()], 500);
         }
+    }
+    public function updateBot($id) 
+    {
+        return DbTransactions()->addCallbackJson(function () use ($id) {
+            $bot = Bot::find($id);
+
+            if (!$bot) {
+                throw new AppServiceException('Bot not found');
+            }
+
+            $bot->update(request()->all());
+
+            return $bot;
+        });
     }
     public function delete($id)
     {
@@ -658,116 +662,281 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function checkMessage($message, $chatId, $botId, $botToken, $client)
+    public function checkMessageContent($message, $chatId, $botId, $botToken)
     {
         try {
-            // Check message
             if (isset($message['text'])) {
-                // Start bot
-                if ($message['text'] === '/start') {
-
-                    if (isset($message['from']['first_name'])) {
-                        $firstname = $message['from']['first_name'] ?? null;
-                    }
-                    if (isset($message['from']['last_name'])) {
-                        $lastname = $message['from']['last_name'] ?? null;
-                    }
-                    if (isset($message['from']['username'])) {
-                        $username = $message['from']['username'] ?? null;
-                    }
-
-                    $avatar = $this->getUserOrBotImage($botToken, $chatId);
-
-                    $user = User::firstOrCreate(
-                        ['telegram_id' => $chatId],
-                        [
-                            'username' => $username,
-                            'firstname' => $firstname,
-                            'lastname' => $lastname,
-                            'telegram_id' => $chatId,
-                            'avatar' => $avatar
-                        ]
-                    );
-
-                    $botUserExists = BotUser::where([
-                        'user_id' => $user->id,
-                        'bot_id' => $botId
-                    ])->exists();
-
-                    if (!$botUserExists) {
-                        BotUser::create([
-                            'status' => 'start',
-                            'user_id' => $user->id,
-                            'bot_id' => $botId
-                        ]);
-                    }
-                }
-
-                if (Command::where('command', $message['text'])->exists()) {
-
-                    $command = Command::where('command', $message['text'])->first();
-
-                    $bCC = BotCommandContent::where([
-                        'bot_id' => $botId,
-                        'command_id' => $command->id
-                    ])->first();
-
-                    if ($bCC) {
-                        $content = ContentConfig::where('id', $bCC->content_id)->first();
-                        $this->send([$chatId], $content->id, $botToken);
-                    }
-                } else {
-                    // Check status of user
-                    $user = User::where('telegram_id', $chatId)->first();
-
-                    if ($user && ($user->status !== 'start')) {
-                        $status = $user->status;
-
-                        switch ($status) {
-                            case "check_password":
-                                $password = $message['text'];
-
-                                if (Password::where('password', $password)->exists()) {
-                                    $userPass = UserPassword::where(['telegram_id' => $chatId, 'password' => $password])->first();
-
-                                    if ($userPass) {
-                                        if (Carbon::now()->diffInMinutes($userPass->updated_at) > PASS_VALID_TIME) {
-                                            $text = PhoneNumber::inRandomOrder()->first()->phone_number;
-                                            $user->status = 'start';
-                                            $user->save();
-                                            $userPass->updated_at = Carbon::now();
-                                            $userPass->save();
-                                        } else {
-                                            $text = "Mật khẩu không chính xác.";
-                                        }
-                                    } else {
-                                        $text = PhoneNumber::inRandomOrder()->first()->phone_number;
-                                        $user->status = 'start';
-                                        $user->save();
-                                        UserPassword::create([
-                                            'telegram_id' => $chatId,
-                                            'password' => $password,
-                                        ]);
-                                    }
-                                } else {
-                                    $text = "Mật khẩu không chính xác.";
-                                }
-
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'chat_id' => $chatId,
-                                        'text' => $text
-                                    ]
-                                ]);
-
-                                break;
-                        }
-                    }
-                }
+                //check user status
+                $this->checkUserStatus($message, $botId, $chatId, $botToken);
             }
         } catch (AppServiceException | \Exception $error) {
             logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
+    }
+    public function startCommandDefaultHandler($message, $botToken, $chatId, $botId)
+    {
+        try {
+            if (isset($message['from']['first_name'])) {
+                $firstname = $message['from']['first_name'] ?? null;
+            }
+            if (isset($message['from']['last_name'])) {
+                $lastname = $message['from']['last_name'] ?? null;
+            }
+            if (isset($message['from']['username'])) {
+                $username = $message['from']['username'] ?? null;
+            }
+
+            $avatar = $this->getUserOrBotImage($botToken, $chatId);
+
+            $user = User::firstOrCreate(
+                ['telegram_id' => $chatId],
+                [
+                    'username' => $username,
+                    'firstname' => $firstname,
+                    'lastname' => $lastname,
+                    'telegram_id' => $chatId,
+                    'avatar' => $avatar
+                ]
+            );
+
+            $botUser = BotUser::where([
+                'user_id' => $user->id,
+                'bot_id' => $botId
+            ])->first();
+
+            if (!$botUser) {
+                BotUser::create([
+                    'status' => 'start',
+                    'user_id' => $user->id,
+                    'bot_id' => $botId
+                ]);
+            } else {
+                $botUser->status = 'start';
+                $botUser->save();
+            }
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function tradeCommanDefaultHandler($chatId, $botId, $botToken)
+    {
+        try {
+            $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
+                $query->where('telegram_id', $chatId);
+            })->first();
+
+            if ($botUser) {
+                $botUser->status = 'trade';
+                $botUser->save();
+            }
+
+            $client = new Client([
+                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+            ]);
+
+            $client->post('sendMessage', [
+                'json' => [
+                    'text' => "🔄 Bạn vừa chuyển sang chế độ bot nhận đặt lệnh.\n📞 Vui lòng liên hệ admin để kích hoạt đặt lệnh.\n/start để về lại chế độ ban đầu.",
+                    'chat_id' => $chatId
+                ]
+            ]);
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function checkUserStatus($message, $botId, $chatId, $botToken)
+    {
+        try {
+            $text = $message['text'];
+            $client = new Client([
+                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+            ]);
+
+            $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
+                $query->where('telegram_id', $chatId);
+            })->first();
+            $status = $botUser->status;
+
+            switch ($status) {
+                case 'trade':
+                    if ($botUser->is_actived) {
+                        $text = strtolower($text);
+                        if (strpos($text, 'en') !== false && strpos($text, 'sl') !== false && strpos($text, 'tp') !== false) {
+                            $data = $this->parseOrder($text);
+
+                            // logger($data);
+
+                            $response = $this->createOrder($data);
+
+                            if ($response['code'] === "00000") {
+                                logger($response);
+                                $client->post('sendMessage', [
+                                    'json' => [
+                                        'text' => "🟢 [Đã vào lệnh]\n\n". strtoupper($data['coin']) . "-" . strtoupper($data['orderType']) . " " . ($data['isLimit'] ? "limit" : "") . "\n- EN: {$data['EN']}\n- SL: {$data['SL']}\n- TP: {$data['TP']}",
+                                        'chat_id' => $chatId
+                                    ]
+                                ]);
+                            } else {
+                                $client->post('sendMessage', [
+                                    'json' => [
+                                        'text' => "🔴 Tạo lệnh thất bại\n{$response['msg']}",
+                                        'chat_id' => $chatId
+                                    ]
+                                ]);
+                            }
+                        } else {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Để đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG limit\nEN: 50000\nSL: 49000\nTP: 51000\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- EN, SL chỉ nhập 1 giá",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                        }
+                    } else {
+                        $client->post('sendMessage', [
+                            'json' => [
+                                'text' => "Vui lòng liên hệ admin để kích hoạt đặt lệnh",
+                                'chat_id' => $chatId
+                            ]
+                        ]);
+                    }
+                    break;
+                case 'start':
+                    //handle default command
+                    switch ($text) {
+                        case '/start':
+                            $this->startCommandDefaultHandler($message, $botToken, $chatId, $botId);
+                            break;
+                        case '/trade':
+                            $this->tradeCommanDefaultHandler($chatId, $botId, $botToken);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    //check command to resend config content
+                    if (Command::where('command', $message['text'])->exists()) {
+
+                        $command = Command::where('command', $message['text'])->first();
+
+                        $bCC = BotCommandContent::where([
+                            'bot_id' => $botId,
+                            'command_id' => $command->id
+                        ])->first();
+
+                        if ($bCC) {
+                            $content = ContentConfig::where('id', $bCC->content_id)->first();
+                            $this->send([$chatId], $content->id, $botToken);
+                        }
+                    }
+                default:
+                    break;
+            }
+        } catch (\Exception $error) {
+            logger($error->getMessage());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+
+    public function generateSignature($timestamp, $method, $requestPath, $queryString, $body, $secretKey)
+    {
+        if (!empty($queryString)) {
+            $stringToSign = $timestamp . strtoupper($method) . $requestPath . "?" . $queryString . $body;
+        } else {
+            $stringToSign = $timestamp . strtoupper($method) . $requestPath . $body;
+        }
+
+        return base64_encode(
+            hash_hmac('sha256', $stringToSign, $secretKey, true)
+        );
+    }
+    public function parseOrder($text)
+    {
+        // Chuyển đoạn văn bản về dạng chuẩn (lowercase, xóa các khoảng trắng thừa)
+        $normalizedText = strtolower(trim($text));
+
+        // Định nghĩa các mẫu Regular Expressions
+        $coinPattern = '/^([a-zA-Z0-9]+)([\s-])/i'; // Lấy tên đồng coin từ đầu văn bản
+        $orderTypePattern = '/(short|long|buy|sell)\s*(limit)?/i'; // Kiểu lệnh và "limit"
+        $enPattern = '/en:\s*(\d+(\.\d+)?)/i'; // Giá vào lệnh
+        $slPattern = '/sl:\s*(\d+(\.\d+)?)/i'; // Giá stop loss
+        $tpPattern = '/tp:\s*(\d+(\.\d+)?)/i'; // Giá take profit
+
+        // Kiểm tra các thông tin từ văn bản
+        $coinMatch = preg_match($coinPattern, $normalizedText, $coinMatches);
+        $orderTypeMatch = preg_match($orderTypePattern, $normalizedText, $orderTypeMatches);
+        $enMatch = preg_match($enPattern, $normalizedText, $enMatches);
+        $slMatch = preg_match($slPattern, $normalizedText, $slMatches);
+        $tpMatch = preg_match($tpPattern, $normalizedText, $tpMatches);
+
+        // Lấy các thông tin từ kết quả khớp
+        $coin = $coinMatch ? $coinMatches[1] : null;
+        $orderType = $orderTypeMatch ? $orderTypeMatches[1] : null;
+        $isLimit = isset($orderTypeMatches[2]) ? true : false;
+        $en = $enMatch ? $enMatches[1] : null;
+        $sl = $slMatch ? $slMatches[1] : null;
+        $tp = $tpMatch ? $tpMatches[1] : null;
+
+        return [
+            'coin' => $coin,
+            'orderType' => $orderType,
+            'isLimit' => $isLimit,
+            'EN' => $en,
+            'SL' => $sl,
+            'TP' => $tp
+        ];
+    }
+    public function createOrder($input)
+    {
+        try {
+            $timestamp = round(microtime(true) * 1000);
+            $size = 3 * 10 / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
+            $data = [
+                "planType" => "normal_plan",
+                "symbol" => strtoupper($input['coin']) . "USDT",
+                "productType" => "usdt-futures",
+                "marginMode" => "crossed",
+                "marginCoin" => "USDT",
+                "size" =>  round($size, 2),
+                "triggerPrice" => $input['EN'],
+                "price" => $input['EN'],
+                "triggerType" => "mark_price",
+                "side" => $input['orderType'],
+                "tradeSide" => "open",
+                "orderType" => $input['isLimit'] ? "limit" : "market",
+                "clientOid" => uniqid(),
+                "reduceOnly" => "NO",
+                "presetStopLossPrice" => $input['SL'],
+                "presetTakeProfitPrice" => $input['TP'],
+            ];
+            $body = json_encode($data);
+
+            $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/order/place-plan-order", "", $body, env('BITGET_SECRET_KEY'));
+
+            $response = Http::withHeaders([
+                'ACCESS-KEY' => env('BITGET_API_KEY'),
+                'ACCESS-SIGN' => $accessSign,
+                'ACCESS-PASSPHRASE' => env('BITGET_PASSPHRASE'),
+                'ACCESS-TIMESTAMP' => $timestamp,
+                'locale' => 'en-US',
+                'Content-Type' => 'application/json',
+
+            ])->post('https://api.bitget.com/api/v2/mix/order/place-plan-order', $data);
+
+            return json_decode($response->body(), true);
+        } catch (AppServiceException | \Exception $error) {
+            logger($error->getMessage());
+            logger($error->getLine());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function getLatestPriceOfCoin($symbol)
+    {
+        $response = Http::get("https://api.bitget.com/api/v2/spot/market/tickers?symbol={$symbol}");
+
+        return json_decode($response->body(), true)['data'][0]['lastPr'];
     }
 }
