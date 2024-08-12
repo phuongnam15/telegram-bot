@@ -19,6 +19,7 @@
                 </svg>
             </button>
             <div id="userMenu" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg hidden overflow-hidden border-[1px] border-solid border-gray-300">
+                <a href="#" id="profileButton" class="block px-3 py-2 text-gray-800 hover:bg-gray-200 space-x-1 border-b border-gray-200"><i class="fa-solid fa-user"></i><span>Profile</span></a>
                 <a href="#" id="logoutButton" class="block px-3 py-2 text-gray-800 hover:bg-gray-200 space-x-1"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
             </div>
         </div>
@@ -30,6 +31,13 @@
         try {
             const response = await fetchClient('/api/admin/me');
             document.getElementById('username').innerText = response.data.name;
+
+            if(document.getElementById('profile_name') && document.getElementById('profile_email') && document.getElementById('profile_telegram_id')) {
+                document.getElementById('profile_name').value = response.data.name;
+                document.getElementById('profile_email').value = response.data.email;
+                document.getElementById('profile_telegram_id').value = response.data.telegram_id ?? '';
+            }
+
         } catch (error) {
             console.log(error);
         }
@@ -51,5 +59,8 @@
     document.getElementById('logoutButton').addEventListener('click', () => {
         localStorage.removeItem('access_token');
         window.location.href = '/login';
+    });
+    document.getElementById('profileButton').addEventListener('click', () => {
+        window.location.href = '/profile';
     });
 </script>

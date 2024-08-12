@@ -52,3 +52,6 @@ Route::prefix('coin')->group((function() {
         return view('coin_user');
     });
 }));
+Route::get('profile', function () {
+    return view('profile');
+});
