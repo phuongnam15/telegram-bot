@@ -822,7 +822,9 @@ class BotService extends BaseService
                         } else {
 
                             if (!$data['leverage']) {
-                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, LEVERAGE_LEVELS);
+                            }else{
+                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage']]);
                             }
 
                             if ($data['isLimit']) {
@@ -980,10 +982,9 @@ class BotService extends BaseService
 
         return json_decode($response->body(), true)['data'][0]['lastPr'];
     }
-    public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase)
+    public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase, $leverageLevels = [])
     {
-        $arrayLeverageLevel = ["125", "100", "70", "50"];
-        foreach ($arrayLeverageLevel as $value) {
+        foreach ($leverageLevels as $value) {
             $timestamp = round(microtime(true) * 1000);
             $data = [
                 "symbol" => $symbol,

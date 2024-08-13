@@ -7,6 +7,8 @@ const DEFAULT_PAGINATE = 10;
 const PASS_VALID_TIME = 60;
 const BANK_STATEMENT = "TELEGRAMBOT ";
 
+const LEVERAGE_LEVELS = ["125", "100", "70", "50"];
+
 const ALLOW_UPDATE = [
     'message', // Nhận tin nhắn mới.
     'edited_message', // Nhận phiên bản chỉnh sửa của tin nhắn đã được bot biết đến.
