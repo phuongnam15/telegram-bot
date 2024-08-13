@@ -18,9 +18,9 @@
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
         <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
-            <div class="bg-gray-200 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
-                <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('createBotModal').classList.add('hidden')">
-                    <span aria-hidden="true" class="text-[20px]">
+            <div class="flex flex-row-reverse pr-3 border-b border-gray-100">
+                <button type="button" class="text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('createBotModal').classList.add('hidden')">
+                    <span aria-hidden="true" class="text-xl">
                         &times;
                     </span>
                 </button>
@@ -31,9 +31,9 @@
                         <label for="botToken" class="text-sm font-mono text-gray-700">
                             Token
                         </label>
-                        <input type="text" id="botToken" name="token" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" />
+                        <input type="text" id="botToken" name="token" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-[#6c799a]" />
                     </div>
-                    <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white">
+                    <button type="submit" class="rounded bg-[#6c799a] px-4 py-1 text-white">
                         Tạo
                     </button>
                 </form>

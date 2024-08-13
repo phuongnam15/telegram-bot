@@ -48,6 +48,7 @@
             </button>
         </div>
 
+        <!-- Modal for creating new command -->
         <div class="fixed inset-0 z-10 hidden overflow-y-auto" id="newCommandModal" tabindex="-1" role="dialog" aria-labelledby="newCommandModalLabel" aria-hidden="true">
             <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -57,14 +58,14 @@
                     &#8203;
                 </span>
                 <div class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                    <div class="flex flex-row-reverse bg-gray-200 px-3 py-2 sm:px-6">
+                    <div class="flex flex-row-reverse pr-3 border-b border-gray-200">
                         <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal">
                             <span aria-hidden="true" class="text-[20px]">
                                 &times;
                             </span>
                         </button>
                     </div>
-                    <div class="bg-white px-4 pb-4 pt-3">
+                    <div class="bg-white px-4 pb-3 pt-3">
                         <div class="sm:flex sm:items-start">
                             <div class="w-full">
                                 <form id="commandForm">
@@ -72,14 +73,14 @@
                                         <label for="commandInput" class="text-gray-700 font-mono text-sm">
                                             Command
                                         </label>
-                                        <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" id="commandInput" name="commandInput" required placeholder="ex: /start" />
+                                        <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300" id="commandInput" name="commandInput" required placeholder="ex: /start" />
                                     </div>
                                     <div class="mb-4">
                                         <select id="contentList" class="text-sm outline-none">
                                             <option value="">-----content----</option>
                                         </select>
                                     </div>
-                                    <button type="submit" class="float-end rounded bg-blue-500 px-4 py-2 text-white">
+                                    <button type="submit" class="float-end rounded bg-gray-600 px-4 py-2 text-white">
                                         Save
                                     </button>
                                 </form>
@@ -215,23 +216,23 @@
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
         <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
-            <div class="bg-gray-200 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
+            <div class="flex flex-row-reverse pr-3 border-b border-gray-200">
                 <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" aria-label="Close" onclick="document.getElementById('scheduleModal').classList.add('hidden')">
-                    <span aria-hidden="true" class="text-[20px]">
+                    <span aria-hidden="true" class="text-xl">
                         &times;
                     </span>
                 </button>
             </div>
-            <div class="bg-white px-4 py-2 pt-4 pb-1">
-                <form id="scheduleUpdateForm">
+            <div class="bg-white px-4 pt-2">
+                <form id="scheduleUpdateForm" class="mb-4">
                     <input type="hidden" id="scheduleType" />
                     <input type="hidden" id="scheduleId" />
                     <input type="hidden" id="scheduleBotId" />
-                    <div class="mb-4">
+                    <div class="mb-1">
                         <label for="scheduleStatus" class="text-sm font-mono tracking-tighter text-gray-700">
                             Status
                         </label>
-                        <select id="scheduleStatus" name="status" required class="w-full rounded border-[1px] text-sm border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
+                        <select id="scheduleStatus" name="status" required class="w-full rounded border-[1px] text-sm border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300">
                             <option value="on">On</option>
                             <option value="off">Off</option>
                         </select>
@@ -240,9 +241,9 @@
                         <label for="scheduleTime" class="text-sm font-mono tracking-tighter text-gray-700">
                             Delay Time (minutes)
                         </label>
-                        <input type="number" id="scheduleTime" name="delay_time" required class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300" />
+                        <input type="number" id="scheduleTime" name="delay_time" required class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300" />
                     </div>
-                    <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white">
+                    <button type="submit" class="rounded bg-gray-600 px-4 py-1 text-white">
                         Save
                     </button>
                 </form>
@@ -270,7 +271,7 @@
                     <label for="monthQty" class="text-sm text-gray-700">
                         Select num of months
                     </label>
-                    <select id="monthQty" class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
+                    <select id="monthQty" class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300">
                         <option value="1" data-price="100000">
                             1 Month - 100,000 đ
                         </option>
@@ -859,7 +860,7 @@
                                     ${data.token}
                                     ${data.status === '1' ? 
                                         `<button class="bg-gray-700 px-2 -skew-x-[20deg]" onClick="showCoinMode(${data.id})">
-                                            <span class="text-[#fbc31c] text-[14px] hover:underline">bitcoin</span>
+                                            <span class="text-[#fbc31c] text-md hover:underline">bitcoin</span>
                                         </button>`
                                     :
                                         ""
@@ -876,7 +877,7 @@
                                     : 
                                         ""
                                     }
-                                    <button class="text-purple-500 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify-mode <strong>(${data.is_notify_mode === "1" ? "ON" : "OFF"})</strong></button>
+                                    <button class="text-lime-600 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify-mode (${data.is_notify_mode === "1" ? "on" : "off"})</button>
                                     <span>/</span>
                                     <button class="text-red-500 text-sm italic hover:underline" id="deleteBotButton">delete</button>
                                 </div>
@@ -894,7 +895,7 @@
                                                 type="number"
                                                 id="delay_time"
                                                 name="delay_time"
-                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-gray-300 focus:ring"
                                                 value="${data.schedule_delete_message.delay_time}"
                                             />
                                         </div>
@@ -903,7 +904,7 @@
                                             <select
                                                 id="status"
                                                 name="status"
-                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-green-300 focus:ring"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-gray-300 focus:ring"
                                             >
                                                 <option value="on" ${data.schedule_delete_message.status === 'on' ? 'selected' : ''}>On</option>
                                                 <option value="off" ${data.schedule_delete_message.status === 'off' ? 'selected' : ''}>Off</option>
@@ -938,7 +939,7 @@
                                                 type="number"
                                                 id="config_delay_time"
                                                 name="delay_time"
-                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
                                                 value="${data.schedule_config.time}"
                                             />
                                         </div>
@@ -947,7 +948,7 @@
                                             <select
                                                 id="config_status"
                                                 name="status"
-                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
                                             >
                                                 <option value="on" ${data.schedule_config.status === 'on' ? 'selected' : ''}>On</option>
                                                 <option value="off" ${data.schedule_config.status === 'off' ? 'selected' : ''}>Off</option>
@@ -993,7 +994,7 @@
                                                 type="number"
                                                 id="group_config_delay_time"
                                                 name="delay_time"
-                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
                                                 value="${data.schedule_group_config.time}"
                                             />
                                         </div>
@@ -1002,7 +1003,7 @@
                                             <select
                                                 id="group_config_status"
                                                 name="status"
-                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-green-300 focus:ring"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
                                             >
                                                 <option value="on" ${data.schedule_group_config.status === 'on' ? 'selected' : ''}>On</option>
                                                 <option value="off" ${data.schedule_group_config.status === 'off' ? 'selected' : ''}>Off</option>
@@ -1128,7 +1129,7 @@
     $(document).ready(async () => {
 
         // Initial load
-        await scripts.showTab('group');
+        await scripts.showTab('command');
         await scripts.getDetailBot();
 
         //event listeners
