@@ -14,9 +14,11 @@ class BotUser extends Model
         'user_id',
         'status',
         'is_actived',
-        'token',
+        'api_key',
+        'secret_key',
+        'passphrase',
         'expired_at',
-        'point_limit',
+        'risk_tolerance',
     ];
 
     const ACTIVE = 1;

@@ -14,7 +14,7 @@
                     Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-center">
-                    Point Limit
+                    Risk Tolerance
                 </th>
                 <th scope="col" class="px-6 py-3 text-center">
                     Expired at
@@ -40,12 +40,20 @@
             <div class="px-6 py-4">
                 <form id="updateUserForm">
                     <div class="mb-4">
-                        <label for="pointLimit" class="block mb-2 text-sm">Point Limit</label> 
-                        <input type="text" id="pointLimit" name="point_limit" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <label for="riskTolerance" class="block mb-2 text-sm">Risk Tolerance</label> 
+                        <input type="text" id="riskTolerance" name="riskTolerance" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
-                        <label for="token" class="block mb-2 text-sm">Token</label>
-                        <input type="text" id="token" name="token" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <label for="apiKey" class="block mb-2 text-sm">API key</label>
+                        <input type="text" id="apiKey" name="apiKey" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="secretKey" class="block mb-2 text-sm">Secret key</label>
+                        <input type="text" id="secretKey" name="secretKey" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="passphrase" class="block mb-2 text-sm">Passphrase</label>
+                        <input type="text" id="passphrase" name="passphrase" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="flex justify-end space-x-2">
                         <button type="button" class="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700" onclick="closeUpdateUserModal()">Cancel</button>
@@ -110,10 +118,10 @@
                                 <div class="h-2.5 w-2.5 rounded-full ${user.pivot.is_actived ? "bg-green-500" : "bg-red-500"} me-2"></div> ${user.pivot.is_actived ? "Active" : "Inactive"}
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-center">${user.pivot.point_limit ?? ""}</td>
+                        <td class="px-6 py-4 text-center">${user.pivot.risk_tolerance ?? ""}</td>
                         <td class="px-6 py-4 text-center">${user.pivot.expired_at ? formatDate(user.pivot.expired_at) : ""}</td>
                         <td class="px-6 py-4 space-x-2 text-center">
-                            <a href="#" class="font-medium text-blue-600 hover:underline" onclick="openUpdateUserModal('${user.pivot.id}', '${user.pivot.point_limit ?? ""}', '${user.pivot.token ?? ""}')">Edit</a>
+                            <a href="#" class="font-medium text-blue-600 hover:underline" onclick="openUpdateUserModal('${user.pivot.id}', '${user.pivot.risk_tolerance ?? ""}', '${user.pivot.api_key ?? ""}', '${user.pivot.secret_key ?? ""}', '${user.pivot.passphrase ?? ""}')">Edit</a>
                             ${user.pivot.is_actived === "0" ? 
                                 `<a href="#" class="font-medium text-green-600 hover:underline" onclick="openActivateUserModal('${user.pivot.id}')">Active</a>`
                             : 
@@ -129,10 +137,12 @@
     }
 
 
-    const openUpdateUserModal = (pivotId, pointLimit, token) => {
+    const openUpdateUserModal = (pivotId, riskTolerance, apiKey, secretKey, passphrase) => {
         $('#pivotId').val(pivotId);
-        $('#updateUserModal #pointLimit').val(pointLimit);
-        $('#updateUserModal #token').val(token);
+        $('#updateUserModal #riskTolerance').val(riskTolerance);
+        $('#updateUserModal #apiKey').val(apiKey);
+        $('#updateUserModal #secretKey').val(secretKey);
+        $('#updateUserModal #passphrase').val(passphrase);
         $('#updateUserModal').removeClass('hidden');
     };
 
@@ -153,8 +163,10 @@
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append('point_limit', $('#pointLimit').val());
-        formData.append('token', $('#token').val());
+        formData.append('risk_tolerance', $('#riskTolerance').val());
+        formData.append('api_key', $('#apiKey').val());
+        formData.append('secret_key', $('#secretKey').val());
+        formData.append('passphrase', $('#passphrase').val());
         formData.append('id', $('#pivotId').val());
 
         try{

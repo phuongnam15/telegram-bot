@@ -7,8 +7,6 @@ const DEFAULT_PAGINATE = 10;
 const PASS_VALID_TIME = 60;
 const BANK_STATEMENT = "TELEGRAMBOT ";
 
-const BOT_TOKEN = "6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc";
-
 const ALLOW_UPDATE = [
     'message', // Nhận tin nhắn mới.
     'edited_message', // Nhận phiên bản chỉnh sửa của tin nhắn đã được bot biết đến.

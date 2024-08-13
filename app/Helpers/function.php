@@ -14,149 +14,6 @@ if (!function_exists('DbTransactions')) {
         return resolve("app.transactions");
     }
 }
-
-// if (!function_exists('generateShortlink')) {
-//     function generateShortlink(string $url)
-//     {
-//         $response = Http::get($url);
-
-//         $data = $response->json();
-
-//         $shortUrl = isset($data['shortenedUrl']) ? $data['shortenedUrl'] : $data['url'];
-
-//         return $shortUrl;
-//     }
-// }
-
-// if (!function_exists('generateRandomString')) {
-//     function generateRandomString($length)
-//     {
-//         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-//         $charLength = strlen($characters);
-//         $randomString = '';
-//         for ($i = 0; $i < $length; $i++) {
-//             $randomString .= $characters[rand(0, $charLength - 1)];
-//         }
-//         return $randomString;
-//     }
-// }
-
-// if (!function_exists('responseData')) {
-//     function responseSuccess($data = [], $message = 'success')
-//     {
-//         $response = collect([
-//             (object)[
-//                 'status' => true,
-//                 'message' => $message,
-//                 'data' => ""
-//             ]
-//         ])->first();
-
-//         $response->data = $data;
-
-//         return $response;
-//     }
-
-//     function responseError($message = '')
-//     {
-//         return collect([
-//             (object)[
-//                 'status' => false,
-//                 'message' => $message
-//             ]
-//         ])->first();
-//     }
-// }
-
-// if (!function_exists('processOfferwall')) {
-//     function processOfferwall($mission)
-//     {
-//         switch (Str::lower($mission->name)) {
-//             case 'bitlabs':
-//                 return processBitlabs($mission);
-//                 break;
-//         }
-//     }
-// }
-
-// if (!function_exists('processBitlabs')) {
-//     function processBitlabs($mission)
-//     {
-
-//         $alias = request()->get('user_id');
-//         $reward = request()->get('reward');
-//         $url = request()->fullUrlWithoutQuery(['hash']);
-//         $hash = request()->get('hash');
-
-//         if (hash_hmac("sha1", $url, $mission->secret_key) != $hash) {
-//             return responseError("Lỗi");
-//         }
-//         return responseSuccess([
-//             'alias' => $alias,
-//             'balance' => $reward
-//         ]);
-//     }
-// }
-// if (!function_exists('gameFeeOrReward')) {
-//     function gameFeeOrReward($nameOfGame)
-//     {
-//         $fee = GameFeesModel::where('name', $nameOfGame)->first();
-//         return $fee->amount;
-//     }
-// }
-
-// if (!function_exists('getImage')) {
-
-//     function getImage($file, $path = PATH_FILE_PROOF_APP)
-//     {
-//         $url = asset(Storage::url($path . '/' . $file));
-
-//         return $url;
-//     }
-// }
-
-// if (!function_exists('getImages')) {
-
-
-//     function getImages($files, $path = PATH_FILE_PROOF_APP)
-//     {
-//         $url = [];
-
-//         foreach ($files as $file) {
-//             $url[] = getImage($file, $path);
-//         }
-
-//         return $url;
-//     }
-// }
-
-// if (!function_exists('saveImage')) {
-
-//     function saveImages($image, $alias)
-//     {
-//         $images = [];
-
-//         if (!File::isDirectory(public_path(SOURCE_FILE_PROOF_APP . "/" . $alias))) {
-//             File::makeDirectory(public_path(SOURCE_FILE_PROOF_APP . "/" . $alias), 0777, true, true);
-//         }
-
-//         $path = Telegram::getFile([
-//             'file_id' => $image['file_id'],
-//         ]);
-
-//         $path = json_decode($path);
-
-//         $data = Http::get("https://api.telegram.org/file/bot" . env("TELEGRAM_BOT_TOKEN") . "/$path->file_path");
-
-//         File::put(public_path(SOURCE_FILE_PROOF_APP . "/" . $alias . "/" . $image['file_unique_id'] . ".png"), $data);
-
-//         $images[] = $image['file_unique_id'] . ".png";
-
-//         Log::info(collect($images));
-
-//         return collect($images);
-//     }
-// }
 if (!function_exists('sanitizeHtml')) {
     function sanitizeHtml($html)
     {
@@ -212,5 +69,78 @@ if (!function_exists('sanitizeHtml')) {
         $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
         // Cắt bỏ phần khai báo XML không cần thiết được thêm vào đầu tài liệu
         return str_replace('<?xml encoding="UTF-8">', '', $html);
+    }
+}
+if (!function_exists('determineVol')) {
+    function determineVol($et, $sl, $leverage, $r)
+    {
+        $result = $r / $leverage / (abs($et - $sl) / $et);
+        return $result;
+    }
+}
+if (!function_exists('parseOrder')) {
+    function parseOrder($text)
+    {
+        // Chuyển đoạn văn bản về dạng chuẩn (lowercase, xóa các khoảng trắng thừa)
+        $normalizedText = strtolower(trim($text));
+
+        // Định nghĩa các mẫu Regular Expressions
+        $coinPattern = '/^([a-zA-Z0-9]+)([\s-])/i'; // Lấy tên đồng coin từ đầu văn bản
+        $orderTypePattern = '/(short|long|buy|sell)\s*(limit)?/i'; // Kiểu lệnh và "limit"
+        $etPattern = '/et:\s*((?:\d+(\.\d+)?\s*){1,3})/i'; // Giá vào lệnh (1 đến 3 số sau ET)
+        $slPattern = '/sl:\s*(\d+(\.\d+)?)/i'; // Giá stop loss
+        $tpPattern = '/tp:\s*(\d+(\.\d+)?)/i'; // Giá take profit
+        $leveragePattern = '/(\d+)x|x(\d+)/i'; // Mẫu để tìm leverage
+
+        // Kiểm tra các thông tin từ văn bản
+        $coinMatch = preg_match($coinPattern, $normalizedText, $coinMatches);
+        $orderTypeMatch = preg_match($orderTypePattern, $normalizedText, $orderTypeMatches);
+        $etMatch = preg_match($etPattern, $normalizedText, $etMatches);
+        $slMatch = preg_match($slPattern, $normalizedText, $slMatches);
+        $tpMatch = preg_match($tpPattern, $normalizedText, $tpMatches);
+        $leverageMatch = preg_match($leveragePattern, $normalizedText, $leverageMatches);
+
+        // Lấy các thông tin từ kết quả khớp
+        $coin = $coinMatch ? $coinMatches[1] : null;
+        $orderType = $orderTypeMatch ? $orderTypeMatches[1] : null;
+        $isLimit = isset($orderTypeMatches[2]) ? true : false;
+
+        // Xử lý giá trị ET
+        $et = [];
+        if ($etMatch) {
+            $etValues = preg_split('/\s+/', trim($etMatches[1]));
+            $et = array_filter($etValues, fn($value) => !empty($value));
+        }
+
+        $sl = $slMatch ? $slMatches[1] : null;
+        $tp = $tpMatch ? $tpMatches[1] : null;
+
+        // Lấy giá trị leverage (đòn bẩy)
+        $leverage = null;
+        if ($leverageMatch) {
+            $leverage = $leverageMatches[1] ? $leverageMatches[1] : $leverageMatches[2];
+        }
+
+        // Kiểm tra nếu các thông tin cần thiết có mặt
+        if (!$orderType || !$sl || !$tp) {
+            return false;
+        }
+
+        // Chuyển đổi kiểu lệnh nếu cần
+        if ($orderType == 'short') {
+            $orderType = 'sell';
+        } else if ($orderType == 'long') {
+            $orderType = 'buy';
+        }
+
+        return [
+            'coin' => $coin,
+            'orderType' => $orderType,
+            'isLimit' => $isLimit,
+            'ET' => $et,
+            'SL' => $sl,
+            'TP' => $tp,
+            'leverage' => $leverage
+        ];
     }
 }

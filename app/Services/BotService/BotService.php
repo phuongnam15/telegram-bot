@@ -49,15 +49,15 @@ class BotService extends BaseService
 
             // logger($update);
 
-            if($bot->is_notify_mode === Bot::NOTI_MODE_ON) {
+            if ($bot->is_notify_mode === Bot::NOTI_MODE_ON) {
                 if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
                     $message = $update['chat_member'] ?? $update['message'];
                     $chatId = $message['chat']['id'];
                     if (isset($message['text'])) {
                         $text = $message['text'];
-                        if($chatId === $bot->admin->telegram_id) {
+                        if ($chatId === $bot->admin->telegram_id) {
                             $users = $bot->users;
-                            foreach($users as $user) {
+                            foreach ($users as $user) {
                                 $client->post('sendMessage', [
                                     'json' => [
                                         'text' => $text,
@@ -65,7 +65,7 @@ class BotService extends BaseService
                                     ]
                                 ]);
                             }
-                        }else{
+                        } else {
                             $client->post('sendMessage', [
                                 'json' => [
                                     'text' => $text,
@@ -75,14 +75,14 @@ class BotService extends BaseService
                         }
                     }
                 }
-            }else{
+            } else {
                 $this->checkIsUserMessage($update);
                 $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
-    
+
                 if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
                     $message = $update['chat_member'] ?? $update['message'];
                     $chatId = $message['chat']['id'];
-    
+
                     $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
                     $this->checkMessageContent($message, $chatId, $botId, $botToken, $client);
                 }
@@ -93,6 +93,7 @@ class BotService extends BaseService
         } catch (AppServiceException | \Exception $error) {
             DB::rollBack();
             logger($error->getMessage());
+            logger($error->getLine());
         }
     }
     public function send($telegramIds, $configId, $botToken, $text = "")
@@ -300,11 +301,11 @@ class BotService extends BaseService
             return response()->json(['error' => 'Failed to update bot status', 'details' => $e->getMessage()], 500);
         }
     }
-    public function updateBot($id) 
+    public function updateBot($id)
     {
         return DbTransactions()->addCallbackJson(function () use ($id) {
             $admin = auth()->user();
-            if(!$admin->telegram_id) {
+            if (!$admin->telegram_id) {
                 throw new AppServiceException('Set telegram id before use this feature');
             }
 
@@ -434,7 +435,6 @@ class BotService extends BaseService
 
             return "";
         } catch (\Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -547,7 +547,6 @@ class BotService extends BaseService
                 }
             }
         } catch (\Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -629,7 +628,6 @@ class BotService extends BaseService
                 }
             }
         } catch (AppServiceException | \Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -664,7 +662,6 @@ class BotService extends BaseService
                 }
             }
         } catch (AppServiceException | \Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -672,11 +669,15 @@ class BotService extends BaseService
     {
         try {
             if (isset($message['text'])) {
-                //check user status
+
+                if ($message['text'] === '/start') {
+                    $this->startCommandDefaultHandler($message, $botToken, $chatId, $botId);
+                    return;
+                }
+
                 $this->checkUserStatus($message, $botId, $chatId, $botToken);
             }
         } catch (AppServiceException | \Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -722,7 +723,6 @@ class BotService extends BaseService
                 $botUser->save();
             }
         } catch (\Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -749,7 +749,6 @@ class BotService extends BaseService
                 ]
             ]);
         } catch (\Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -764,42 +763,102 @@ class BotService extends BaseService
             $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
                 $query->where('telegram_id', $chatId);
             })->first();
+
             $status = $botUser->status;
 
             switch ($status) {
                 case 'trade':
                     if ($botUser->is_actived) {
                         $text = strtolower($text);
-                        if (strpos($text, 'en') !== false && strpos($text, 'sl') !== false && strpos($text, 'tp') !== false) {
-                            $data = $this->parseOrder($text);
 
-                            // logger($data);
-
-                            $response = $this->createOrder($data);
-
-                            if ($response['code'] === "00000") {
-                                logger($response);
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "🟢 [Đã vào lệnh]\n\n". strtoupper($data['coin']) . "-" . strtoupper($data['orderType']) . " " . ($data['isLimit'] ? "limit" : "") . "\n- EN: {$data['EN']}\n- SL: {$data['SL']}\n- TP: {$data['TP']}",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                            } else {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "🔴 Tạo lệnh thất bại\n{$response['msg']}",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                            }
-                        } else {
+                        if (!$botUser->risk_tolerance) {
                             $client->post('sendMessage', [
                                 'json' => [
-                                    'text' => "Để đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG limit\nEN: 50000\nSL: 49000\nTP: 51000\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- EN, SL chỉ nhập 1 giá",
+                                    'text' => "Liên hệ admin để thiết lập số tiền chấp nhận rủi ro (thường từ 3-5% vốn)\n  ",
                                     'chat_id' => $chatId
                                 ]
                             ]);
+                            break;
+                        }
+                        if (!$botUser->api_key) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Bạn chưa cung cấp API Key cho admin",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                            break;
+                        }
+                        if (!$botUser->secret_key) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Bạn chưa cung cấp Secret Key cho admin",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                            break;
+                        }
+                        if (!$botUser->passphrase) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Bạn chưa cung cấp Passphrase cho admin",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                            break;
+                        }
+
+                        $data = parseOrder($text);
+
+                        // logger($data);
+
+                        if (!$data) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Để đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000 (entry)\n- SL: 49000 (stoploss)\n- TP: 51000 (takeprofit)\n- x10 (đòn bẩy)\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                        } else {
+
+                            if (!$data['leverage']) {
+                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                            }
+
+                            if ($data['isLimit']) {
+                                $ets = $data['ET'];
+
+                                $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                
+                                $etLength = count($ets);
+                                switch ($etLength) {
+                                    case 1:
+                                        $data['ET'] = $ets[0];
+                                        $this->createOrder($vol, $data, $client, $chatId);
+                                        break;
+                                    case 2:
+                                        $data['ET'] = $ets[0];
+                                        $this->createOrder($vol / 2, $data, $client, $chatId);
+                                        $data['ET'] = $ets[1];
+                                        $this->createOrder($vol / 2, $data, $client, $chatId);
+                                        break;
+                                    case 3:
+                                        $data['ET'] = $ets[0];
+                                        $this->createOrder($vol / 4, $data, $client, $chatId);
+                                        $data['ET'] = $ets[1];
+                                        $this->createOrder($vol / 4, $data, $client, $chatId);
+                                        $data['ET'] = $ets[2];
+                                        $this->createOrder($vol / 2, $data, $client, $chatId);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else {
+                                $currentPrice = $this->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
+                                $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                $data['ET'] = $currentPrice;
+                                $this->createOrder($vol, $data, $client, $chatId);
+                            }
                         }
                     } else {
                         $client->post('sendMessage', [
@@ -813,9 +872,6 @@ class BotService extends BaseService
                 case 'start':
                     //handle default command
                     switch ($text) {
-                        case '/start':
-                            $this->startCommandDefaultHandler($message, $botToken, $chatId, $botId);
-                            break;
                         case '/trade':
                             $this->tradeCommanDefaultHandler($chatId, $botId, $botToken);
                             break;
@@ -842,11 +898,9 @@ class BotService extends BaseService
                     break;
             }
         } catch (\Exception $error) {
-            logger($error->getMessage());
             throw new AppServiceException($error->getMessage());
         }
     }
-
     public function generateSignature($timestamp, $method, $requestPath, $queryString, $body, $secretKey)
     {
         if (!empty($queryString)) {
@@ -859,47 +913,11 @@ class BotService extends BaseService
             hash_hmac('sha256', $stringToSign, $secretKey, true)
         );
     }
-    public function parseOrder($text)
-    {
-        // Chuyển đoạn văn bản về dạng chuẩn (lowercase, xóa các khoảng trắng thừa)
-        $normalizedText = strtolower(trim($text));
-
-        // Định nghĩa các mẫu Regular Expressions
-        $coinPattern = '/^([a-zA-Z0-9]+)([\s-])/i'; // Lấy tên đồng coin từ đầu văn bản
-        $orderTypePattern = '/(short|long|buy|sell)\s*(limit)?/i'; // Kiểu lệnh và "limit"
-        $enPattern = '/en:\s*(\d+(\.\d+)?)/i'; // Giá vào lệnh
-        $slPattern = '/sl:\s*(\d+(\.\d+)?)/i'; // Giá stop loss
-        $tpPattern = '/tp:\s*(\d+(\.\d+)?)/i'; // Giá take profit
-
-        // Kiểm tra các thông tin từ văn bản
-        $coinMatch = preg_match($coinPattern, $normalizedText, $coinMatches);
-        $orderTypeMatch = preg_match($orderTypePattern, $normalizedText, $orderTypeMatches);
-        $enMatch = preg_match($enPattern, $normalizedText, $enMatches);
-        $slMatch = preg_match($slPattern, $normalizedText, $slMatches);
-        $tpMatch = preg_match($tpPattern, $normalizedText, $tpMatches);
-
-        // Lấy các thông tin từ kết quả khớp
-        $coin = $coinMatch ? $coinMatches[1] : null;
-        $orderType = $orderTypeMatch ? $orderTypeMatches[1] : null;
-        $isLimit = isset($orderTypeMatches[2]) ? true : false;
-        $en = $enMatch ? $enMatches[1] : null;
-        $sl = $slMatch ? $slMatches[1] : null;
-        $tp = $tpMatch ? $tpMatches[1] : null;
-
-        return [
-            'coin' => $coin,
-            'orderType' => $orderType,
-            'isLimit' => $isLimit,
-            'EN' => $en,
-            'SL' => $sl,
-            'TP' => $tp
-        ];
-    }
-    public function createOrder($input)
+    public function createOrder($vol, $input, $client, $chatId)
     {
         try {
             $timestamp = round(microtime(true) * 1000);
-            $size = 3 * 10 / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
+            $size = $vol * $input['leverage'] / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
             $data = [
                 "planType" => "normal_plan",
                 "symbol" => strtoupper($input['coin']) . "USDT",
@@ -907,8 +925,8 @@ class BotService extends BaseService
                 "marginMode" => "crossed",
                 "marginCoin" => "USDT",
                 "size" =>  round($size, 2),
-                "triggerPrice" => $input['EN'],
-                "price" => $input['EN'],
+                "triggerPrice" => $input['ET'],
+                "price" => $input['ET'],
                 "triggerType" => "mark_price",
                 "side" => $input['orderType'],
                 "tradeSide" => "open",
@@ -918,6 +936,9 @@ class BotService extends BaseService
                 "presetStopLossPrice" => $input['SL'],
                 "presetTakeProfitPrice" => $input['TP'],
             ];
+
+            // logger($data);
+
             $body = json_encode($data);
 
             $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/order/place-plan-order", "", $body, env('BITGET_SECRET_KEY'));
@@ -932,10 +953,24 @@ class BotService extends BaseService
 
             ])->post('https://api.bitget.com/api/v2/mix/order/place-plan-order', $data);
 
-            return json_decode($response->body(), true);
+            $result = json_decode($response->body(), true);
+
+            if ($result['code'] === "00000") {
+                $client->post('sendMessage', [
+                    'json' => [
+                        'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . "-" . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? "limit" : "") . "\n- ET: {$input['ET']}\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
+                        'chat_id' => $chatId
+                    ]
+                ]);
+            } else {
+                $client->post('sendMessage', [
+                    'json' => [
+                        'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . "-" . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? "limit" : "") . "\n- ET: {$input['ET']}\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
+                        'chat_id' => $chatId
+                    ]
+                ]);
+            }
         } catch (AppServiceException | \Exception $error) {
-            logger($error->getMessage());
-            logger($error->getLine());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -944,5 +979,40 @@ class BotService extends BaseService
         $response = Http::get("https://api.bitget.com/api/v2/spot/market/tickers?symbol={$symbol}");
 
         return json_decode($response->body(), true)['data'][0]['lastPr'];
+    }
+    public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase)
+    {
+        $arrayLeverageLevel = ["125", "100", "70", "50"];
+        foreach ($arrayLeverageLevel as $value) {
+            $timestamp = round(microtime(true) * 1000);
+            $data = [
+                "symbol" => $symbol,
+                "productType" => "USDT-FUTURES",
+                "marginCoin" => "usdt",
+                "leverage" => $value,
+                "holdSide" => "long"
+            ];
+            $body = json_encode($data);
+
+            $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/account/set-leverage", "", $body, $secretKey);
+
+            $response = Http::withHeaders([
+                'ACCESS-KEY' => $apiKey,
+                'ACCESS-SIGN' => $accessSign,
+                'ACCESS-PASSPHRASE' => $passphrase,
+                'ACCESS-TIMESTAMP' => $timestamp,
+                'locale' => 'en-US',
+                'Content-Type' => 'application/json',
+
+            ])->post('https://api.bitget.com/api/v2/mix/account/set-leverage', $data);
+
+            $result = json_decode($response->body(), true);
+
+            if ($result['code'] === "00000") {
+                return $result['data']['longLeverage'];
+            }
+        }
+
+        return "20";
     }
 }

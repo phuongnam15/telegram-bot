@@ -53,9 +53,7 @@ class UserService extends BaseService
                 throw new AppServiceException('Bot User not found');
             }
 
-            $botUser->token = request()->token;
-            $botUser->point_limit = request()->point_limit;
-            $botUser->save();
+            $botUser->update(request()->all());
 
             return $botUser;
         });
