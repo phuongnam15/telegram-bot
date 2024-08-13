@@ -834,21 +834,21 @@ class BotService extends BaseService
                                 switch ($etLength) {
                                     case 1:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol, $data, $client, $chatId);
+                                        $this->createOrder($vol, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                                         break;
                                     case 2:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                                         $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                                         break;
                                     case 3:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId);
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                                         $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId);
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                                         $data['ET'] = $ets[2];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                                         break;
                                     default:
                                         break;
@@ -857,7 +857,7 @@ class BotService extends BaseService
                                 $currentPrice = $this->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
                                 $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
                                 $data['ET'] = $currentPrice;
-                                $this->createOrder($vol, $data, $client, $chatId);
+                                $this->createOrder($vol, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                             }
                         }
                     } else {
@@ -913,7 +913,7 @@ class BotService extends BaseService
             hash_hmac('sha256', $stringToSign, $secretKey, true)
         );
     }
-    public function createOrder($vol, $input, $client, $chatId)
+    public function createOrder($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase)
     {
         try {
             $timestamp = round(microtime(true) * 1000);
@@ -941,12 +941,12 @@ class BotService extends BaseService
 
             $body = json_encode($data);
 
-            $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/order/place-plan-order", "", $body, env('BITGET_SECRET_KEY'));
+            $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/order/place-plan-order", "", $body, $secretKey);
 
             $response = Http::withHeaders([
-                'ACCESS-KEY' => env('BITGET_API_KEY'),
+                'ACCESS-KEY' => $apiKey,
                 'ACCESS-SIGN' => $accessSign,
-                'ACCESS-PASSPHRASE' => env('BITGET_PASSPHRASE'),
+                'ACCESS-PASSPHRASE' => $passphrase,
                 'ACCESS-TIMESTAMP' => $timestamp,
                 'locale' => 'en-US',
                 'Content-Type' => 'application/json',
