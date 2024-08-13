@@ -5,7 +5,7 @@
 @section("content")
 <div class="container h-8 mt-3 space-y-2">
     <div class="flex flex-col gap-2" id="botList"></div>
-    <div class="bg-[#e5e9f4] border-[1px] border-solid border-[#e5e7eb] rounded-md py-[7px] pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" data-toggle="modal" data-target="#createBotModal">
+    <div class="bg-gray-300 text-[0.8rem] border border-gray-300 rounded-md py-[0.4rem] font-popi pl-7 space-x-5 text-gray-700 flex items-center hover:bg-white transition-all duration-200 cursor-pointer" data-toggle="modal" data-target="#createBotModal">
         <i class="fa-solid fa-plus"></i>
         <span class="test-sm font-medium">Add new bot</span>
     </div>
@@ -93,8 +93,8 @@
                 $('#botList').empty();
                 response.forEach((bot) => {
                     $('#botList').append(`
-                        <div class="cursor-pointer border-[1px] border-solid border-[#e5e7eb] rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
-                            <div class="flex items-center gap-2 flex-1 hover:bg-[#ced3dc] py-2 px-3">
+                        <div class="cursor-pointer border border-gray-200 hover:border-gray-300 transition-all duration-150 rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
+                            <div class="flex items-center gap-2 flex-1 hover:bg-gray-100 transition-all duration-150 py-2 px-3">
                                 <img class="size-12 rounded-full" src="${bot.avatar ?? "{{ asset('assets/images/bot.png') }}"}" alt="">
                                 <div class="flex flex-col leading-5">
                                     <p class="">
