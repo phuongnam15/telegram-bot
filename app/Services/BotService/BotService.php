@@ -669,10 +669,18 @@ class BotService extends BaseService
     {
         try {
             if (isset($message['text'])) {
+                $text = $message['text'];
 
-                if ($message['text'] === '/start') {
-                    $this->startCommandDefaultHandler($message, $botToken, $chatId, $botId);
-                    return;
+                switch ($text) {
+                    case '/start':
+                        $this->startCommandDefaultHandler($message, $botToken, $chatId, $botId);
+                        return;
+                    case '/trade':
+                        $this->tradeCommanDefaultHandler($chatId, $botId, $botToken);
+                        return;
+                    case '/me':
+                        $this->meCommandDefaultHandler($chatId, $botId, $botToken);
+                        return;
                 }
 
                 $this->checkUserStatus($message, $botId, $chatId, $botToken);
@@ -752,6 +760,27 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
+    public function meCommandDefaultHandler($chatId, $botId, $botToken)
+    {
+        try {
+            $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
+                $query->where('telegram_id', $chatId);
+            })->first();
+
+            $client = new Client([
+                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+            ]);
+
+            $client->post('sendMessage', [
+                'json' => [
+                    'text' => "Username: {$botUser->user->username}\nFirstname: {$botUser->user->firstname}\nLastname: {$botUser->user->lastname}\nTrade Mode Expired At: {$botUser->expired_at}",
+                    'chat_id' => $chatId
+                ]
+            ]);
+        } catch (AppServiceException | \Exception $error) {
+            throw new AppServiceException($error->getMessage());
+        }
+    }
     public function checkUserStatus($message, $botId, $chatId, $botToken)
     {
         try {
@@ -823,7 +852,7 @@ class BotService extends BaseService
 
                             if (!$data['leverage']) {
                                 $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, LEVERAGE_LEVELS);
-                            }else{
+                            } else {
                                 $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage'], "20"]);
                             }
 
@@ -831,7 +860,7 @@ class BotService extends BaseService
                                 $ets = $data['ET'];
 
                                 $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-                                
+
                                 $etLength = count($ets);
                                 switch ($etLength) {
                                     case 1:
@@ -872,15 +901,6 @@ class BotService extends BaseService
                     }
                     break;
                 case 'start':
-                    //handle default command
-                    switch ($text) {
-                        case '/trade':
-                            $this->tradeCommanDefaultHandler($chatId, $botId, $botToken);
-                            break;
-                        default:
-                            break;
-                    }
-
                     //check command to resend config content
                     if (Command::where('command', $message['text'])->exists()) {
 
@@ -912,7 +932,7 @@ class BotService extends BaseService
         }
 
         return base64_encode(
-            hash_hmac('sha256', $stringToSign, $secretKey, true) 
+            hash_hmac('sha256', $stringToSign, $secretKey, true)
         );
     }
     public function createOrder($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase)
