@@ -43,49 +43,18 @@ class BotService extends BaseService
         try {
             DB::beginTransaction();
             $update = $request->all();
-            $client = new Client([
-                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
-            ]);
 
             // logger($update);
 
-            if ($bot->is_notify_mode === Bot::NOTI_MODE_ON) {
-                if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
-                    $message = $update['chat_member'] ?? $update['message'];
-                    $chatId = $message['chat']['id'];
-                    if (isset($message['text'])) {
-                        $text = $message['text'];
-                        if ($chatId === $bot->admin->telegram_id) {
-                            $users = $bot->users;
-                            foreach ($users as $user) {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => $text,
-                                        'chat_id' => $user->telegram_id
-                                    ]
-                                ]);
-                            }
-                        } else {
-                            $client->post('sendMessage', [
-                                'json' => [
-                                    'text' => $text,
-                                    'chat_id' => $bot->admin->telegram_id
-                                ]
-                            ]);
-                        }
-                    }
-                }
-            } else {
-                $this->checkIsUserMessage($update);
-                $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
+            $this->checkIsUserMessage($update);
+            $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
 
-                if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
-                    $message = $update['chat_member'] ?? $update['message'];
-                    $chatId = $message['chat']['id'];
+            if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
+                $message = $update['chat_member'] ?? $update['message'];
+                $chatId = $message['chat']['id'];
 
-                    $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
-                    $this->checkMessageContent($message, $chatId, $botId, $botToken);
-                }
+                $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
+                $this->checkMessageContent($message, $chatId, $bot);
             }
 
             DB::commit();
@@ -665,9 +634,15 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function checkMessageContent($message, $chatId, $botId, $botToken)
+    public function checkMessageContent($message, $chatId, $bot)
     {
         try {
+            $botToken = $bot->token;
+            $botId = $bot->id;
+            $client = new Client([
+                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+            ]);
+
             if (isset($message['text'])) {
                 $text = $message['text'];
 
@@ -682,8 +657,32 @@ class BotService extends BaseService
                         $this->meCommandDefaultHandler($chatId, $botId, $botToken);
                         return;
                 }
-
-                $this->checkUserStatus($message, $botId, $chatId, $botToken);
+                if ($bot->is_notify_mode) {
+                    if ($chatId == $bot->admin->telegram_id) {
+                        $users = $bot->users->where('telegram_id', '!=', $bot->admin->telegram_id);
+                        foreach ($users as $user) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "<strong>👩‍🎤 From Admin</strong>" . "\n" . $text,
+                                    'chat_id' => $user->telegram_id,
+                                    'parse_mode' => 'HTML'
+                                ]
+                            ]);
+                        }
+                    } else {
+                        $user = User::where('telegram_id', $chatId)->first();
+                        $username = $user->username === "" ? $user->firstname . $user->lastname : "@".$user->username;
+                        $client->post('sendMessage', [
+                            'json' => [
+                                'text' => "<i>{$username}</i>" . "\n" . $text,
+                                'chat_id' => $bot->admin->telegram_id,
+                                'parse_mode' => 'HTML'
+                            ]
+                        ]);
+                    }
+                } else {
+                    $this->checkUserStatus($message, $botId, $chatId, $botToken);
+                }
             }
         } catch (AppServiceException | \Exception $error) {
             throw new AppServiceException($error->getMessage());
@@ -707,9 +706,9 @@ class BotService extends BaseService
             $user = User::firstOrCreate(
                 ['telegram_id' => $chatId],
                 [
-                    'username' => $username,
-                    'firstname' => $firstname,
-                    'lastname' => $lastname,
+                    'username' => $username ?? "",
+                    'firstname' => $firstname ?? "",
+                    'lastname' => $lastname ?? "",
                     'telegram_id' => $chatId,
                     'avatar' => $avatar
                 ]

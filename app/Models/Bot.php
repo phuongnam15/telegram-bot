@@ -23,8 +23,8 @@ class Bot extends Model
     ];
     const STATUS_ACTIVE = true;
     const STATUS_INACTIVE = false;
-    const NOTI_MODE_ON = true;
-    const NOTI_MODE_OFF = false;
+    const NOTI_MODE_ON = 1;
+    const NOTI_MODE_OFF = 0;
     const MAP_DAY = [
         100000 => 30,
         200000 => 90,
