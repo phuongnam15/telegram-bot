@@ -773,7 +773,7 @@ class BotService extends BaseService
 
             $client->post('sendMessage', [
                 'json' => [
-                    'text' => "Username: {$botUser->user->username}\nFirstname: {$botUser->user->firstname}\nLastname: {$botUser->user->lastname}\nTrade Mode Expired At: {$botUser->expired_at}",
+                    'text' => "<strong>{$botUser->user->firstname} {$botUser->user->lastname}</strong>\n\n🧑‍🎤Username: {$botUser->user->username}\n🚀Telegram ID: {$botUser->user->telegram_id}\n⛺️Trade Mode: " . ($botUser->is_actived ? "active" : "inactive") . "\n🌺Trade Mode Expired At: {$botUser->expired_at}\n🌊Risk Tolerance: {$botUser->risk_tolerance}",
                     'chat_id' => $chatId
                 ]
             ]);
