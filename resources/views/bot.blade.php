@@ -93,17 +93,13 @@
                 $('#botList').empty();
                 response.forEach((bot) => {
                     $('#botList').append(`
-                        <div class="cursor-pointer border border-gray-200 hover:border-gray-300 transition-all duration-150 rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
+                        <div class="relative cursor-pointer border border-gray-200 hover:border-gray-300 transition-all duration-150 rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
+                            <span class="size-2 top-1 left-1 rounded-full absolute border border-gray-300 ${bot.status === '1' ? 'bg-green-400' : 'bg-red-400'}"></span>
                             <div class="flex items-center gap-2 flex-1 hover:bg-gray-100 transition-all duration-150 py-2 px-3">
                                 <img class="size-12 rounded-full" src="${bot.avatar ?? "{{ asset('assets/images/bot.png') }}"}" alt="">
                                 <div class="flex flex-col leading-5">
                                     <p class="">
                                         <span class="font-medium text-[15px] tracking-wide font-sans">${bot.firstname}</span>
-                                        ${bot.status === '1' ? 
-                                            `<span class="py-[3px] px-2 bg-green-400 text-white rounded-full text-[12px]">actived</span>`
-                                        : 
-                                            ``
-                                        }
                                     </p>
                                     <p class="text-gray-500 flex items-center gap-1">
                                         <span class="text-sm">@${bot.username}</span>

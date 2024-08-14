@@ -868,7 +868,7 @@
                                 </p>
                                 <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
                                 <p class="block text-sm font-medium text-gray-600"><strong>Firstname:</strong> ${data.firstname}</p>
-                                <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? 'Active' : 'Inactive'}</p>
+                                <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? '<i class="text-green-500">activated</i>' : '<i class="text-red-500">not activated</i>'}</p>
                                 <p class="block text-sm font-medium text-gray-600"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
                                 <div class="mt-2">
                                     ${data.status === '0' ? 
@@ -877,7 +877,7 @@
                                     : 
                                         ""
                                     }
-                                    <button class="text-lime-600 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify-mode (${data.is_notify_mode === "1" ? "on" : "off"})</button>
+                                    <button class="text-lime-600 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify (${data.is_notify_mode === "1" ? "on" : "off"})</button>
                                     <span>/</span>
                                     <button class="text-red-500 text-sm italic hover:underline" id="deleteBotButton">delete</button>
                                 </div>
