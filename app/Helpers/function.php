@@ -1,12 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
-use App\Models\GameFeesModel;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Telegram\Bot\Laravel\Facades\Telegram;
+use App\Models\Ticker;
 
 if (!function_exists('DbTransactions')) {
     function DbTransactions()
@@ -122,8 +116,19 @@ if (!function_exists('parseOrder')) {
         }
 
         // Kiểm tra nếu các thông tin cần thiết có mặt
-        if (!$orderType || !$sl || !$tp) {
+        if (!$orderType || !$sl || !$tp || ($isLimit && empty($et))) {
             return false;
+        }
+        if ($coin !== null) {
+            $coin = strtoupper($coin);
+            if (
+                Ticker::where('name', $coin)->count() == 0 &&
+                Ticker::where('usdt', $coin . 'USDT')->count() == 0 &&
+                Ticker::where('usd', $coin . 'USD')->count() == 0 &&
+                Ticker::where('perp', $coin . 'PERP')->count() == 0
+            ) {
+                return false;
+            }
         }
 
         // Chuyển đổi kiểu lệnh nếu cần

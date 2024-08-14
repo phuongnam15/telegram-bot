@@ -84,7 +84,7 @@ class BotService extends BaseService
                     $chatId = $message['chat']['id'];
 
                     $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
-                    $this->checkMessageContent($message, $chatId, $botId, $botToken, $client);
+                    $this->checkMessageContent($message, $chatId, $botId, $botToken);
                 }
             }
 
@@ -824,7 +824,7 @@ class BotService extends BaseService
                             if (!$data['leverage']) {
                                 $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, LEVERAGE_LEVELS);
                             }else{
-                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage']]);
+                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage'], "20"]);
                             }
 
                             if ($data['isLimit']) {
@@ -912,12 +912,14 @@ class BotService extends BaseService
         }
 
         return base64_encode(
-            hash_hmac('sha256', $stringToSign, $secretKey, true)
+            hash_hmac('sha256', $stringToSign, $secretKey, true) 
         );
     }
     public function createOrder($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase)
     {
         try {
+            $method = "POST";
+            $api = "/api/v2/mix/order/place-plan-order";
             $timestamp = round(microtime(true) * 1000);
             $size = $vol * $input['leverage'] / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
             $data = [
@@ -943,7 +945,7 @@ class BotService extends BaseService
 
             $body = json_encode($data);
 
-            $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/order/place-plan-order", "", $body, $secretKey);
+            $accessSign = $this->generateSignature($timestamp, $method, $api, "", $body, $secretKey);
 
             $response = Http::withHeaders([
                 'ACCESS-KEY' => $apiKey,
@@ -953,7 +955,7 @@ class BotService extends BaseService
                 'locale' => 'en-US',
                 'Content-Type' => 'application/json',
 
-            ])->post('https://api.bitget.com/api/v2/mix/order/place-plan-order', $data);
+            ])->post("https://api.bitget.com{$api}", $data);
 
             $result = json_decode($response->body(), true);
 
@@ -984,6 +986,8 @@ class BotService extends BaseService
     }
     public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase, $leverageLevels = [])
     {
+        $method = "POST";
+        $api = "/api/v2/mix/account/set-leverage";
         foreach ($leverageLevels as $value) {
             $timestamp = round(microtime(true) * 1000);
             $data = [
@@ -995,7 +999,7 @@ class BotService extends BaseService
             ];
             $body = json_encode($data);
 
-            $accessSign = $this->generateSignature($timestamp, "POST", "/api/v2/mix/account/set-leverage", "", $body, $secretKey);
+            $accessSign = $this->generateSignature($timestamp, $method, $api, "", $body, $secretKey);
 
             $response = Http::withHeaders([
                 'ACCESS-KEY' => $apiKey,
@@ -1005,7 +1009,7 @@ class BotService extends BaseService
                 'locale' => 'en-US',
                 'Content-Type' => 'application/json',
 
-            ])->post('https://api.bitget.com/api/v2/mix/account/set-leverage', $data);
+            ])->post("https://api.bitget.com{$api}", $data);
 
             $result = json_decode($response->body(), true);
 
