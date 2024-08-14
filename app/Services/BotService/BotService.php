@@ -306,7 +306,7 @@ class BotService extends BaseService
         return DbTransactions()->addCallbackJson(function () use ($id) {
             $admin = auth()->user();
             if (!$admin->telegram_id) {
-                throw new AppServiceException('Set telegram id before use this feature');
+                throw new AppServiceException('Set Telegram ID in your profile before active this feature');
             }
 
             $bot = Bot::find($id);
