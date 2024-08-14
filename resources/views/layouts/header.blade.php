@@ -7,6 +7,7 @@
 <script>
     $(document).ready(async () => {
         const botId = window.location.pathname.split('/').pop();
+        document.getElementById('botUserLink').href = `/coin/${botId}`;
 
         const getInfoBot = async () => {
             try {
