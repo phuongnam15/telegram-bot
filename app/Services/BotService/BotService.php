@@ -946,7 +946,7 @@ class BotService extends BaseService
                 "productType" => "usdt-futures",
                 "marginMode" => "crossed",
                 "marginCoin" => "USDT",
-                "size" => $size,
+                "size" => round($size, 2),
                 "side" => $input['orderType'],
                 "tradeSide" => "open",
                 "orderType" => $input['isLimit'] ? "limit" : "market",
