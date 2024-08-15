@@ -82,7 +82,7 @@ if (!function_exists('parseOrder')) {
         $coinPattern = '/^([a-zA-Z0-9]+)([\s\-])/i'; // Lấy tên đồng coin từ đầu văn bản
         $orderTypePattern = '/(short|long|buy|sell)\s*(limit)?/i'; // Kiểu lệnh và "limit"
         $etPattern = '/et[\s:]*([\d\.\-\s]+)/i'; // Giá vào lệnh (có thể cách nhau bởi dấu " " hoặc "-")
-        $slPattern = '/sl[\s:]*([\d\.]+)/i'; // Giá stop loss
+        $slPattern = '/stl[\s:]*([\d\.]+)|sl[\s:]*([\d\.]+)/i'; // Giá stop loss hoặc stop loss viết tắt
         $tpPattern = '/tp[\s:]*([\d\.]+)/i'; // Giá take profit
         $leveragePattern = '/(\d+)x|x(\d+)/i'; // Mẫu để tìm leverage
 
@@ -107,7 +107,7 @@ if (!function_exists('parseOrder')) {
         }
 
         // Xử lý giá trị SL
-        $sl = $slMatch ? trim($slMatches[1]) : null;
+        $sl = $slMatch ? trim($slMatches[1] ?: $slMatches[2]) : null;
 
         // Xử lý giá trị TP
         $tp = $tpMatch ? trim($tpMatches[1]) : null;
