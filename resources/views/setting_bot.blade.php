@@ -851,11 +851,11 @@
 
                 const data = response.data;
 
-                data.forEach(user => {
+                data.forEach((user, index) => {
                     $('#userTable tbody').append(`
-                        <tr>
+                        <tr class="${index < (data.length - 1) ? "border-b border-gray-200" : ""}">
                             <td class="text-blue-500">${user.telegram_id}</td>
-                            <td class="flex justify-center py-2"><img class="size-14 rounded-full" src="${user.avatar}" alt=""></td>
+                            <td class="flex justify-center py-1"><img class="size-10 rounded-full" src="${user.avatar}" alt=""></td>
                             <td>@${user.username}</td>
                             <td>${user.firstname}</td>
                             <td>${user.lastname}</td>
