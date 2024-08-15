@@ -793,6 +793,10 @@ class BotService extends BaseService
                 $query->where('telegram_id', $chatId);
             })->first();
 
+            if(!$botUser) {
+                return;
+            }
+
             $status = $botUser->status;
 
             switch ($status) {
