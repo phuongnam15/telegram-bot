@@ -79,11 +79,11 @@ if (!function_exists('parseOrder')) {
         $normalizedText = strtolower(trim($text));
 
         // Định nghĩa các mẫu Regular Expressions
-        $coinPattern = '/^([a-zA-Z0-9]+)([\s-])/i'; // Lấy tên đồng coin từ đầu văn bản
+        $coinPattern = '/^([a-zA-Z0-9]+)([\s\-])/i'; // Lấy tên đồng coin từ đầu văn bản
         $orderTypePattern = '/(short|long|buy|sell)\s*(limit)?/i'; // Kiểu lệnh và "limit"
-        $etPattern = '/et:\s*((?:\d+(\.\d+)?\s*){1,3})/i'; // Giá vào lệnh (1 đến 3 số sau ET)
-        $slPattern = '/sl:\s*(\d+(\.\d+)?)/i'; // Giá stop loss
-        $tpPattern = '/tp:\s*(\d+(\.\d+)?)/i'; // Giá take profit
+        $etPattern = '/et[\s:]*([\d\.\-\s]+)/i'; // Giá vào lệnh (có thể cách nhau bởi dấu " " hoặc "-")
+        $slPattern = '/sl[\s:]*([\d\.]+)/i'; // Giá stop loss
+        $tpPattern = '/tp[\s:]*([\d\.]+)/i'; // Giá take profit
         $leveragePattern = '/(\d+)x|x(\d+)/i'; // Mẫu để tìm leverage
 
         // Kiểm tra các thông tin từ văn bản
@@ -102,12 +102,15 @@ if (!function_exists('parseOrder')) {
         // Xử lý giá trị ET
         $et = [];
         if ($etMatch) {
-            $etValues = preg_split('/\s+/', trim($etMatches[1]));
+            $etValues = preg_split('/[\s\-]+/', trim($etMatches[1]));
             $et = array_filter($etValues, fn($value) => !empty($value));
         }
 
-        $sl = $slMatch ? $slMatches[1] : null;
-        $tp = $tpMatch ? $tpMatches[1] : null;
+        // Xử lý giá trị SL
+        $sl = $slMatch ? trim($slMatches[1]) : null;
+
+        // Xử lý giá trị TP
+        $tp = $tpMatch ? trim($tpMatches[1]) : null;
 
         // Lấy giá trị leverage (đòn bẩy)
         $leverage = null;
@@ -116,7 +119,7 @@ if (!function_exists('parseOrder')) {
         }
 
         // Kiểm tra nếu các thông tin cần thiết có mặt
-        if (!$orderType || !$sl || !$tp || ($isLimit && empty($et))) {
+        if (!$orderType || !$sl || !$tp || ($isLimit && empty($et)) || (count($et) > 3)) {
             return false;
         }
         if ($coin !== null) {
