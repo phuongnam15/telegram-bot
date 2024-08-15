@@ -26,6 +26,11 @@
                     Group
                 </a>
             </li>
+            <li class="me-2">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-user">
+                    User
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -203,6 +208,26 @@
                 </thead>
                 <tbody class="text-sm text-gray-600 text-center">
                     <!-- Rows will be added by jQuery -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- user tab list -->
+    <div id="user" class="hidden">
+        <div class="mt-5">
+            <table class="min-w-full shadow rounded" id="userTable">
+                <thead class="text-sm text-gray-600 font-mono border-b border-gray-300">
+                    <tr class="w-full">
+                        <th class="px-4 py-2">#</th>
+                        <th class="px-4 py-2">Avatar</th>
+                        <th class="px-4 py-2">Username</th>
+                        <th class="px-4 py-2">Firstname</th>
+                        <th class="px-4 py-2">Lastname</th>
+                        <th class="px-4 py-2">Started At</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-gray-600 text-center font-popi">
                 </tbody>
             </table>
         </div>
@@ -815,9 +840,40 @@
             });
         },
 
+        //USER script
+        async listUser() {
+            $('#userTable tbody').html('');
+
+            try {
+                const response = await fetchClient(`/api/admin/bot/user?bot_id=${botId}`, {
+                    method: 'GET',
+                });
+
+                const data = response.data;
+
+                data.forEach(user => {
+                    $('#userTable tbody').append(`
+                        <tr>
+                            <td class="text-blue-500">${user.telegram_id}</td>
+                            <td class="flex justify-center py-2"><img class="size-14 rounded-full" src="${user.avatar}" alt=""></td>
+                            <td>@${user.username}</td>
+                            <td>${user.firstname}</td>
+                            <td>${user.lastname}</td>
+                            <td>${formatDate(user.pivot.created_at)}</td>
+                        </tr>
+                    `);
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async userScript() {
+            await scripts.listUser();
+        },
+
         ////////////////////////////////////////////
         async showTab(tabId) {
-            const tabIds = ['command', 'content', 'group'];
+            const tabIds = ['command', 'content', 'group', 'user'];
             tabIds.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
 
@@ -827,6 +883,8 @@
                 await scripts.contentScript();
             } else if (tabId === 'group') {
                 await scripts.groupScript();
+            } else if (tabId === 'user') {
+                await scripts.userScript();
             }
 
             // Update tab styles
@@ -1129,7 +1187,7 @@
     $(document).ready(async () => {
 
         // Initial load
-        await scripts.showTab('command');
+        await scripts.showTab('user');
         await scripts.getDetailBot();
 
         //event listeners
@@ -1144,6 +1202,10 @@
         $('#tab-group').on('click', (e) => {
             e.preventDefault();
             scripts.showTab('group');
+        });
+        $('#tab-user').on('click', (e) => {
+            e.preventDefault();
+            scripts.showTab('user');
         });
         $('#deleteBotButton').on('click', async () => {
             await scripts.deleteBot(botId);
