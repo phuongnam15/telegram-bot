@@ -671,7 +671,7 @@ class BotService extends BaseService
                         }
                     } else {
                         $user = User::where('telegram_id', $chatId)->first();
-                        $username = $user->username === "" ? $user->firstname . $user->lastname : "@".$user->username;
+                        $username = $user->username === "" ? $user->firstname . $user->lastname : "@" . $user->username;
                         $client->post('sendMessage', [
                             'json' => [
                                 'text' => "<i>{$username}</i>" . "\n" . $text,
@@ -887,7 +887,6 @@ class BotService extends BaseService
                             } else {
                                 $currentPrice = $this->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
                                 $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-                                $data['ET'] = $currentPrice;
                                 $this->createOrder($vol, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
                             }
                         }
@@ -939,27 +938,27 @@ class BotService extends BaseService
     {
         try {
             $method = "POST";
-            $api = "/api/v2/mix/order/place-plan-order";
+            $api = "/api/v2/mix/order/place-order";
             $timestamp = round(microtime(true) * 1000);
-            $size = $vol * $input['leverage'] / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
+            $size = ($vol * $input['leverage']) / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
             $data = [
-                "planType" => "normal_plan",
                 "symbol" => strtoupper($input['coin']) . "USDT",
                 "productType" => "usdt-futures",
                 "marginMode" => "crossed",
                 "marginCoin" => "USDT",
-                "size" =>  round($size, 2),
-                "triggerPrice" => $input['ET'],
-                "price" => $input['ET'],
-                "triggerType" => "mark_price",
+                "size" => $size,
                 "side" => $input['orderType'],
                 "tradeSide" => "open",
                 "orderType" => $input['isLimit'] ? "limit" : "market",
+                "force" => "gtc",
                 "clientOid" => uniqid(),
-                "reduceOnly" => "NO",
+                "presetStopSurplusPrice" => $input['TP'],
                 "presetStopLossPrice" => $input['SL'],
-                "presetTakeProfitPrice" => $input['TP'],
             ];
+
+            if ($input['isLimit']) {
+                $data['price'] = $input['ET'];
+            }
 
             // logger($data);
 
@@ -982,14 +981,14 @@ class BotService extends BaseService
             if ($result['code'] === "00000") {
                 $client->post('sendMessage', [
                     'json' => [
-                        'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . "-" . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? "limit" : "") . "\n- ET: {$input['ET']}\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
+                        'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "") . "" . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
                         'chat_id' => $chatId
                     ]
                 ]);
             } else {
                 $client->post('sendMessage', [
                     'json' => [
-                        'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . "-" . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? "limit" : "") . "\n- ET: {$input['ET']}\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
+                        'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
                         'chat_id' => $chatId
                     ]
                 ]);

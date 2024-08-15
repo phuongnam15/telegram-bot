@@ -120,12 +120,11 @@ if (!function_exists('parseOrder')) {
             return false;
         }
         if ($coin !== null) {
-            $coin = strtoupper($coin);
             if (
-                Ticker::where('name', $coin)->count() == 0 &&
-                Ticker::where('usdt', $coin . 'USDT')->count() == 0 &&
-                Ticker::where('usd', $coin . 'USD')->count() == 0 &&
-                Ticker::where('perp', $coin . 'PERP')->count() == 0
+                Ticker::where('name', strtoupper($coin))->count() == 0 &&
+                Ticker::where('usdt', strtoupper($coin) . 'USDT')->count() == 0 &&
+                Ticker::where('usd', strtoupper($coin) . 'USD')->count() == 0 &&
+                Ticker::where('perp', strtoupper($coin) . 'PERP')->count() == 0
             ) {
                 return false;
             }
