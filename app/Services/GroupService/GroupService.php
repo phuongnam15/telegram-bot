@@ -136,36 +136,28 @@ class GroupService extends BaseService
                 throw new AppServiceException('Group not found');
             }
 
+            $bot = $group->bots->first();
+
+            if(!$bot) {
+                throw new AppServiceException('No bot in this group');
+            }
+
+            if(!$bot->status) {
+                throw new AppServiceException('Bot in this group is inactive');
+            }
+
+            $botToken = $bot->token;
+
             $group->list_ban = $request->list_ban;
 
-            $expiredTime = $request->expired_time;
-            if (preg_match('/(\d+)([smhd])/', $expiredTime, $matches)) {
-                $value = $matches[1];
-                $unit = $matches[2];
-
-                switch ($unit) {
-                    case 's':
-                        $expiredAt = now()->addSeconds($value)->timestamp;
-                        break;
-                    case 'm':
-                        $expiredAt = now()->addMinutes($value)->timestamp;
-                        break;
-                    case 'h':
-                        $expiredAt = now()->addHours($value)->timestamp;
-                        break;
-                    case 'd':
-                        $expiredAt = now()->addDays($value)->timestamp;
-                        break;
-                }
-            }
+            $expiredAt = convertBanExpireTime($request->expired_at);
 
             $group->ban_expired_at = $expiredAt;
             $group->save();
 
             $users = $group->users;
-
             foreach ($users as $user) {
-                restrictChatMember(json_decode($request->list_ban, true), $group->telegram_id, $user->telegram_id, $expiredAt);
+                restrictChatMember(json_decode($request->list_ban, true), $group->telegram_id, $user->telegram_id, $expiredAt, $botToken);
             }
 
             return $group;

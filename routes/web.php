@@ -43,8 +43,8 @@ Route::get('/register', function () {
 Route::get('/setting-bot/{id}', function () {
     return view('setting_bot');
 });
-Route::get('/analytic/{id}', function () {
-    return view('analytic');
+Route::get('/manage-group/{id}', function () {
+    return view('manage-group');
 });
 
 Route::prefix('coin')->group((function() {

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Ticker;
+use App\Services\_Exception\AppServiceException;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 
 if (!function_exists('DbTransactions')) {
@@ -154,21 +156,9 @@ if (!function_exists('parseOrder')) {
 }
 
 if (!function_exists('restrictChatMember')) {
-    function restrictChatMember($listBan, $chatId, $userId, $untilDate)
+    function restrictChatMember($permissions, $chatId, $userId, $untilDate, $botToken)
     {
-        $permissions = [];
-
-        foreach (PERMISSIONS as $permission) {
-            if (in_array($permission, $listBan)) {
-                $permissions[$permission] = true;
-            }
-        }
-
-        if ($permissions == []) {
-            return "No permissions to update.";
-        }
-
-        $url = "https://api.telegram.org/bot6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc/restrictChatMember";
+        $url = "https://api.telegram.org/bot{$botToken}/restrictChatMember";
 
         $response = Http::post($url, [
             'chat_id' => $chatId,
@@ -179,9 +169,107 @@ if (!function_exists('restrictChatMember')) {
         ]);
 
         if ($response->successful()) {
-            return "Permissions updated successfully for user.";
+            return true;
         } else {
-            return "Failed to update permissions. Error: " . $response->body();
+            logger($response->body());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('banChatMember')) {
+    function banChatMember($chatId, $userId, $untilDate, $botToken)
+    {
+        $url = "https://api.telegram.org/bot{$botToken}/banChatMember";
+
+        $response = Http::post($url, [
+            'chat_id' => $chatId,
+            'user_id' => $userId,
+            'until_date' => $untilDate
+        ]);
+
+        if ($response->successful()) {
+            return true;
+        } else {
+            logger($response->body());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('unbanChatMember')) {
+    function unbanChatMember($chatId, $userId, $botToken)
+    {
+        $url = "https://api.telegram.org/bot{$botToken}/unbanChatMember";
+
+        $response = Http::post($url, [
+            'chat_id' => $chatId,
+            'user_id' => $userId
+        ]);
+
+        if ($response->successful()) {
+            return true;
+        } else {
+            logger($response->body());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('sendMessage')) {
+    function sendMessage($chatId, $botToken, $text)
+    {
+        $client = new Client([
+            'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+        ]);
+
+        $response = $client->post('sendMessage', [
+            'json' => [
+                'chat_id' => $chatId,
+                'text' => $text,
+                'parse_mode' => 'HTML'
+            ],
+        ]);
+
+        if ($response->getStatusCode() == 200) {
+            return true;
+        } else {
+            logger($response->getBody());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('convertBanExpireTime')) {
+    function convertBanExpireTime($time)
+    {
+        try {
+
+            if (preg_match('/(\d+)([smhd])/', $time, $matches)) {
+                $value = $matches[1];
+                $unit = $matches[2];
+
+                switch ($unit) {
+                    case 's':
+                        $expiredAt = now()->addSeconds($value)->timestamp;
+                        break;
+                    case 'm':
+                        $expiredAt = now()->addMinutes($value)->timestamp;
+                        break;
+                    case 'h':
+                        $expiredAt = now()->addHours($value)->timestamp;
+                        break;
+                    case 'd':
+                        $expiredAt = now()->addDays($value)->timestamp;
+                        break;
+                };
+
+                return $expiredAt;
+            }
+
+            throw new AppServiceException('Invalid time format');
+        } catch (AppServiceException $e) {
+            throw new AppServiceException($e->getMessage());
         }
     }
 }

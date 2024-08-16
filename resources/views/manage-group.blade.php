@@ -46,17 +46,17 @@
     <div id="policy" class="hidden">
         <form id="policyForm">
             <div>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Can Send Messages</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Can Send Other Messages</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Can Add Web Page Previews</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Can Send Audios</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Can Send Documents</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Can Send Photos</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Can Send Videos</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Can Send Video Notes</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Can Send Voice Notes</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Can Send Polls</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Can Invite Users</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Cannot Send Messages</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Cannot Send Other Messages</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Cannot Add Web Page Previews</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Cannot Send Audios</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Cannot Send Documents</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Cannot Send Photos</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Cannot Send Videos</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Cannot Send Video Notes</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Cannot Send Voice Notes</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Cannot Send Polls</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Cannot Invite Users</label><br>
             </div>
 
             <div>
@@ -289,8 +289,11 @@
 
             const formData = new FormData();
 
-            const checkboxes = document.querySelectorAll('input[name="list_ban[]"]:checked');
-            const listBan = Array.from(checkboxes).map(checkbox => checkbox.value);
+            const allCheckboxes = document.querySelectorAll('input[name="list_ban[]"]');
+            const listBan = {};
+            allCheckboxes.forEach(checkbox => {
+                listBan[checkbox.value] = !checkbox.checked;
+            });
 
             const timeAmount = document.getElementById('timeAmount').value;
             const timeUnit = document.getElementById('timeUnit').value;
@@ -327,13 +330,16 @@
 
             document.getElementById('groupName').innerText = response.title;
             document.getElementById('groupAvatar').src = response.avatar ?? "{{asset('assets/images/bot.png')}}";
-            const listBan = JSON.parse(response.list_ban);
 
-            // Đánh dấu các checkbox dựa trên giá trị của list_ban
-            listBan.forEach(permission => {
-                const checkbox = document.getElementById(permission);
+            if(response.list_ban === null) {
+                return;
+            }
+
+            const listBan = JSON.parse(response.list_ban);
+            Object.keys(listBan).forEach(permission => {
+                const checkbox = document.querySelector(`input[name="list_ban[]"][value="${permission}"]`);
                 if (checkbox) {
-                    checkbox.checked = true;
+                    checkbox.checked = !listBan[permission];
                 }
             });
         } catch (error) {
@@ -347,9 +353,9 @@
         document.getElementById(tabId).classList.remove('hidden');
 
         if (tabId === 'analytic') {
-            await analyticScript();
+            analyticScript();
         } else if (tabId === 'policy') {
-            await policyScript();
+            policyScript();
         }
 
         document.querySelectorAll('a[id^="tab-"]').forEach(tabLink => {

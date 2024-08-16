@@ -823,7 +823,7 @@
                                 <td class="py-4">8375687358</td>
                                 <td class="py-4">${formatDate(group.created_at)}</td>
                                 <td class="py-4">
-                                    <button class="text-blue-500 text-[14px] italic hover:underline" id="analyticGroupButton" data-group-id="${group.id}">detail</button>
+                                    <button class="text-blue-500 text-[14px] italic hover:underline" id="detailGroupButton" data-group-id="${group.id}">detail</button>
                                 </td>
                             </tr>
                         `);
@@ -834,9 +834,9 @@
         },
         async groupScript() {
             await scripts.listGroup();
-            $('#analyticGroupButton').on('click', async function() {
+            $('#detailGroupButton').on('click', async function() {
                 const groupId = $(this).data('group-id');
-                window.location.href = `/analytic/${groupId}`;
+                window.location.href = `/manage-group/${groupId}`;
             });
         },
 

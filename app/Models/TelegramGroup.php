@@ -18,6 +18,14 @@ class TelegramGroup extends Model
         'list_ban',
         'ban_expired_at',
     ];
+    const DEFAULT_COMMAND = [
+        '/ban',
+        '/unban',
+        '/mute',
+        '/unmute',
+        '/nolink',
+        '/allowlink'
+    ];
     public function bots()
     {
         return $this->belongsToMany(Bot::class, 'bot_groups', 'group_id', 'bot_id');
