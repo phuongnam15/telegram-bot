@@ -203,7 +203,6 @@
                         <th class="px-4 py-2">Infomation</th>
                         <th class="px-4 py-2">ID</th>
                         <th class="px-4 py-2">Created At</th>
-                        <th class="px-4 py-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="text-sm text-gray-600 text-center">
@@ -807,7 +806,7 @@
 
                 response.data.forEach((group) => {
                     $('#groupTable tbody').append(`
-                            <tr>
+                            <tr class="cursor-pointer hover:bg-gray-100 transition-all duration-200" id="detailGroup" data-group-id="${group.id}">
                                 <td class="flex items-center justify-center gap-2 py-4">
                                     <img class="size-12 rounded-full" src="${group.avatar}" alt="">
                                     <div class="flex flex-col leading-5">
@@ -822,9 +821,6 @@
                                 </td>
                                 <td class="py-4">8375687358</td>
                                 <td class="py-4">${formatDate(group.created_at)}</td>
-                                <td class="py-4">
-                                    <button class="text-blue-500 text-[14px] italic hover:underline" id="detailGroupButton" data-group-id="${group.id}">detail</button>
-                                </td>
                             </tr>
                         `);
                 });
@@ -834,7 +830,7 @@
         },
         async groupScript() {
             await scripts.listGroup();
-            $('#detailGroupButton').on('click', async function() {
+            $('#detailGroup').on('click', async function() {
                 const groupId = $(this).data('group-id');
                 window.location.href = `/manage-group/${groupId}`;
             });
