@@ -874,13 +874,13 @@
             document.getElementById(tabId).classList.remove('hidden');
 
             if (tabId === 'command') {
-                await scripts.commandScript();
+                scripts.commandScript();
             } else if (tabId === 'content') {
-                await scripts.contentScript();
+                scripts.contentScript();
             } else if (tabId === 'group') {
-                await scripts.groupScript();
+                scripts.groupScript();
             } else if (tabId === 'user') {
-                await scripts.userScript();
+                scripts.userScript();
             }
 
             // Update tab styles
