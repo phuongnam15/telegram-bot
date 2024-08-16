@@ -60,6 +60,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('/', [GroupController::class, 'list']);
         Route::get('/{id}', [GroupController::class, 'detail']);
         Route::post('/', [GroupController::class, 'create']);
+        Route::post('/policy', [GroupController::class, 'updateListBan']);
         Route::put('/{id}', [GroupController::class, 'update']);
         Route::delete('/{id}', [GroupController::class, 'delete']);
 

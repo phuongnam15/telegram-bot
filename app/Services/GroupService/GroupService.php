@@ -127,4 +127,48 @@ class GroupService extends BaseService
             return $analytic;
         });
     }
+    public function updateListBan($request)
+    {
+        return DbTransactions()->addCallBackJson(function () use ($request) {
+            $group = TelegramGroup::where('id', $request->group_id)->first();
+
+            if (!$group) {
+                throw new AppServiceException('Group not found');
+            }
+
+            $group->list_ban = $request->list_ban;
+
+            $expiredTime = $request->expired_time;
+            if (preg_match('/(\d+)([smhd])/', $expiredTime, $matches)) {
+                $value = $matches[1];
+                $unit = $matches[2];
+
+                switch ($unit) {
+                    case 's':
+                        $expiredAt = now()->addSeconds($value)->timestamp;
+                        break;
+                    case 'm':
+                        $expiredAt = now()->addMinutes($value)->timestamp;
+                        break;
+                    case 'h':
+                        $expiredAt = now()->addHours($value)->timestamp;
+                        break;
+                    case 'd':
+                        $expiredAt = now()->addDays($value)->timestamp;
+                        break;
+                }
+            }
+
+            $group->ban_expired_at = $expiredAt;
+            $group->save();
+
+            $users = $group->users;
+
+            foreach ($users as $user) {
+                restrictChatMember(json_decode($request->list_ban, true), $group->telegram_id, $user->telegram_id, $expiredAt);
+            }
+
+            return $group;
+        });
+    }
 }

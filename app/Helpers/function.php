@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Ticker;
+use Illuminate\Support\Facades\Http;
 
 if (!function_exists('DbTransactions')) {
     function DbTransactions()
@@ -149,5 +150,38 @@ if (!function_exists('parseOrder')) {
             'TP' => $tp,
             'leverage' => $leverage
         ];
+    }
+}
+
+if (!function_exists('restrictChatMember')) {
+    function restrictChatMember($listBan, $chatId, $userId, $untilDate)
+    {
+        $permissions = [];
+
+        foreach (PERMISSIONS as $permission) {
+            if (in_array($permission, $listBan)) {
+                $permissions[$permission] = true;
+            }
+        }
+
+        if ($permissions == []) {
+            return "No permissions to update.";
+        }
+
+        $url = "https://api.telegram.org/bot6618205269:AAFKAsIcFvHyYAD6RLitdIq1mmr-l3HocTc/restrictChatMember";
+
+        $response = Http::post($url, [
+            'chat_id' => $chatId,
+            'user_id' => $userId,
+            'permissions' => json_encode($permissions),
+            'use_independent_chat_permissions' => true,
+            'until_date' => $untilDate
+        ]);
+
+        if ($response->successful()) {
+            return "Permissions updated successfully for user.";
+        } else {
+            return "Failed to update permissions. Error: " . $response->body();
+        }
     }
 }

@@ -10,11 +10,13 @@ class TelegramGroup extends Model
     use HasFactory;
     protected $table = 'telegram_groups';
     protected $fillable = [
-        'telegram_id', 
+        'telegram_id',
         'name',
         'admin_id',
         'avatar',
-        'title'
+        'title',
+        'list_ban',
+        'ban_expired_at',
     ];
     public function bots()
     {
@@ -27,5 +29,9 @@ class TelegramGroup extends Model
     public function analyticUsers()
     {
         return $this->hasMany(AnalyticGroupUser::class, 'group_id');
+    }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'group_users', 'group_id', 'user_id');
     }
 }

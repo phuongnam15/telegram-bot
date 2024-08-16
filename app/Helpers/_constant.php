@@ -25,3 +25,17 @@ const ALLOW_UPDATE = [
     'chat_member', // Trạng thái của một thành viên trong một cuộc trò chuyện được cập nhật.
     'chat_join_request' // Nhận yêu cầu tham gia trò chuyện mới.
 ];
+
+const PERMISSIONS = [
+    'can_send_messages',
+    'can_send_other_messages',
+    'can_add_web_page_previews',
+    'can_send_audios',
+    'can_send_documents',
+    'can_send_photos',
+    'can_send_videos',
+    'can_send_video_notes',
+    'can_send_voice_notes ',
+    'can_send_polls ',
+    'can_invite_users',
+];

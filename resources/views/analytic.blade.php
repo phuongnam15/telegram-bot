@@ -4,15 +4,29 @@
 
 @section("content")
 <div class="container mx-auto mt-4">
-    <div class="flex flex-col gap-5">
-        <div class="flex items-center gap-2 flex-1 border-b border-gray-200 pb-3">
-            <img class="size-12 rounded-full" src="" alt="" id="groupAvatar">
-            <div class="flex flex-col leading-5">
-                <p class="">
-                    <span class="font-medium text-[15px] tracking-wide font-sans" id="groupName"></span>
-                </p>
-            </div>
+    <div class="flex items-center gap-2 flex-1 border-b border-gray-200 pb-3">
+        <img class="size-12 rounded-full" src="" alt="" id="groupAvatar">
+        <div class="flex flex-col leading-5">
+            <p class="">
+                <span class="font-medium text-[15px] tracking-wide font-sans" id="groupName"></span>
+            </p>
         </div>
+    </div>
+    <div class="my-5 border-b-[1px] border-solid border-gray-200">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+            <li class="me-2">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-analytic">
+                    Analytics
+                </a>
+            </li>
+            <li class="me-2">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-policy">
+                    Policies
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div id="analytic" class="">
         <input type="text" readonly id="litepicker" class="border-gray-300 border outline-none rounded text-center text-[0.8rem] mb-1 focus:border-blue-300 py-1 font-bold font-popi text-gray-600 w-[10rem]">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-10">
             <div class="col-span-1">
@@ -29,11 +43,48 @@
             </div>
         </div>
     </div>
+    <div id="policy" class="hidden">
+        <form id="policyForm">
+            <div>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Can Send Messages</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Can Send Other Messages</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Can Add Web Page Previews</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Can Send Audios</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Can Send Documents</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Can Send Photos</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Can Send Videos</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Can Send Video Notes</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Can Send Voice Notes</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Can Send Polls</label><br>
+                <label><input type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Can Invite Users</label><br>
+            </div>
+
+            <div>
+                <label for="timeAmount">Amount:</label>
+                <input type="number" id="timeAmount" name="timeAmount" min="1" required>
+            </div>
+
+            <div>
+                <label for="timeUnit">Unit:</label>
+                <select id="timeUnit" name="timeUnit" required>
+                    <option value="s">Seconds</option>
+                    <option value="m">Minutes</option>
+                    <option value="h">Hours</option>
+                    <option value="d">Days</option>
+                </select>
+            </div>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
 </div>
 @endsection
 
 @push("scripts")
 <script>
+    const groupId = window.location.pathname.split("/").pop();
+
+    //ANALYTIC script
     const picker = new Litepicker({
         element: document.getElementById('litepicker'),
         plugins: ['ranges'],
@@ -58,7 +109,6 @@
         singleMode: false,
         format: 'MMM DD'
     });
-    const groupId = window.location.pathname.split("/").pop();
 
     const analyticMessage = async (startAt, endAt) => {
         try {
@@ -224,6 +274,51 @@
 
         return formattedData;
     }
+    const analyticScript = async () => {
+        const defaultStartAt = new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
+        const defaultEndAt = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];
+
+        await analyticMessage(defaultStartAt, defaultEndAt);
+        await analyticUser(defaultStartAt, defaultEndAt);
+    }
+
+    //POLICY script
+    const policyScript = async () => {
+        document.getElementById('policyForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData();
+
+            const checkboxes = document.querySelectorAll('input[name="list_ban[]"]:checked');
+            const listBan = Array.from(checkboxes).map(checkbox => checkbox.value);
+
+            const timeAmount = document.getElementById('timeAmount').value;
+            const timeUnit = document.getElementById('timeUnit').value;
+            const expiredTime = timeAmount + timeUnit;
+
+            // console.log('List Ban:', listBan);
+            // console.log('Expired Time:', expiredTime);
+
+            formData.append('list_ban', JSON.stringify(listBan));
+            formData.append('expired_time', expiredTime);
+            formData.append('group_id', groupId);
+
+            try {
+                const response = await fetchClient(`/api/admin/group/policy`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                // console.log(response);
+
+                showNotification('Saved', 'success');
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    }
+
+    //////////////////////////////////////////
     const infoGroup = async () => {
         try {
             const response = await fetchClient(`/api/admin/group/${groupId}`, {
@@ -232,18 +327,51 @@
 
             document.getElementById('groupName').innerText = response.title;
             document.getElementById('groupAvatar').src = response.avatar ?? "{{asset('assets/images/bot.png')}}";
+            const listBan = JSON.parse(response.list_ban);
+
+            // Đánh dấu các checkbox dựa trên giá trị của list_ban
+            listBan.forEach(permission => {
+                const checkbox = document.getElementById(permission);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
         } catch (error) {
             console.error(error);
         }
     }
 
-    $(document).ready(async () => {
-        const defaultStartAt = new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
-        const defaultEndAt = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];
+    const showTab = async (tabId) => {
+        const tabIds = ['analytic', 'policy'];
+        tabIds.forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
 
-        await analyticMessage(defaultStartAt, defaultEndAt);
-        await analyticUser(defaultStartAt, defaultEndAt);
+        if (tabId === 'analytic') {
+            await analyticScript();
+        } else if (tabId === 'policy') {
+            await policyScript();
+        }
+
+        document.querySelectorAll('a[id^="tab-"]').forEach(tabLink => {
+            tabLink.classList.remove('bg-gray-500', 'text-white');
+            tabLink.classList.add('hover:border-gray-400');
+        });
+        document.getElementById('tab-' + tabId).classList.add('bg-gray-500', 'text-white');
+        document.getElementById('tab-' + tabId).classList.remove('hover:border-gray-400');
+    }
+
+    $(document).ready(async () => {
+        $('#tab-analytic').on('click', async (e) => {
+            e.preventDefault();
+            await showTab('analytic');
+        });
+        $('#tab-policy').on('click', async (e) => {
+            e.preventDefault();
+            await showTab('policy');
+        });
+
         await infoGroup();
+        await showTab('policy');
     });
 </script>
 @endpush

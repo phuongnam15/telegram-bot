@@ -11,22 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('telegram_groups', function (Blueprint $table) {
+        Schema::create('group_users', function (Blueprint $table) {
             $table->id();
-            $table->string('telegram_id');
-            $table->string('name');
-            $table->string('avatar')->nullable();
-            $table->string('title')->nullable();
-            $table->json('list_ban')->nullable();
-            $table->bigInteger('ban_expired_at')->nullable();
+            $table->foreignId('group_id')->constrained('telegram_groups')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('telegram_groups');
+        Schema::dropIfExists('group_users');
     }
 };

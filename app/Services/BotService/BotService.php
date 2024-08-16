@@ -11,6 +11,7 @@ use App\Models\BotGroup;
 use App\Models\BotUser;
 use App\Models\Command;
 use App\Models\ContentConfig;
+use App\Models\GroupUser;
 use App\Models\Password;
 use App\Models\PhoneNumber;
 use App\Models\ScheduleDeleteMessage;
@@ -498,6 +499,7 @@ class BotService extends BaseService
                         return;
                     }
 
+                    //update amount user join during the day
                     $analyticGroupUser = AnalyticGroupUser::where([
                         'group_id' => $group->id,
                         'type' => AnalyticGroupUser::TYPE_JOIN
@@ -511,6 +513,34 @@ class BotService extends BaseService
                             'total' => 1,
                             'group_id' => $group->id,
                             'type' => AnalyticGroupUser::TYPE_JOIN
+                        ]);
+                    }
+
+                    //save users and group_users
+                    $user = User::firstOrCreate(
+                        ['telegram_id' => $message['new_chat_member']['id']],
+                        [
+                            'username' => $message['new_chat_member']['username'] ?? "",
+                            'firstname' => $message['new_chat_member']['first_name'] ?? "",
+                            'lastname' => $message['new_chat_member']['last_name'] ?? "",
+                            'telegram_id' => $message['new_chat_member']['id'],
+                            'avatar' => $this->getUserOrBotImage($botToken, $message['new_chat_member']['id'])
+                        ]
+                    );
+
+                    if($group->list_ban) {
+                        $listBan = json_decode($group->list_ban, true);
+                        restrictChatMember($listBan, $group->telegram_id, $user->telegram_id, $group->ban_expired_at);
+                    }
+
+                    $userGroup = GroupUser::where([
+                        'user_id' => $user->id,
+                        'group_id' => $group->id,
+                    ])->first();
+                    if(!$userGroup){
+                        GroupUser::create([
+                            'user_id' => $user->id,
+                            'group_id' => $group->id,
                         ]);
                     }
                 }
@@ -793,7 +823,7 @@ class BotService extends BaseService
                 $query->where('telegram_id', $chatId);
             })->first();
 
-            if(!$botUser) {
+            if (!$botUser) {
                 return;
             }
 

@@ -42,4 +42,8 @@ class GroupController extends Controller
     {
         return $this->service->analyticUser($request);
     }
+    public function updateListBan(Request $request) 
+    {
+        return $this->service->updateListBan($request);
+    }
 }
