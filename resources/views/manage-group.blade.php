@@ -13,15 +13,20 @@
         </div>
     </div>
     <div class="my-5 border-b-[1px] border-solid border-gray-200">
-        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 pb-[0.4rem] font-sans">
             <li class="me-2">
-                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-analytic">
+                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 hover:text-white" id="tab-analytic">
                     Analytics
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-policy">
+                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 hover:text-white" id="tab-policy">
                     Policies
+                </a>
+            </li>
+            <li class="me-2">
+                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 hover:text-white" id="tab-commands">
+                    Commands
                 </a>
             </li>
         </ul>
@@ -76,6 +81,43 @@
             <button type="submit" class="flex items-center gap-1 mt-2 rounded-sm py-[0.5rem] px-3 bg-green-600 text-white hover:bg-gray-500"><i class="fa-solid fa-floppy-disk"></i>Save</button>
         </form>
     </div>
+    <div id="commands" class="hidden">
+        <h1 class="text-lg font-bold font-serif text-gray-700 tracking-wide">Commands</h1>
+        <div class="border border-gray-300 rounded-md mt-4">
+            <div>
+                <button id="ban" class="border-b rounded-t-md w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]">
+                    <h1>/ban</h1>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <p id="toggenContent-ban" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+            </div>
+            <div>
+                <button id="unban" class="border-b border-gray-300 w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]">
+                    <h1>/ban</h1>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <p id="toggenContent-unban" class="hidden p-4">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ban').addEventListener('click', () => {
+            const content = document.getElementById('toggenContent-ban');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+            } else {
+                content.classList.add('hidden');
+            }
+        });
+        document.getElementById('unban').addEventListener('click', () => {
+            const content = document.getElementById('toggenContent-unban');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+            } else {
+                content.classList.add('hidden');
+            }
+        });
+    </script>
 </div>
 @endsection
 
@@ -330,7 +372,7 @@
             document.getElementById('groupName').innerText = response.title;
             document.getElementById('groupAvatar').src = response.avatar ?? "{{asset('assets/images/bot.png')}}";
 
-            if(response.list_ban === null) {
+            if (response.list_ban === null) {
                 return;
             }
 
@@ -347,7 +389,7 @@
     }
 
     const showTab = async (tabId) => {
-        const tabIds = ['analytic', 'policy'];
+        const tabIds = ['analytic', 'policy', 'commands'];
         tabIds.forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById(tabId).classList.remove('hidden');
 
@@ -374,9 +416,13 @@
             e.preventDefault();
             await showTab('policy');
         });
+        $('#tab-commands').on('click', async (e) => {
+            e.preventDefault();
+            await showTab('commands');
+        });
 
         await infoGroup();
-        await showTab('policy');
+        await showTab('commands');
     });
 </script>
 @endpush
