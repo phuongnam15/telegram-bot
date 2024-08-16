@@ -83,39 +83,57 @@
     </div>
     <div id="commands" class="hidden">
         <h1 class="text-lg font-bold font-serif text-gray-700 tracking-wide">Commands</h1>
-        <div class="border border-gray-300 rounded-md mt-4">
+        <div class="border border-gray-300 rounded-md mt-4 font-popi">
             <div>
-                <button id="ban" class="border-b rounded-t-md w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]">
+                <button class="buttonCommand border-b rounded-t-md w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="ban">
                     <h1>/ban</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
                 <p id="toggenContent-ban" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
             <div>
-                <button id="unban" class="border-b border-gray-300 w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]">
-                    <h1>/ban</h1>
+                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="unban">
+                    <h1>/unban</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <p id="toggenContent-unban" class="hidden p-4">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+                <p id="toggenContent-unban" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+            </div>
+            <div>
+                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="mute">
+                    <h1>/mute</h1>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <p id="toggenContent-mute" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+            </div>
+            <div>
+                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="unmute">
+                    <h1>/unmute</h1>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <p id="toggenContent-unmute" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+            </div>
+            <div>
+                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="nolink">
+                    <h1>/nolink</h1>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <p id="toggenContent-nolink" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+            </div>
+            <div>
+                <button class="buttonCommand w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="allowlink">
+                    <h1>/allowlink</h1>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <p id="toggenContent-allowlink" class="hidden p-4">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
         </div>
     </div>
     <script>
-        document.getElementById('ban').addEventListener('click', () => {
-            const content = document.getElementById('toggenContent-ban');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-            } else {
-                content.classList.add('hidden');
-            }
-        });
-        document.getElementById('unban').addEventListener('click', () => {
-            const content = document.getElementById('toggenContent-unban');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-            } else {
-                content.classList.add('hidden');
-            }
+        $('.buttonCommand').click(function() {
+            const target = $(this).data('target');
+            $(this).toggleClass('bg-[#d8e1f7]');
+            $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+            $('#toggenContent-' + target).toggleClass('hidden');
         });
     </script>
 </div>
