@@ -43,38 +43,37 @@
             </div>
         </div>
     </div>
-    <div id="policy" class="hidden">
+    <div id="policy" class="hidden font-popi text-sm">
         <form id="policyForm">
-            <div>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Cannot Send Messages</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Cannot Send Other Messages</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Cannot Add Web Page Previews</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Cannot Send Audios</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Cannot Send Documents</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Cannot Send Photos</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Cannot Send Videos</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Cannot Send Video Notes</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Cannot Send Voice Notes</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Cannot Send Polls</label><br>
-                <label><input type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Cannot Invite Users</label><br>
+            <h1 class="text-lg font-bold font-serif text-gray-700 tracking-wide">Restrict Chat Members</h1>
+            <div class="text-gray-600 leading-3 mt-4">
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Cannot Send Messages</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Cannot Send Other Messages</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Cannot Add Web Page Previews</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Cannot Send Audios</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Cannot Send Documents</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Cannot Send Photos</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Cannot Send Videos</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Cannot Send Video Notes</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Cannot Send Voice Notes</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Cannot Send Polls</label><br>
+                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Cannot Invite Users</label><br>
             </div>
 
             <div>
-                <label for="timeAmount">Amount:</label>
-                <input type="number" id="timeAmount" name="timeAmount" min="1" required>
+                <p class="text-sm">Restrict for</p>
+                <div class="flex">
+                    <input type="number" id="timeAmount" name="timeAmount" min="1" class="max-w-[7rem] text-gray-700 text-sm py-1 px-2 outline-none border border-gray-200" required>
+                    <select id="timeUnit" name="timeUnit" class="max-w-[7rem] py-1 px-2 flex-1 border-t border-b border-r border-gray-200 outline-none text-sm text-gray-500" required>
+                        <option value="s">seconds</option>
+                        <option value="m">minutes</option>
+                        <option value="h">hours</option>
+                        <option value="d">days</option>
+                    </select>
+                </div>
             </div>
 
-            <div>
-                <label for="timeUnit">Unit:</label>
-                <select id="timeUnit" name="timeUnit" required>
-                    <option value="s">Seconds</option>
-                    <option value="m">Minutes</option>
-                    <option value="h">Hours</option>
-                    <option value="d">Days</option>
-                </select>
-            </div>
-
-            <button type="submit">Save</button>
+            <button type="submit" class="flex items-center gap-1 mt-2 rounded-sm py-[0.5rem] px-3 bg-green-600 text-white hover:bg-gray-500"><i class="fa-solid fa-floppy-disk"></i>Save</button>
         </form>
     </div>
 </div>
