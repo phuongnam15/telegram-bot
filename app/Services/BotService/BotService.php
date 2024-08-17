@@ -55,7 +55,7 @@ class BotService extends BaseService
                 $message = $update['chat_member'] ?? $update['message'];
                 $chatId = $message['chat']['id'];
 
-                $this->checkNewMemberToSayHi($message, $adminId, $chatId, $botToken);
+                $this->checkNewMemberToSayGreeting($message, $adminId, $chatId, $botToken);
                 $this->checkMessageContent($message, $chatId, $bot);
             }
 
@@ -631,7 +631,7 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function checkNewMemberToSayHi($message, $adminId, $chatId, $botToken)
+    public function checkNewMemberToSayGreeting($message, $adminId, $chatId, $botToken)
     {
         try {
             if (isset($message['new_chat_member'])) {
