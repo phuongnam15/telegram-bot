@@ -292,6 +292,21 @@ class BotService extends BaseService
             return $bot;
         });
     }
+    public function updatePlatform($id, $request)
+    {
+        return DbTransactions()->addCallbackJson(function () use ($id, $request) {
+            $bot = Bot::find($id);
+
+            if (!$bot) {
+                throw new AppServiceException('Bot not found');
+            }
+
+            $bot->trading_platform = $request->trading_platform;
+            $bot->save();
+
+            return $bot;
+        });
+    }
     public function delete($id)
     {
         $bot = Bot::where(['admin_id' => auth()->user()->id, 'id' => $id])->first();
@@ -668,10 +683,8 @@ class BotService extends BaseService
     public function checkMessageContent($message, $chatId, $bot)
     {
         try {
-            $botToken = $bot->token;
-            $botId = $bot->id;
             $client = new Client([
-                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+                'base_uri' => "https://api.telegram.org/bot{$bot->token}/",
             ]);
 
             if (isset($message['text'])) {
@@ -679,13 +692,13 @@ class BotService extends BaseService
 
                 switch ($text) {
                     case '/start':
-                        $this->startCommandDefaultHandler($message, $botToken, $chatId, $botId);
+                        $this->startCommandDefaultHandler($message, $bot, $chatId);
                         return;
                     case '/trade':
-                        $this->tradeCommanDefaultHandler($chatId, $botId, $botToken);
+                        $this->tradeCommanDefaultHandler($chatId, $bot);
                         return;
                     case '/me':
-                        $this->meCommandDefaultHandler($chatId, $botId, $botToken);
+                        $this->meCommandDefaultHandler($chatId, $bot);
                         return;
                 }
                 if ($bot->is_notify_mode) {
@@ -712,16 +725,19 @@ class BotService extends BaseService
                         ]);
                     }
                 } else {
-                    $this->checkUserStatus($message, $botId, $chatId, $botToken);
+                    $this->checkUserStatus($message, $chatId, $bot);
                 }
             }
         } catch (AppServiceException | \Exception $error) {
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function startCommandDefaultHandler($message, $botToken, $chatId, $botId)
+    public function startCommandDefaultHandler($message, $bot, $chatId)
     {
         try {
+            $botId = $bot->id;
+            $botToken = $bot->token;
+
             if (isset($message['from']['first_name'])) {
                 $firstname = $message['from']['first_name'] ?? null;
             }
@@ -764,9 +780,13 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function tradeCommanDefaultHandler($chatId, $botId, $botToken)
+    public function tradeCommanDefaultHandler($chatId, $bot)
     {
         try {
+            $botId = $bot->id;
+            $botToken = $bot->token;
+            $platform = $bot->trading_platform;
+
             $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
                 $query->where('telegram_id', $chatId);
             })->first();
@@ -782,7 +802,7 @@ class BotService extends BaseService
 
             $client->post('sendMessage', [
                 'json' => [
-                    'text' => "🔄 Bạn vừa chuyển sang chế độ bot nhận đặt lệnh.\n📞 Vui lòng liên hệ admin để kích hoạt đặt lệnh.\n/start để về lại chế độ ban đầu.",
+                    'text' => "🔄 Bạn vừa chuyển sang chế độ bot nhận đặt lệnh.\n📞 Vui lòng liên hệ admin để kích hoạt đặt lệnh.\n🪙 Platform: " . strtoupper($platform) . "\n\n/start để về lại chế độ ban đầu.",
                     'chat_id' => $chatId
                 ]
             ]);
@@ -790,9 +810,12 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function meCommandDefaultHandler($chatId, $botId, $botToken)
+    public function meCommandDefaultHandler($chatId, $bot)
     {
         try {
+            $botId = $bot->id;
+            $botToken = $bot->token;
+
             $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
                 $query->where('telegram_id', $chatId);
             })->first();
@@ -812,9 +835,13 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function checkUserStatus($message, $botId, $chatId, $botToken)
+    public function checkUserStatus($message, $chatId, $bot)
     {
         try {
+            $botId = $bot->id;
+            $platform = $bot->trading_platform;
+            $botToken = $bot->token;
+
             $text = $message['text'];
             $client = new Client([
                 'base_uri' => "https://api.telegram.org/bot{$botToken}/",
@@ -900,21 +927,21 @@ class BotService extends BaseService
                                 switch ($etLength) {
                                     case 1:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                        $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
                                         break;
                                     case 2:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
                                         $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
                                         break;
                                     case 3:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser, $platform);
                                         $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser, $platform);
                                         $data['ET'] = $ets[2];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
                                         break;
                                     default:
                                         break;
@@ -922,7 +949,7 @@ class BotService extends BaseService
                             } else {
                                 $currentPrice = $this->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
                                 $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-                                $this->createOrder($vol, $data, $client, $chatId, $botUser->api_key, $botUser->secret_key, $botUser->passphrase);
+                                $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
                             }
                         }
                     } else {
@@ -969,7 +996,28 @@ class BotService extends BaseService
             hash_hmac('sha256', $stringToSign, $secretKey, true)
         );
     }
-    public function createOrder($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase)
+    public function createOrder($vol, $input, $client, $chatId, $botUser, $platform)
+    {
+        try {
+            $apiKey = $botUser->api_key;
+            $secretKey = $botUser->secret_key;
+            $passphrase = $botUser->passphrase;
+
+            switch ($platform) {
+                case 'bitget':
+                    $this->createOrderBitget($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase);
+                    break;
+                case 'binance':
+                    $this->createOrderBinance($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase);
+                    break;
+                default:
+                    break;
+            }
+        } catch (\Exception $error) {
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function createOrderBitget($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase)
     {
         try {
             $method = "POST";
@@ -1032,6 +1080,7 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
+    public function createOrderBinance($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase) {}
     public function getLatestPriceOfCoin($symbol)
     {
         $response = Http::get("https://api.bitget.com/api/v2/spot/market/tickers?symbol={$symbol}");
@@ -1152,7 +1201,7 @@ class BotService extends BaseService
                             $type = substr($commandType, 1);
                             if ($result) {
                                 sendMessage($chatId, "<strong>$type</strong> <i>$arrayCommandValue[1]</i> success", $botToken);
-                            }else{
+                            } else {
                                 sendMessage($chatId, "<strong>$type</strong> <i>$arrayCommandValue[1]</i> failed", $botToken);
                             }
                         }

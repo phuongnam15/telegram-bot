@@ -81,6 +81,7 @@ Route::middleware('auth:admin')->group(function () {
         });
         Route::get('/', [BotController::class, 'list']);
         Route::get('/{id}', [BotController::class, 'detail']);
+        Route::post('/update-platform/{id}', [BotController::class, 'updatePlatform']);
         Route::post('/{id}', [BotController::class, 'activeBot']);
         Route::post('/', [BotController::class, 'saveBot']);
         Route::put('/{id}', [BotController::class, 'update']);

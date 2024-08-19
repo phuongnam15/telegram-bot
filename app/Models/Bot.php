@@ -19,7 +19,8 @@ class Bot extends Model
         'admin_id',
         'expired_at',
         'avatar',
-        'is_notify_mode'
+        'is_notify_mode',
+        'trading_platform',
     ];
     const STATUS_ACTIVE = true;
     const STATUS_INACTIVE = false;
@@ -31,6 +32,9 @@ class Bot extends Model
         300000 => 180,
         400000 => 365,
     ];
+
+    const TRADING_PLATFORM_BITGET = 'bitget';
+    const TRADING_PLATFORM_BINANCE = 'binance';
 
     function scheduleDeleteMessage()
     {

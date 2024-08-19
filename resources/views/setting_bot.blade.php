@@ -712,7 +712,7 @@
                     },
                 );
 
-                console.log('Success:', response);
+                showNotification('set default success', 'success');
                 await scripts.fetchContent();
             } catch (error) {
                 console.error('Error:', error);
@@ -1133,7 +1133,7 @@
             }
         },
         openAcbPaymentModal(amount, botId) {
-            console.log(amount, botId);
+            // console.log(amount, botId);
 
             const acbQR = `https://apiqr.web2m.com/api/generate/ACB/12515801/PHUNGPHUONGNAM?amount=${amount}&memo=TELEGRAMBOT%${botId}&is_mask=0&bg=0`;
             $('#acbQrCode').attr('src', acbQR);
@@ -1150,7 +1150,7 @@
                 );
 
                 const data = response.data;
-                console.log(data);
+                // console.log(data);
 
                 if (data.status === '1') {
                     showNotification('Bot is active', 'success');

@@ -90,7 +90,6 @@
 @endsection
 @push("scripts")
 <script>
-    const botId = window.location.pathname.split('/').pop();
     const getListUser = async () => {
         try {
             const response = await fetchClient(`/api/admin/bot/user?bot_id=${botId}`, {
@@ -99,7 +98,7 @@
 
             const data = response.data;
 
-            console.log(data);
+            // console.log(data);
 
             $('#listUserTable tbody').empty();
 
