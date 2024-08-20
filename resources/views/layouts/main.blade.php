@@ -21,8 +21,25 @@
 </head>
 
 <body class="font-ubuntu dark:bg-[#1a222d]">
-    <div id="notification" class="hidden fixed left-[50%] -translate-x-[50%] z-20 top-10 rounded-md text-white py-1 px-5 w-fitmx-auto">
-        <p class="text-sm"></p>
+    <div id="toast-element" class="fixed z-40 top-6 -right-full font-popi space-y-2 transition-all duration-500">
+        <div class="max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700" role="alert" tabindex="-1" aria-labelledby="hs-toast-success-example-label">
+            <div class="flex p-4">
+                <div class="shrink-0" id="toast-icon">
+                    <!-- icon svg toast -->
+                </div>
+                <div class="ms-3">
+                    <p id="toast-message" class="text-sm text-gray-700 dark:text-neutral-400 mr-4">
+                        <!-- toast message -->
+                    </p>
+                </div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-success" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-2 h-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
     <div class="" id="root">
         @if (Request::is('coin*'))
