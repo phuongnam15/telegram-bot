@@ -46,4 +46,8 @@ class GroupController extends Controller
     {
         return $this->service->updateListBan($request);
     }
+    public function offRestriction(Request $request) 
+    {
+        return $this->service->offRestriction($request);
+    }
 }

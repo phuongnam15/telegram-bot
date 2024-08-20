@@ -61,6 +61,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('/{id}', [GroupController::class, 'detail']);
         Route::post('/', [GroupController::class, 'create']);
         Route::post('/policy', [GroupController::class, 'updateListBan']);
+        Route::post('/policy/reset', [GroupController::class, 'offRestriction']);
         Route::put('/{id}', [GroupController::class, 'update']);
         Route::delete('/{id}', [GroupController::class, 'delete']);
 

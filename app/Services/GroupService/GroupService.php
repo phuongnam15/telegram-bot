@@ -130,7 +130,9 @@ class GroupService extends BaseService
     public function updateListBan($request)
     {
         return DbTransactions()->addCallBackJson(function () use ($request) {
-            $group = TelegramGroup::where('id', $request->group_id)->first();
+            $input = $request->all();
+
+            $group = TelegramGroup::where('id', $input['group_id'])->first();
 
             if (!$group) {
                 throw new AppServiceException('Group not found');
@@ -148,16 +150,54 @@ class GroupService extends BaseService
 
             $botToken = $bot->token;
 
-            $group->list_ban = $request->list_ban;
+            $group->list_ban = $input['list_ban'];
 
-            $expiredAt = convertBanExpireTime($request->expired_at);
+            $expiredAt = convertBanExpireTime($input['expired_time']);
 
             $group->ban_expired_at = $expiredAt;
             $group->save();
 
             $users = $group->users;
             foreach ($users as $user) {
-                restrictChatMember(json_decode($request->list_ban, true), $group->telegram_id, $user->telegram_id, $expiredAt, $botToken);
+                restrictChatMember(json_decode($input['list_ban'], true), $group->telegram_id, $user->telegram_id, $expiredAt, $botToken);
+            }
+
+            return $group;
+        });
+    }
+    public function offRestriction($request) 
+    {
+        return DbTransactions()->addCallBackJson(function () use ($request) {
+            $input = $request->all();
+
+            $group = TelegramGroup::where('id', $input['group_id'])->first();
+
+            if (!$group) {
+                throw new AppServiceException('Group not found');
+            }
+
+            $bot = $group->bots->first();
+
+            if(!$bot) {
+                throw new AppServiceException('No bot in this group');
+            }
+
+            if(!$bot->status) {
+                throw new AppServiceException('Bot in this group is inactive');
+            }
+
+            $botToken = $bot->token;
+
+            $group->list_ban = null;
+            $group->ban_expired_at = null;
+            $group->save();
+
+            $users = $group->users;
+            
+            $permissions = array_fill_keys(PERMISSIONS, true);
+
+            foreach ($users as $user) {
+                restrictChatMember($permissions, $group->telegram_id, $user->telegram_id, null, $botToken);
             }
 
             return $group;

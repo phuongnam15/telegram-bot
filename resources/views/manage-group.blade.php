@@ -48,21 +48,21 @@
             </div>
         </div>
     </div>
-    <div id="policy" class="hidden font-popi text-sm">
+    <div id="policy" class="hidden font-popi text-sm relative">
         <form id="policyForm">
             <h1 class="text-lg font-bold font-serif text-gray-700 dark:text-gray-300 tracking-wide">Restrict Chat Members</h1>
             <div class="text-gray-600 dark:text-gray-300 leading-3 mt-4">
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Cannot Send Messages</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Cannot Send Other Messages</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Cannot Add Web Page Previews</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Cannot Send Audios</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Cannot Send Documents</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Cannot Send Photos</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Cannot Send Videos</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Cannot Send Video Notes</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Cannot Send Voice Notes</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Cannot Send Polls</label><br>
-                <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Cannot Invite Users</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Cannot Send Messages</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Cannot Send Other Messages</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Cannot Add Web Page Previews</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_audios" value="can_send_audios"> Cannot Send Audios</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_documents" value="can_send_documents"> Cannot Send Documents</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_photos" value="can_send_photos"> Cannot Send Photos</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_videos" value="can_send_videos"> Cannot Send Videos</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_video_notes" value="can_send_video_notes"> Cannot Send Video Notes</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_voice_notes" value="can_send_voice_notes"> Cannot Send Voice Notes</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_polls" value="can_send_polls"> Cannot Send Polls</label><br>
+                <label class="flex items-center gap-1 w-fit"><input class="size-5" type="checkbox" name="list_ban[]" id="can_invite_users" value="can_invite_users"> Cannot Invite Users</label><br>
             </div>
 
             <div>
@@ -77,9 +77,9 @@
                     </select>
                 </div>
             </div>
-
             <button type="submit" class="flex items-center gap-1 mt-2 rounded-sm py-[0.5rem] px-3 bg-green-600 text-white hover:bg-green-500 dark:bg-green-700 dark:hover:bg-green-600"><i class="fa-solid fa-floppy-disk"></i>Save</button>
         </form>
+        <button id="resetButton" class="absolute bottom-0 left-[5rem] flex items-center gap-1 rounded-sm py-[0.5rem] px-3 bg-cyan-500 text-white hover:bg-cyan-400 dark:bg-cyan-600 dark:hover:bg-cyan-500"><i class="fa-solid fa-arrow-rotate-right"></i>Reset</button>
     </div>
     <div id="commands" class="hidden">
         <h1 class="text-lg font-bold font-serif text-gray-700 dark:text-gray-300 tracking-wide">Commands</h1>
@@ -380,6 +380,24 @@
                 console.error(error);
             }
         });
+
+        $('#resetButton').on('click', async (e) => {
+            try{
+                const formData = new FormData();
+                formData.append('group_id', groupId);
+
+                const response = await fetchClient('/api/admin/group/policy/reset', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // console.log(response);
+
+                showNotification('Reseted', 'success');
+            }catch(error){
+                console.log(error);
+            }
+        });
     }
 
     //////////////////////////////////////////
@@ -442,7 +460,7 @@
         });
 
         await infoGroup();
-        await showTab('commands');
+        await showTab('analytic');
     });
 </script>
 @endpush
