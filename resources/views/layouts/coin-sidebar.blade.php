@@ -1,13 +1,9 @@
-<aside class="sticky top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+<aside class="h-screen w-64" aria-label="Sidebar">
     <div class="h-full px-5 py-4 overflow-y-auto border-r border-gray-700 flex flex-col gap-3">
-        <div class="flex gap-2 items-center">
-            <img class="size-12" src="{{asset('/assets/images/money.png')}}" alt="">
-            <span class="text-[#c7aa52] font-bold">Bitcoin</span>
-        </div>
         <ul class="space-y-2 font-medium">
             <li>
                 <a href="#" id="botUserLink" class="flex items-center p-2 rounded-lg hover:bg-[#2a2d35] group text-gray-300">
-                    <svg class="flex-shrink-0 w-5 h-5 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                    <svg class="flex-shrink-0 w-5 h-5 transition duration-75" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
                         <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
                     </svg>
                     <span class="flex-1 ms-3 whitespace-nowrap">Users</span>

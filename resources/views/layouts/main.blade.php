@@ -26,14 +26,14 @@
     </div>
     <div class="" id="root">
         @if (Request::is('coin*'))
-        @include("layouts.coin-sidebar")
+        @include("layouts.header")
         @else
         @include("layouts.navbar")
         @endif
 
-        <main class="w-full">
+        <main class="w-full" id="main">
             @if (Request::is('coin*'))
-            @include("layouts.header")
+            @include("layouts.coin-sidebar")
             @endif
             <div class="w-full flex justify-center">
                 @yield("content")
@@ -46,11 +46,14 @@
 <script>
     const path = window.location.pathname;
     const rootElement = document.getElementById('root');
+    const mainElement = document.querySelector('main');
 
     if (path.startsWith('/coin')) {
-        rootElement.classList.add('flex', 'bg-[#161a1e]');
+        rootElement.classList.add('bg-[#161a1e]');
+        main.classList.add('flex');
     } else {
-        rootElement.classList.remove('flex', 'bg-[#161a1e]');
+        rootElement.classList.remove('bg-[#161a1e]');
+        main.classList.remove('flex');
     }
 </script>
 
