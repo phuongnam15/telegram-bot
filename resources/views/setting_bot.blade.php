@@ -733,18 +733,21 @@
                 });
             });
 
-            $('#showUsersButton').on('click', function() {
+            $('#contentData').on('click', '#showUsersButton', function() {
                 const contentId = $(this).data('content-id');
                 scripts.showUsers(contentId);
             });
-            $('#deleteConfigButton').on('click', function() {
+
+            $('#contentData').on('click', '#deleteConfigButton', function() {
                 const contentId = $(this).data('content-id');
                 scripts.deleteConfig(contentId);
             });
-            $('#updateConfigButton').on('click', function() {
+
+            $('#contentData').on('click', '#updateConfigButton', function() {
                 const contentId = $(this).data('content-id');
                 location.href = `/update/${contentId}`;
             });
+            
             $('#setDefaultButton').on('click', function() {
                 const contentId = $(this).data('content-id');
                 scripts.setDefault(contentId);
