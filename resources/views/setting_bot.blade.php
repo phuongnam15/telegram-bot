@@ -854,7 +854,7 @@
                     $('#userTable tbody').append(`
                         <tr class="${index < (data.length - 1) ? "border-b border-gray-200 dark:border-gray-700" : ""}">
                             <td class="text-blue-500">${user.telegram_id}</td>
-                            <td class="flex justify-center py-3"><img class="size-10 rounded-full" src="${user.avatar ?? "{{ asset('assets/images/bot.png') }}"}" alt=""></td>
+                            <td class="flex justify-center py-3"><img class="size-10 rounded-full" src="${user.avatar ?? "{{ asset('assets/images/profile-account.png') }}"}" alt=""></td>
                             <td>@${user.username}</td>
                             <td>${user.firstname}</td>
                             <td>${user.lastname}</td>
