@@ -106,7 +106,7 @@
                 $('#listUserTable tbody').append(`
                     <tr class="bg-[#1e2026] border-b border-gray-700 hover:bg-gray-900 text-gray-400">
                         <th scope="row" class="flex items-center px-6 py-4 whitespace-nowrap">
-                            <img class="w-10 h-10 rounded-full" src="${user.avatar}" alt="Jese image">
+                            <img class="w-10 h-10 rounded-full" src="${user.avatar ?? "{{ asset('assets/images/profile-account.png') }}"}" alt="Jese image">
                             <div class="ps-3">
                                 <div class="font-semibold">${user.firstname + user.lastname}</div>
                                 <div class="font-normal text-gray-500">@${user.username}</div>
