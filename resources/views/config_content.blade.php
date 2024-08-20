@@ -3,24 +3,24 @@
 @section("title", "Config Content")
 
 @section("content")
-<div class="container relative mx-auto rounded bg-white p-5">
-    <form action="{{ url("/api/posts") }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+<div class="container relative mx-auto rounded bg-white dark:bg-[#1a222d] p-5">
+    <form action="{{ url('/api/posts') }}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
         @csrf
         <div class="flex gap-2 items-stretch h-[50px]">
             <div class="mb-4 flex-1">
-                <input type="text" class="text-gray-500 text-sm h-full form-input w-full rounded border outline-none pl-3" id="name" name="name" required placeholder="name" />
+                <input type="text" class="text-gray-500 dark:bg-gray-800 dark:text-gray-300 text-sm h-full form-input w-full rounded border dark:border-gray-600 outline-none pl-3" id="name" name="name" required placeholder="name" />
             </div>
             <div class="mb-4">
-                <select class="px-2 h-full form-select w-full rounded border text-sm text-gray-500 outline-none" id="type" name="type" required>
+                <select class="px-2 h-full form-select w-full rounded border dark:border-gray-600 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300 outline-none" id="type" name="type" required>
                     <option value="" class="hidden">type content</option>
                     <option value="text">Text</option>
                     <option value="photo">Image</option>
                     <option value="video">Video</option>
                 </select>
             </div>
-    
+
             <div class="mb-4">
-                <select class="px-2 h-full form-select w-full rounded border text-sm text-gray-500 outline-none" id="kind" name="kind" required>
+                <select class="px-2 h-full form-select w-full rounded border dark:border-gray-600 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300 outline-none" id="kind" name="kind" required>
                     <option value="" class="hidden">topic content</option>
                     <option value="introduce">Welcome</option>
                     <option value="button">Click Button</option>
@@ -31,12 +31,12 @@
         </div>
 
         <div class="mb-4">
-            <textarea class="form-input w-full rounded border px-3 py-2" id="content" name="content"></textarea>
+            <textarea class="form-input w-full rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300" id="content" name="content"></textarea>
         </div>
 
         <div class="mb-4">
-            <label for="media" class="font-popi mb-4 text-gray-500 text-xs py-1 px-2 border-[1px] border-solid border-gray-200 rounded-lg">
-                <input type="file" class="form-input w-full rounded border px-3 py-2 hidden" id="media" name="media" />
+            <label for="media" class="font-popi mb-4 text-gray-500 dark:text-gray-300 text-xs py-1 px-2 border dark:border-gray-600 border-gray-200 rounded-md">
+                <input type="file" class="form-input w-full rounded border px-3 py-2 dark:border-gray-600 hidden" id="media" name="media" />
                 <i class="fa-solid fa-image"></i>
                 Upload media
             </label>
@@ -48,20 +48,19 @@
         </div>
 
         <div class="mb-4">
-            <select class="form-select w-full rounded border px-3 py-2 text-sm text-gray-500 outline-none" id="keyboardType" name="keyboardType">
+            <select class="form-select w-full rounded border px-3 py-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 outline-none" id="keyboardType" name="keyboardType">
                 <option value="" class="hidden">type button</option>
                 <option value="inline_keyboard">Inline keyboard</option>
                 <option value="keyboard">Keyboard</option>
-                
             </select>
         </div>
         <div id="buttonsContainer" class="mb-4">
             <!-- Dynamic buttons will be added here -->
         </div>
-        <button type="button" id="addButton" class="mb-4 rounded  py-2 border border-gray-500 px-2 text-sm">
+        <button type="button" id="addButton" class="mb-4 rounded py-2 border border-gray-500 dark:border-gray-600 px-2 text-sm dark:text-gray-300 text-gray-500">
             More button
         </button>
-        <button type="submit" class="rounded bg-gray-600 px-2 border border-gray-600 py-2 text-white text-sm">
+        <button type="submit" class="rounded bg-gray-600 px-2 border border-gray-600 py-2 text-white text-sm dark:bg-gray-700 dark:border-gray-700">
             Create
         </button>
     </form>
@@ -141,17 +140,17 @@
             if (type === 'inline_keyboard') {
                 $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex gap-2">
-                            <input type="text" name="buttons[][text]" placeholder="text" class="form-input w-full border rounded py-1 px-3 text-sm outline-none">
-                            <input type="text" name="buttons[][url]" placeholder="url (optional)" class="form-input w-full border rounded py-1 px-3 text-sm outline-none">
-                            <input type="text" name="buttons[][callback_data]" placeholder="callback data (optional)" class="form-input w-full border rounded py-1 px-3 text-sm outline-none">
+                            <input type="text" name="buttons[][text]" placeholder="text" class="form-input w-full border rounded py-1 px-3 text-sm outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            <input type="text" name="buttons[][url]" placeholder="url (optional)" class="form-input w-full border rounded py-1 px-3 text-sm outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            <input type="text" name="buttons[][callback_data]" placeholder="callback data (optional)" class="form-input w-full border rounded py-1 px-3 text-sm outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                             <button type="button" class="text-red-500 px-2 rounded remove-button"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `);
             } else if (type === 'keyboard') {
                 $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex gap-2">
-                            <input type="text" name="buttons[][text]" placeholder="text" class="form-input w-full border rounded py-1 px-3 outline-none text-sm text-gray-500">
-                            <select name="buttons[][action]" class="form-select w-full border rounded py-1 px-3 outline-none text-sm text-gray-500">
+                            <input type="text" name="buttons[][text]" placeholder="text" class="form-input w-full border rounded py-1 px-3 outline-none text-sm text-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            <select name="buttons[][action]" class="form-select w-full border rounded py-1 px-3 outline-none text-sm text-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                                 <option value="" class="hidden">select action</option>
                                 <option value="contact">request contact</option>
                                 <option value="location">request location</option>
@@ -162,9 +161,9 @@
             } else if (type === 'inline_keyboard_phone_number') {
                 $('#buttonsContainer').append(`
                         <div class="button-group mb-2 flex gap-2">
-                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-input w-full border rounded py-2 px-3">
-                            <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-input w-full border rounded py-2 px-3">
-                            <input type="text" name="buttons[][callback_data]" value="get_phone_number" readOnly class="form-input w-full border rounded py-2 px-3">
+                            <input type="text" name="buttons[][text]" placeholder="Nội dung" class="form-input w-full border rounded py-2 px-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            <input type="text" name="buttons[][url]" placeholder="URL (tuỳ chọn)" class="form-input w-full border rounded py-2 px-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            <input type="text" name="buttons[][callback_data]" value="get_phone_number" readOnly class="form-input w-full border rounded py-2 px-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                             <button type="button" class="text-red-500 px-2 rounded remove-button"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `);

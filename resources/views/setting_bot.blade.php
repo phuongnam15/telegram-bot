@@ -4,30 +4,30 @@
 
 @section("content")
 <div class="container mt-5">
-    <div id="botDetails" class="space-y-1 bg-white font-sans mb-5">
+    <div id="botDetails" class="space-y-1 bg-white font-sans mb-5 dark:bg-[#1a222d]">
         <!-- Bot details will be populated here -->
     </div>
     <input type="text" id="botToken" class="hidden">
     <input type="text" id="botStatus" class="hidden">
-    <div class="mb-5 border-b-[1px] border-solid border-gray-200">
-        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+    <div class="mb-5 border-b border-gray-200 dark:border-gray-700">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
             <li class="me-2">
-                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-command">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 dark:hover:border-gray-500 group" id="tab-command">
                     Command
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-content">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 dark:hover:border-gray-500 group" id="tab-content">
                     Content
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-group">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 dark:hover:border-gray-500 group" id="tab-group">
                     Group
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 group" id="tab-user">
+                <a href="#" class="inline-flex items-center justify-center px-3 py-[5px] border-b-2 border-transparent rounded-t-lg hover:border-gray-400 dark:hover:border-gray-500 group" id="tab-user">
                     User
                 </a>
             </li>
@@ -36,10 +36,10 @@
 
     <!-- command tab list -->
     <div id="command" class="hidden">
-        <div id="botCommands" class="space-y-2 rounded bg-white">
-            <table class="w-full shadow">
-                <thead class="border-b-[1px] border-solid border-gray-300">
-                    <tr class="text-sm font-medium text-gray-600">
+        <div id="botCommands" class="space-y-2 rounded bg-white dark:bg-[#1a222d]">
+            <table class="w-full shadow dark:bg-gray-800">
+                <thead class="border-b-[1px] border-solid border-gray-300 dark:border-gray-600">
+                    <tr class="text-sm font-medium text-gray-600 dark:text-gray-300">
                         <td class="px-4 py-2 text-center">Command</td>
                         <td class="px-4 py-2 text-center">Content Name</td>
                         <td class="px-4 py-2 text-center">Created At</td>
@@ -48,7 +48,7 @@
                 </thead>
                 <tbody id="botCommandsBody"></tbody>
             </table>
-            <button class="transform mb-1 rounded border border-gray-500 bg-gray-500 w-full py-[5px] text-sm font-popi text-white duration-200 hover:border-gray-500 hover:bg-gray-50 hover:text-gray-500" data-toggle="modal" data-target="#newCommandModal">
+            <button class="transform mb-1 rounded border border-gray-500 bg-gray-500 dark:border-gray-600 dark:bg-gray-600 w-full py-[5px] text-sm font-popi text-white duration-200 hover:border-gray-500 hover:bg-gray-50 hover:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-gray-300" data-toggle="modal" data-target="#newCommandModal">
                 New command
             </button>
         </div>
@@ -62,30 +62,30 @@
                 <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">
                     &#8203;
                 </span>
-                <div class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                    <div class="flex flex-row-reverse pr-3 border-b border-gray-200">
+                <div class="inline-block transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
+                    <div class="flex flex-row-reverse pr-3 border-b border-gray-200 dark:border-gray-700">
                         <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal">
                             <span aria-hidden="true" class="text-[20px]">
                                 &times;
                             </span>
                         </button>
                     </div>
-                    <div class="bg-white px-4 pb-3 pt-3">
+                    <div class="bg-white px-4 pb-3 pt-3 dark:bg-gray-800">
                         <div class="sm:flex sm:items-start">
                             <div class="w-full">
                                 <form id="commandForm">
                                     <div class="mb-4">
-                                        <label for="commandInput" class="text-gray-700 font-mono text-sm">
+                                        <label for="commandInput" class="text-gray-700 font-mono text-sm dark:text-gray-300">
                                             Command
                                         </label>
-                                        <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300" id="commandInput" name="commandInput" required placeholder="ex: /start" />
+                                        <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:focus:border-gray-500 dark:focus:ring-gray-600 dark:text-gray-200" id="commandInput" name="commandInput" required placeholder="ex: /start" />
                                     </div>
                                     <div class="mb-4">
-                                        <select id="contentList" class="text-sm outline-none">
+                                        <select id="contentList" class="text-sm outline-none dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
                                             <option value="">-----content----</option>
                                         </select>
                                     </div>
-                                    <button type="submit" class="float-end rounded bg-gray-600 px-4 py-2 text-white">
+                                    <button type="submit" class="float-end rounded bg-gray-600 px-4 py-2 text-white dark:bg-gray-700 dark:hover:bg-gray-600">
                                         Save
                                     </button>
                                 </form>
@@ -104,28 +104,28 @@
                 <div id="contentData" class="w-full overflow-x-auto shadow"></div>
                 <div class="text-left">
                     <div>
-                        <button type="button" class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" id="menu-button">
+                        <button type="button" class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700" id="menu-button">
                             <svg class="h-3 w-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                             </svg>
                         </button>
                     </div>
-                    <div id="menu-content" class="max-h-0 overflow-auto absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-black focus:outline-none">
+                    <div id="menu-content" class="max-h-0 overflow-auto absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-black focus:outline-none">
                         <div class="p-2">
-                            <select id="kindFilter" class="hover:bg-gray-50 cursor-pointer form-control w-full px-4 py-2 outline-none text-sm text-gray-700 border-b border-gray-200">
+                            <select id="kindFilter" class="hover:bg-gray-50 cursor-pointer form-control w-full px-4 py-2 outline-none text-sm text-gray-700 border-b border-gray-200 bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-900">
                                 <option value="" class="hidden">Kind</option>
                                 <option value="Giới thiệu">Introduce</option>
                                 <option value="Click button">Click Button</option>
                                 <option value="Start">Start</option>
                                 <option value="Other">Other</option>
                             </select>
-                            <select id="typeFilter" class="hover:bg-gray-50 cursor-pointer form-control w-full px-4 py-2 outline-none text-sm text-gray-700">
+                            <select id="typeFilter" class="hover:bg-gray-50 cursor-pointer form-control w-full px-4 py-2 outline-none text-sm text-gray-700 bg-transparent dark:text-gray-300 dark:hover:bg-gray-900">
                                 <option value="" class="hidden">Type</option>
                                 <option value="text">Text</option>
                                 <option value="photo">Image</option>
                                 <option value="video">Video</option>
                             </select>
-                            <button class="w-full px-4 py-2 outline-none text-sm text-gray-700 bg-gray-200" id="createNew">
+                            <button class="w-full px-4 py-2 outline-none text-sm text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-300" id="createNew">
                                 New content
                             </button>
                         </div>
@@ -156,36 +156,36 @@
                 <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">
                     &#8203;
                 </span>
-                <div class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
+                <div class="inline-block min-w-[25rem] font-popi transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left align-middle shadow-xl transition-all">
+                    <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5">
+                        <div class="flex items-start">
                             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                                <h5 class="text-lg font-medium leading-6 text-gray-900" id="userModalLabel">
+                                <h5 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-300" id="userModalLabel">
                                     List Users
                                 </h5>
                                 <div class="mt-2">
                                     <!-- <form id="sendUsersForm"> -->
                                     <div class="mb-4">
                                         <input type="hidden" name="content_id" id="contentId" />
-                                        <label class="inline-flex items-center">
-                                            <input type="checkbox" id="selectAllUsers" class="mr-2" />
+                                        <label class="flex items-center gap-1 text-sm dark:text-gray-400">
+                                            <input type="checkbox" id="selectAllUsers" />
                                             Chọn tất cả
                                         </label>
                                     </div>
                                     <div class="mb-4">
-                                        <input type="text" id="userSearch" class="form-control w-full rounded border border-gray-300 p-2" placeholder="Tìm kiếm Telegram ID" />
+                                        <input type="text" id="userSearch" class="form-control w-full rounded border outline-none border-gray-300 p-2 dark:border-gray-800 dark:text-gray-400 text-sm dark:bg-gray-900" placeholder="Tìm kiếm Telegram ID" />
                                     </div>
-                                    <div id="userList" class="text-sm"></div>
+                                    <div id="userList" class="text-sm dark:text-gray-400 tracking-wide"></div>
                                     <!-- </form> -->
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-end gap-2 bg-gray-50 px-4 py-3">
-                        <button type="button" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" data-dismiss="modal">
+                    <div class="flex justify-end gap-2 bg-gray-50 dark:bg-gray-900 px-4 py-3">
+                        <button type="button" class="rounded-md border border-gray-300 bg-white dark:border-gray-400 dark:bg-gray-400 px-4 py-2 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" data-dismiss="modal">
                             Close
                         </button>
-                        <button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white" id="sendContent">
+                        <button type="submit" class="rounded bg-blue-500 dark:bg-blue-600 px-4 py-2 text-white" id="sendContent">
                             Send
                         </button>
                     </div>
@@ -197,15 +197,15 @@
     <!-- group tab list -->
     <div id="group" class="hidden">
         <div class="mt-5">
-            <table class="min-w-full shadow rounded" id="groupTable">
-                <thead class="text-sm text-gray-600 font-mono border-b-[1px] border-solid border-gray-300">
+            <table class="min-w-full shadow rounded dark:bg-gray-800" id="groupTable">
+                <thead class="text-sm text-gray-600 font-mono border-b border-gray-300 dark:border-gray-700 dark:text-gray-300">
                     <tr class="w-full">
                         <th class="px-4 py-2">Infomation</th>
                         <th class="px-4 py-2">ID</th>
                         <th class="px-4 py-2">Created At</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm text-gray-600 text-center">
+                <tbody class="text-sm text-gray-600 text-center dark:text-gray-400">
                     <!-- Rows will be added by jQuery -->
                 </tbody>
             </table>
@@ -215,8 +215,8 @@
     <!-- user tab list -->
     <div id="user" class="hidden">
         <div class="mt-5">
-            <table class="min-w-full shadow rounded" id="userTable">
-                <thead class="text-sm text-gray-600 font-mono border-b border-gray-300">
+            <table class="min-w-full shadow rounded dark:bg-gray-800" id="userTable">
+                <thead class="text-sm text-gray-600 dark:text-gray-300 font-mono border-b border-gray-300 dark:border-gray-700">
                     <tr class="w-full">
                         <th class="px-4 py-2">#</th>
                         <th class="px-4 py-2">Avatar</th>
@@ -226,7 +226,7 @@
                         <th class="px-4 py-2">Started At</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm text-gray-600 text-center font-popi">
+                <tbody class="text-sm text-gray-600 dark:text-gray-400 text-center font-popi">
                 </tbody>
             </table>
         </div>
@@ -239,33 +239,33 @@
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
-            <div class="flex flex-row-reverse pr-3 border-b border-gray-200">
+        <div class="w-full transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all sm:max-w-lg">
+            <div class="flex flex-row-reverse pr-3 border-b border-gray-200 dark:border-gray-700">
                 <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" aria-label="Close" onclick="document.getElementById('scheduleModal').classList.add('hidden')">
                     <span aria-hidden="true" class="text-xl">
                         &times;
                     </span>
                 </button>
             </div>
-            <div class="bg-white px-4 pt-2">
-                <form id="scheduleUpdateForm" class="mb-4">
+            <div class="bg-white dark:bg-gray-800 px-4 pt-2">
+                <form id="scheduleUpdateForm" class="mb-4 text-gray-700 dark:text-gray-300">
                     <input type="hidden" id="scheduleType" />
                     <input type="hidden" id="scheduleId" />
                     <input type="hidden" id="scheduleBotId" />
                     <div class="mb-1">
-                        <label for="scheduleStatus" class="text-sm font-mono tracking-tighter text-gray-700">
+                        <label for="scheduleStatus" class="text-sm font-mono tracking-tighter">
                             Status
                         </label>
-                        <select id="scheduleStatus" name="status" required class="w-full rounded border-[1px] text-sm border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300">
+                        <select id="scheduleStatus" name="status" required class="w-full rounded border text-sm border-gray-300 bg-gray-100 dark:bg-gray-900 dark:border-gray-700 px-2 py-1 outline-none focus:ring-1 focus:ring-gray-300">
                             <option value="on">On</option>
                             <option value="off">Off</option>
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label for="scheduleTime" class="text-sm font-mono tracking-tighter text-gray-700">
+                        <label for="scheduleTime" class="text-sm font-mono tracking-tighter">
                             Delay Time (minutes)
                         </label>
-                        <input type="number" id="scheduleTime" name="delay_time" required class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300" />
+                        <input type="number" id="scheduleTime" name="delay_time" required class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 dark:bg-gray-900 dark:border-gray-700 px-2 py-1 outline-none focus:ring-1 focus:ring-gray-300" />
                     </div>
                     <button type="submit" class="rounded bg-gray-600 px-4 py-1 text-white">
                         Save
@@ -277,25 +277,25 @@
 </div>
 
 <!-- Modal for activating bot -->
-<div class="fixed inset-0 z-10 hidden overflow-y-auto" id="activateBotModal">
+<div class="fixed inset-0 z-10 overflow-y-auto hidden" id="activateBotModal">
     <div class="flex min-h-screen items-center justify-center">
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
-            <div class="bg-gray-200 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
+        <div class="w-full transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all sm:max-w-lg">
+            <div class="bg-gray-200 dark:bg-gray-800 border-b dark:border-gray-700 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
                 <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('activateBotModal').classList.add('hidden')">
-                    <span aria-hidden="true" class="text-[20px]">
+                    <span aria-hidden="true" class="text-[1.5rem]">
                         &times;
                     </span>
                 </button>
             </div>
-            <div class="bg-white px-4 py-5 sm:p-6">
+            <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:p-6">
                 <div class="mb-4">
-                    <label for="monthQty" class="text-sm text-gray-700">
+                    <label for="monthQty" class="text-sm text-gray-700 dark:text-gray-300">
                         Select num of months
                     </label>
-                    <select id="monthQty" class="w-full text-sm rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300">
+                    <select id="monthQty" class="w-full text-sm rounded dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 py-2 border border-gray-300 bg-gray-100 px-2 outline-none focus:border-blue-500">
                         <option value="1" data-price="100000">
                             1 Month - 100,000 đ
                         </option>
@@ -403,12 +403,12 @@
 
                 response.data.forEach(element => {
                     $("#botCommandsBody").append(`
-                        <tr class="border-b-[1px] border-solid border-gray-200">
+                        <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">
                             <td class="px-4 py-2 text-center">${element.command.command}</td>
                             <td class="px-4 py-2 text-center">${element.content.name}</td>
                             <td class="px-4 py-2 text-center">${formatDate(element.created_at)}</td>
                             <td class="px-4 py-2 text-center">
-                                <button class="rounded-md border-[1px] border-solid border-gray-500 px-3 py-1 text-gray-500" data-command-id="${element.id}">
+                                <button class="rounded-md border border-gray-500 px-3 py-1 text-gray-500 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-gray-50 hover:text-gray-700">
                                     delete
                                 </button>
                             </td>
@@ -511,8 +511,8 @@
 
         renderContentList(data) {
             let contentHTML = `
-                            <table class="min-w-full bg-white overflow-hidden">
-                                <thead class="text-gray-600 border-b-[1px] border-solid border-gray-300 font-mono text-[14px]">
+                            <table class="min-w-full bg-white overflow-hidden dark:bg-gray-800">
+                                <thead class="text-gray-600 dark:text-gray-300 border-b border-gray-300 dark:border-gray-700 font-mono text-[14px]">
                                     <tr>
                                         <th class="py-2 px-4">Name</th>
                                         <th class="py-2 px-4">Content</th>
@@ -577,9 +577,9 @@
                 }
 
                 contentHTML += `
-                                <tr class="${index !== data.data.length - 1 ? 'border-b-[1px] border-solid border-gray-100' : ''}">
-                                    <td class="px-4 py-2 text-center text-gray-600 text-sm">${content.name + (content.is_default ? ' <strong>(mặc định)</strong>' : '')}</td>
-                                    <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words font-sans text-gray-600 text-sm">${content.content}</td>
+                                <tr class="${index !== data.data.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''} dark:text-gray-400">
+                                    <td class="px-4 py-2 text-center text-sm">${content.name + (content.is_default ? ' <strong>(mặc định)</strong>' : '')}</td>
+                                    <td class="px-4 py-2 max-w-[600px] min-w-[400px] break-words font-sans text-sm">${content.content}</td>
                                     <td class="px-4 py-2 text-center">${typeBadge}</td>
                                     <td class="px-4 py-2 text-center">${kindBadge}</td>
                                     <td class="px-4 py-2">${mediaHTML}</td>
@@ -641,7 +641,7 @@
                 const response = await fetchClient(`/api/admin/users?bot_id=${botId}`);
 
                 response.data.forEach((user) => {
-                    userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.name} - ${user.telegram_id}</label><br>`;
+                    userListHTML += `<label class="flex items-center gap-1"><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.username}</label>`;
                 });
 
                 document.getElementById('userList').innerHTML =
@@ -659,7 +659,7 @@
                 const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
 
                 response.data.forEach((user) => {
-                    userListHTML += `<label><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label><br>`;
+                    userListHTML += `<label class="flex items-center gap-1"><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label>`;
                 });
 
                 document.getElementById('userList').innerHTML = userListHTML;
@@ -806,7 +806,7 @@
 
                 response.data.forEach((group) => {
                     $('#groupTable tbody').append(`
-                            <tr class="cursor-pointer hover:bg-gray-100 transition-all duration-200" id="detailGroup" data-group-id="${group.id}">
+                            <tr class="cursor-pointer hover:bg-gray-100 dark:hover:bg-[#253142] transition-all duration-200" id="detailGroup" data-group-id="${group.id}">
                                 <td class="flex items-center justify-center gap-2 py-4">
                                     <img class="size-12 rounded-full" src="${group.avatar}" alt="">
                                     <div class="flex flex-col leading-5">
@@ -851,7 +851,7 @@
                     $('#userTable tbody').append(`
                         <tr class="${index < (data.length - 1) ? "border-b border-gray-200" : ""}">
                             <td class="text-blue-500">${user.telegram_id}</td>
-                            <td class="flex justify-center py-1"><img class="size-10 rounded-full" src="${user.avatar}" alt=""></td>
+                            <td class="flex justify-center py-3"><img class="size-10 rounded-full" src="${user.avatar}" alt=""></td>
                             <td>@${user.username}</td>
                             <td>${user.firstname}</td>
                             <td>${user.lastname}</td>
@@ -885,11 +885,12 @@
 
             // Update tab styles
             document.querySelectorAll('a[id^="tab-"]').forEach(tabLink => {
-                tabLink.classList.remove('bg-gray-500', 'text-white');
-                tabLink.classList.add('hover:border-gray-400');
+                tabLink.classList.remove('bg-gray-500', 'text-white', 'dark:bg-gray-700', 'dark:text-gray-300');
+                tabLink.classList.add('hover:border-gray-400', 'dark:hover:border-gray-500');
             });
-            document.getElementById('tab-' + tabId).classList.add('bg-gray-500', 'text-white');
-            document.getElementById('tab-' + tabId).classList.remove('hover:border-gray-400');
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.add('bg-gray-500', 'text-white', 'dark:bg-gray-700', 'dark:text-gray-300');
+            activeTab.classList.remove('hover:border-gray-400', 'dark:hover:border-gray-500');
         },
 
         //BOT script
@@ -907,33 +908,37 @@
 
                 // Hiển thị chi tiết bot lên trang
                 $('#botDetails').html(`
-                            <div class="mb-3 border-[1px] rounded border-solid border-gray-300 px-3 pt-3 pb-1 relative">
+                            <div class="mb-3 border-[1px] rounded border-solid border-gray-300 dark:border-gray-700 px-3 pt-3 pb-1 relative bg-white dark:bg-gray-800">
                                 <img src="${data.avatar ?? "{{ asset('assets/images/bot.png') }}"}" 
                                     class="size-24 rounded-full absolute top-[50%] -translate-y-1/2 -translate-x-1/2 right-0" />
-                                <p class="block text-sm font-medium text-gray-600"><strong>Token:</strong> 
+                                <p class="block text-sm font-medium text-gray-600 dark:text-gray-300">
+                                    <strong>Token:</strong> 
                                     ${data.token}
                                     ${data.status === '1' ? 
-                                        `<button class="bg-gray-700 px-2 -skew-x-[20deg]" onClick="showCoinMode(${data.id})">
+                                        `<button class="bg-gray-700 dark:bg-gray-600 px-2 -skew-x-[20deg]" onClick="showCoinMode(${data.id})">
                                             <span class="text-[#fbc31c] text-md hover:underline">bitcoin</span>
                                         </button>`
                                     :
                                         ""
                                     }
                                 </p>
-                                <p class="block text-sm font-medium text-gray-600"><strong>Username:</strong> @${data.username}</p>
-                                <p class="block text-sm font-medium text-gray-600"><strong>Firstname:</strong> ${data.firstname}</p>
-                                <p class="block text-sm font-medium text-gray-600"><strong>Status:</strong> ${data.status === '1' ? '<i class="text-green-500">activated</i>' : '<i class="text-red-500">not activated</i>'}</p>
-                                <p class="block text-sm font-medium text-gray-600"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
+                                <p class="block text-sm font-medium text-gray-600 dark:text-gray-300"><strong>Username:</strong> @${data.username}</p>
+                                <p class="block text-sm font-medium text-gray-600 dark:text-gray-300"><strong>Firstname:</strong> ${data.firstname}</p>
+                                <p class="block text-sm font-medium text-gray-600 dark:text-gray-300">
+                                    <strong>Status:</strong> 
+                                    ${data.status === '1' ? '<i class="text-green-500">activated</i>' : '<i class="text-red-500">not activated</i>'}
+                                </p>
+                                <p class="block text-sm font-medium text-gray-600 dark:text-gray-300"><strong>Expire:</strong> ${data.expired_at ?? '--'}</p>
                                 <div class="mt-2">
                                     ${data.status === '0' ? 
-                                        `<button class="text-green-500 text-sm italic hover:underline" id="openActivateBotModal">active</button>
-                                        <span>/</span>`
+                                        `<button class="text-green-500 dark:text-green-400 text-sm italic hover:underline" id="openActivateBotModal">active</button>
+                                        <span class="dark:text-gray-300">/</span>`
                                     : 
                                         ""
                                     }
-                                    <button class="text-lime-600 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify (${data.is_notify_mode === "1" ? "on" : "off"})</button>
-                                    <span>/</span>
-                                    <button class="text-red-500 text-sm italic hover:underline" id="deleteBotButton">delete</button>
+                                    <button class="text-lime-600 dark:text-lime-500 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify (${data.is_notify_mode === "1" ? "on" : "off"})</button>
+                                    <span class="dark:text-gray-300">/</span>
+                                    <button class="text-red-500 dark:text-red-400 text-sm italic hover:underline" id="deleteBotButton">delete</button>
                                 </div>
                             </div>
                         `);
@@ -944,21 +949,21 @@
                                 <div class="">
                                     <form id="scheduleForm" class="flex space-x-4 mb-0">
                                         <div class="flex-1 self-end">
-                                            <label for="delay_time" class="block text-xs font-medium text-gray-700">Độ trễ xoá tin (phút)</label>
+                                            <label for="delay_time" class="block text-xs font-medium text-gray-700 dark:text-gray-300">Độ trễ xoá tin (phút)</label>
                                             <input
                                                 type="number"
                                                 id="delay_time"
                                                 name="delay_time"
-                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-gray-300 focus:ring"
+                                                class="text-sm dark:text-white mt-1 outline-none block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 bg-white dark:bg-gray-800 focus:border-white dark:focus:border-gray-500 focus:ring-gray-300 dark:focus:ring-gray-500 focus:ring"
                                                 value="${data.schedule_delete_message.delay_time}"
                                             />
                                         </div>
                                         <div class="flex-1 flex flex-col">
-                                            <label for="status" class="text-xs font-medium text-gray-700">Trạng thái</label>
+                                            <label for="status" class="text-xs font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
                                             <select
                                                 id="status"
                                                 name="status"
-                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 focus:border-white focus:ring-gray-300 focus:ring"
+                                                class="text-sm dark:text-white mt-1 flex-1 outline-none block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 bg-white dark:bg-gray-800 focus:border-white dark:focus:border-gray-500 focus:ring-gray-300 dark:focus:ring-gray-500 focus:ring"
                                             >
                                                 <option value="on" ${data.schedule_delete_message.status === 'on' ? 'selected' : ''}>On</option>
                                                 <option value="off" ${data.schedule_delete_message.status === 'off' ? 'selected' : ''}>Off</option>
@@ -966,7 +971,7 @@
                                         </div>
                                         <button
                                             type="button"
-                                            class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                            class="text-sm dark:border-gray-700 self-end px-2 py-2 border font-medium rounded-full text-gray-300 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-200 hover:border-gray-500 dark:hover:border-gray-400 transform duration-200"
                                             onclick="openScheduleModal('delete_message', ${botId}, ${JSON.stringify(data.schedule_delete_message).replace(/"/g, '&quot;')})"
                                         >
                                             <i class="fa-solid fa-wrench"></i>
@@ -976,7 +981,7 @@
                             `);
                 } else {
                     $('#botDetails').append(`
-                            <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
+                            <div class="bg-[#f8f9fa] dark:bg-[#2d2f34] border-[1px] border-solid border-[#e5e7eb] dark:border-gray-600 rounded py-1 pl-7 space-x-5 text-gray-700 dark:text-gray-300 flex items-center hover:bg-[#ced3dc] dark:hover:bg-[#3a3d42] cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
                                 <i class="fa-solid fa-plus text-[12px]"></i>
                                 <span class="text-[12px] font-medium">Create schedule auto delete message</span>
                             </div>
@@ -988,40 +993,40 @@
                                  <div class="">
                                     <form id="scheduleConfigForm" class="flex space-x-4 mb-0">
                                         <div class="flex-1">
-                                            <label for="config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy user (phút)</label>
+                                            <label for="config_delay_time" class="block text-xs font-medium text-gray-700 dark:text-gray-300">Lịch chạy user (phút)</label>
                                             <input
                                                 type="number"
                                                 id="config_delay_time"
                                                 name="delay_time"
-                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring dark:bg-gray-800 dark:text-gray-200"
                                                 value="${data.schedule_config.time}"
                                             />
                                         </div>
                                         <div class="flex-1 flex flex-col">
-                                            <label for="config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
+                                            <label for="config_status" class="text-xs font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
                                             <select
                                                 id="config_status"
                                                 name="status"
-                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring dark:bg-gray-800 dark:text-gray-200"
                                             >
                                                 <option value="on" ${data.schedule_config.status === 'on' ? 'selected' : ''}>On</option>
                                                 <option value="off" ${data.schedule_config.status === 'off' ? 'selected' : ''}>Off</option>
                                             </select>
                                         </div>
                                         <div class="flex-1">
-                                            <label for="config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
+                                            <label for="config_lastime" class="text-xs font-medium text-gray-700 dark:text-gray-300">Lần cuối chạy</label>
                                             <input
                                                 type="text"
                                                 id="config_lastime"
                                                 name="lastime"
-                                                class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
+                                                class="text-sm outline-none mt-1 block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
                                                 value="${data.schedule_config.lastime}"
                                                 readonly
                                             />
                                         </div>
                                         <button
                                             type="button"
-                                            class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                            class="text-sm dark:border-gray-700 self-end px-2 py-2 border font-medium rounded-full text-gray-300 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-200 hover:border-gray-500 dark:hover:border-gray-400 transform duration-200"
                                             onclick="openScheduleModal('config', ${botId}, ${JSON.stringify(data.schedule_config).replace(/"/g, '&quot;')})"
                                         >
                                             <i class="fa-solid fa-wrench"></i>
@@ -1031,7 +1036,7 @@
                             `);
                 } else {
                     $('#botDetails').append(`
-                            <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('config', ${botId})">
+                            <div class="bg-[#f8f9fa] dark:bg-gray-800 border-[1px] border-solid border-[#e5e7eb] dark:border-gray-600 rounded py-1 pl-7 space-x-5 text-gray-700 dark:text-gray-300 flex items-center hover:bg-[#ced3dc] dark:hover:bg-gray-700 cursor-pointer" onclick="openScheduleModal('config', ${botId})">
                                 <i class="fa-solid fa-plus text-[12px]"></i>
                                 <span class="text-[12px] font-medium">Create schedule auto for user</span>
                             </div>
@@ -1040,43 +1045,43 @@
 
                 if (data.schedule_group_config) {
                     $('#botDetails').append(`
-                                <div>
+                               <div>
                                     <form id="scheduleGroupConfigForm" class="flex space-x-4 mb-0">
                                         <div class="flex-1">
-                                            <label for="group_config_delay_time" class="block text-xs font-medium text-gray-700">Lịch chạy group (phút)</label>
+                                            <label for="group_config_delay_time" class="block text-xs font-medium text-gray-700 dark:text-gray-300">Lịch chạy group (phút)</label>
                                             <input
                                                 type="number"
                                                 id="group_config_delay_time"
                                                 name="delay_time"
-                                                class="text-sm mt-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
+                                                class="text-sm mt-1 outline-none block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring dark:bg-gray-800 dark:text-gray-200"
                                                 value="${data.schedule_group_config.time}"
                                             />
                                         </div>
                                         <div class="flex-1 flex flex-col">
-                                            <label for="group_config_status" class="text-xs font-medium text-gray-700">Trạng thái</label>
+                                            <label for="group_config_status" class="text-xs font-medium text-gray-700 dark:text-gray-300">Trạng thái</label>
                                             <select
                                                 id="group_config_status"
                                                 name="status"
-                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring"
+                                                class="text-sm mt-1 flex-1 outline-none block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 shadow-sm focus:border-white focus:ring-gray-300 focus:ring dark:bg-gray-800 dark:text-gray-200"
                                             >
                                                 <option value="on" ${data.schedule_group_config.status === 'on' ? 'selected' : ''}>On</option>
                                                 <option value="off" ${data.schedule_group_config.status === 'off' ? 'selected' : ''}>Off</option>
                                             </select>
                                         </div>
                                         <div class="flex-1">
-                                            <label for="group_config_lastime" class="text-xs font-medium text-gray-700">Lần cuối chạy</label>
+                                            <label for="group_config_lastime" class="text-xs font-medium text-gray-700 dark:text-gray-300">Lần cuối chạy</label>
                                             <input
                                                 type="text"
                                                 id="group_config_lastime"
                                                 name="lastime"
-                                                class="text-sm outline-none mt-1 block w-full border-gray-300 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 text-gray-600"
+                                                class="text-sm outline-none mt-1 block w-full border-gray-300 dark:border-gray-600 border-[1px] rounded py-1 px-2 shadow-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
                                                 value="${data.schedule_group_config.lastime}"
                                                 readonly
                                             />
                                         </div>
                                         <button
                                             type="button"
-                                            class="text-sm self-end px-2 py-2 border font-medium rounded-full text-gray-300 hover:bg-gray-50 hover:text-gray-500 hover:border-gray-500 transform duration-200"
+                                            class="text-sm dark:border-gray-700 self-end px-2 py-2 border font-medium rounded-full text-gray-300 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-200 hover:border-gray-500 dark:hover:border-gray-400 transform duration-200"
                                             onclick="openScheduleModal('group_config', ${botId}, ${JSON.stringify(data.schedule_group_config).replace(/"/g, '&quot;')})"
                                         >
                                             <i class="fa-solid fa-wrench"></i>
@@ -1086,7 +1091,7 @@
                             `);
                 } else {
                     $('#botDetails').append(`
-                            <div class="bg-[#f8f9fa] border-[1px] border-solid border-[#e5e7eb] rounded py-1 pl-7 space-x-5 text-gray-700 flex items-center hover:bg-[#ced3dc] cursor-pointer" onclick="openScheduleModal('group_config', ${botId})">
+                            <div class="bg-[#f8f9fa] dark:bg-gray-800 border-[1px] border-solid border-[#e5e7eb] dark:border-gray-600 rounded py-1 pl-7 space-x-5 text-gray-700 dark:text-gray-300 flex items-center hover:bg-[#ced3dc] dark:hover:bg-gray-700 cursor-pointer" onclick="openScheduleModal('group_config', ${botId})">
                                 <i class="fa-solid fa-plus text-[12px]"></i>
                                 <span class="text-[12px] font-medium">Create schedule auto for group</span>
                             </div>

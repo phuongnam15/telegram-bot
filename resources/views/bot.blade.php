@@ -5,7 +5,7 @@
 @section("content")
 <div class="container h-8 mt-3 space-y-2">
     <div class="flex flex-col gap-2" id="botList"></div>
-    <div class="bg-gray-300 text-[0.8rem] border border-gray-300 rounded-md py-[0.4rem] font-popi pl-7 space-x-5 text-gray-700 flex items-center hover:bg-white transition-all duration-200 cursor-pointer" data-toggle="modal" data-target="#createBotModal">
+    <div class="bg-gray-300 dark:bg-gray-800 text-[0.8rem] border border-gray-300 dark:border-gray-600 rounded-md py-[0.4rem] font-popi pl-7 space-x-5 text-gray-700 dark:text-gray-300 flex items-center hover:bg-white dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer" data-toggle="modal" data-target="#createBotModal">
         <i class="fa-solid fa-plus"></i>
         <span class="test-sm font-medium">Add new bot</span>
     </div>
@@ -15,25 +15,25 @@
 <div class="fixed inset-0 z-10 overflow-y-auto hidden" id="createBotModal">
     <div class="flex min-h-screen items-center justify-center">
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
         </div>
-        <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
-            <div class="flex flex-row-reverse pr-3 border-b border-gray-100">
-                <button type="button" class="text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('createBotModal').classList.add('hidden')">
+        <div class="w-full transform overflow-hidden rounded bg-white dark:bg-gray-800 shadow-xl transition-all sm:max-w-lg">
+            <div class="flex flex-row-reverse pr-3 border-b border-gray-100 dark:border-gray-700">
+                <button type="button" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:text-gray-700 dark:focus:text-gray-100 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('createBotModal').classList.add('hidden')">
                     <span aria-hidden="true" class="text-xl">
                         &times;
                     </span>
                 </button>
             </div>
-            <div class="bg-white px-4 pt-3 py-1">
+            <div class="bg-white dark:bg-gray-800 px-4 pt-3 py-1">
                 <form id="createBotForm">
                     <div class="mb-4">
-                        <label for="botToken" class="text-sm font-mono text-gray-700">
+                        <label for="botToken" class="text-sm font-mono text-gray-700 dark:text-gray-300">
                             Token
                         </label>
-                        <input type="text" id="botToken" name="token" required class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-[#6c799a]" />
+                        <input type="text" id="botToken" name="token" required class="w-full rounded border-[1px] border-solid border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-[#6c799a] dark:focus:border-gray-100 dark:focus:ring-gray-600" />
                     </div>
-                    <button type="submit" class="rounded bg-[#6c799a] px-4 py-1 text-white">
+                    <button type="submit" class="rounded bg-[#6c799a] px-4 py-1 text-white dark:bg-[#4a536b]">
                         Tạo
                     </button>
                 </form>
@@ -42,44 +42,6 @@
     </div>
 </div>
 
-<!-- Modal for activating bot -->
-<div class="fixed inset-0 z-10 hidden overflow-y-auto" id="activateBotModal">
-    <div class="flex min-h-screen items-center justify-center">
-        <div class="w-full transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:max-w-lg">
-            <div class="bg-gray-200 px-3 py-1 sm:flex sm:flex-row-reverse sm:px-6">
-                <button type="button" class="ml-4 text-gray-500 hover:text-gray-700 focus:text-gray-700 focus:outline-none" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('activateBotModal').classList.add('hidden')">
-                    <span aria-hidden="true" class="text-[20px]">
-                        &times;
-                    </span>
-                </button>
-            </div>
-            <div class="bg-white px-4 py-5 sm:p-6">
-                <div class="mb-4">
-                    <label for="monthQty" class="text-sm font-medium text-gray-700">
-                        Select Number of Months
-                    </label>
-                    <select id="monthQty" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-blue-300">
-                        <option value="1" data-price="10">
-                            1 Month - $10
-                        </option>
-                        <option value="3" data-price="27">
-                            3 Months - $27
-                        </option>
-                        <option value="6" data-price="48">
-                            6 Months - $48
-                        </option>
-                        <option value="12" data-price="90">
-                            12 Months - $90
-                        </option>
-                    </select>
-                </div>
-                <button id="activateBotButton" class="text-md rounded bg-blue-500 px-3 py-1 text-white">
-                    Activate
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push("scripts")
@@ -93,21 +55,21 @@
                 $('#botList').empty();
                 response.forEach((bot) => {
                     $('#botList').append(`
-                        <div class="relative cursor-pointer border border-gray-200 hover:border-gray-300 transition-all duration-150 rounded-md overflow-hidden bg-[#f8f8f8] flex items-center" onClick="showDetailBot(${bot.id})">
-                            <span class="size-2 top-1 left-1 rounded-full absolute border border-gray-300 ${bot.status === '1' ? 'bg-green-400' : 'bg-red-400'}"></span>
-                            <div class="flex items-center gap-2 flex-1 hover:bg-gray-100 transition-all duration-150 py-2 px-3">
+                        <div class="relative cursor-pointer border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-150 rounded-md overflow-hidden bg-[#f8f8f8] dark:bg-[#1a1a1a] flex items-center" onClick="showDetailBot(${bot.id})">
+                            <span class="size-2 top-1 left-1 rounded-full absolute border border-gray-300 dark:border-gray-600 ${bot.status === '1' ? 'bg-green-400' : 'bg-red-400'}"></span>
+                            <div class="flex items-center gap-2 flex-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-150 py-2 px-3">
                                 <img class="size-12 rounded-full" src="${bot.avatar ?? "{{ asset('assets/images/bot.png') }}"}" alt="">
                                 <div class="flex flex-col leading-5">
                                     <p class="">
-                                        <span class="font-medium text-[15px] tracking-wide font-sans">${bot.firstname}</span>
+                                        <span class="font-medium text-[15px] tracking-wide font-sans text-gray-900 dark:text-gray-100">${bot.firstname}</span>
                                     </p>
-                                    <p class="text-gray-500 flex items-center gap-1">
+                                    <p class="text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                         <span class="text-sm">@${bot.username}</span>
                                         <i class="fa-brands fa-telegram"></i>
                                     </p>
                                 </div>
                             </div>
-                            <i class="fa-solid fa-ellipsis-vertical px-5"></i>
+                            <i class="fa-solid fa-ellipsis-vertical px-5 dark:text-gray-400"></i>
                         </div>
                     `);
                 });

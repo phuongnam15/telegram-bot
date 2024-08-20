@@ -4,54 +4,54 @@
 
 @section("content")
 <div class="container mx-auto mt-4">
-    <div class="flex items-center gap-2 flex-1 border-b border-gray-200 pb-3">
+    <div class="flex items-center gap-2 flex-1 border-b border-gray-200 pb-3 dark:border-gray-600">
         <img class="size-12 rounded-full" src="" alt="" id="groupAvatar">
         <div class="flex flex-col leading-5">
             <p class="">
-                <span class="font-medium text-[15px] tracking-wide font-sans" id="groupName"></span>
+                <span class="font-medium text-[1rem] dark:text-gray-300 tracking-wide font-sans" id="groupName"></span>
             </p>
         </div>
     </div>
-    <div class="my-5 border-b-[1px] border-solid border-gray-200">
-        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 pb-[0.4rem] font-sans">
+    <div class="my-5 border-b-[1px] border-solid border-gray-200 dark:border-gray-600">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-300 pb-[0.4rem] font-sans">
             <li class="me-2">
-                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 hover:text-white" id="tab-analytic">
+                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 dark:hover:bg-gray-900 hover:text-white" id="tab-analytic">
                     Analytics
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 hover:text-white" id="tab-policy">
+                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 dark:hover:bg-gray-900 hover:text-white" id="tab-policy">
                     Policies
                 </a>
             </li>
             <li class="me-2">
-                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 hover:text-white" id="tab-commands">
+                <a href="#" class="inline-flex items-center text-sm justify-center px-3 py-[0.2rem] rounded-2xl hover:bg-gray-400 dark:hover:bg-gray-900 hover:text-white" id="tab-commands">
                     Commands
                 </a>
             </li>
         </ul>
     </div>
     <div id="analytic" class="">
-        <input type="text" readonly id="litepicker" class="border-gray-300 border outline-none rounded text-center text-[0.8rem] mb-1 focus:border-blue-300 py-1 font-bold font-popi text-gray-600 w-[10rem]">
+        <input type="text" readonly id="litepicker" class="border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 border outline-none rounded text-center text-[0.8rem] mb-1 focus:border-blue-300 py-1 font-bold font-popi text-gray-600 w-[10rem]">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-10">
             <div class="col-span-1">
-                <h1 class="text-gray-600 text-[0.9rem] mb-2 font-popi font-bold">Messages</h1>
+                <h1 class="text-gray-600 dark:text-gray-300 text-[0.9rem] mb-2 font-popi font-bold">Messages</h1>
                 <canvas id="messageChart"></canvas>
             </div>
             <div class="col-span-1">
-                <h1 class="text-gray-600 text-[0.9rem] mb-2 font-popi font-bold">New users</h1>
+                <h1 class="text-gray-600 dark:text-gray-300 text-[0.9rem] mb-2 font-popi font-bold">New users</h1>
                 <canvas id="userJoin"></canvas>
             </div>
             <div class="col-span-1">
-                <h1 class="text-gray-600 text-[0.9rem] mb-2 font-popi font-bold">Users left</h1>
+                <h1 class="text-gray-600 dark:text-gray-300 text-[0.9rem] mb-2 font-popi font-bold">Users left</h1>
                 <canvas id="userLeft"></canvas>
             </div>
         </div>
     </div>
     <div id="policy" class="hidden font-popi text-sm">
         <form id="policyForm">
-            <h1 class="text-lg font-bold font-serif text-gray-700 tracking-wide">Restrict Chat Members</h1>
-            <div class="text-gray-600 leading-3 mt-4">
+            <h1 class="text-lg font-bold font-serif text-gray-700 dark:text-gray-300 tracking-wide">Restrict Chat Members</h1>
+            <div class="text-gray-600 dark:text-gray-300 leading-3 mt-4">
                 <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_messages" value="can_send_messages"> Cannot Send Messages</label><br>
                 <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_send_other_messages" value="can_send_other_messages"> Cannot Send Other Messages</label><br>
                 <label class="flex items-center gap-1"><input class="size-5" type="checkbox" name="list_ban[]" id="can_add_web_page_previews" value="can_add_web_page_previews"> Cannot Add Web Page Previews</label><br>
@@ -66,10 +66,10 @@
             </div>
 
             <div>
-                <p class="text-sm">Restrict for</p>
+                <p class="text-sm dark:text-gray-300">Restrict for</p>
                 <div class="flex">
-                    <input type="number" id="timeAmount" name="timeAmount" min="1" class="max-w-[7rem] text-gray-700 text-sm py-1 px-2 outline-none border border-gray-200" required>
-                    <select id="timeUnit" name="timeUnit" class="max-w-[7rem] py-1 px-2 flex-1 border-t border-b border-r border-gray-200 outline-none text-sm text-gray-500" required>
+                    <input type="number" id="timeAmount" name="timeAmount" min="1" class="max-w-[7rem] text-gray-700 text-sm py-1 px-2 outline-none border border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300" required>
+                    <select id="timeUnit" name="timeUnit" class="max-w-[7rem] py-1 px-2 flex-1 border-t border-b border-r border-gray-200 outline-none text-sm text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300" required>
                         <option value="s">seconds</option>
                         <option value="m">minutes</option>
                         <option value="h">hours</option>
@@ -78,49 +78,49 @@
                 </div>
             </div>
 
-            <button type="submit" class="flex items-center gap-1 mt-2 rounded-sm py-[0.5rem] px-3 bg-green-600 text-white hover:bg-gray-500"><i class="fa-solid fa-floppy-disk"></i>Save</button>
+            <button type="submit" class="flex items-center gap-1 mt-2 rounded-sm py-[0.5rem] px-3 bg-green-600 text-white hover:bg-green-500 dark:bg-green-700 dark:hover:bg-green-600"><i class="fa-solid fa-floppy-disk"></i>Save</button>
         </form>
     </div>
     <div id="commands" class="hidden">
-        <h1 class="text-lg font-bold font-serif text-gray-700 tracking-wide">Commands</h1>
-        <div class="border border-gray-300 rounded-md mt-4 font-popi">
+        <h1 class="text-lg font-bold font-serif text-gray-700 dark:text-gray-300 tracking-wide">Commands</h1>
+        <div class="border border-gray-300 dark:border-gray-600 rounded-md mt-4 font-popi dark:text-gray-300">
             <div>
-                <button class="buttonCommand border-b rounded-t-md w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="ban">
+                <button class="buttonCommand dark:border-gray-600 border-b rounded-t-md w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7] dark:focus:ring-[#8790a4] dark:hover:text-gray-900 dark:hover:bg-[#8790a4]" data-target="ban">
                     <h1>/ban</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <p id="toggenContent-ban" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+                <p id="toggenContent-ban" class="hidden p-4 border-b border-t border-gray-300 dark:border-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
             <div>
-                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="unban">
+                <button class="buttonCommand dark:border-gray-600 border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7] dark:focus:ring-[#8790a4] dark:hover:text-gray-900 dark:hover:bg-[#8790a4]" data-target="unban">
                     <h1>/unban</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <p id="toggenContent-unban" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+                <p id="toggenContent-unban" class="hidden p-4 border-b border-t border-gray-300 dark:border-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
             <div>
-                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="mute">
+                <button class="buttonCommand dark:border-gray-600 border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7] dark:focus:ring-[#8790a4] dark:hover:text-gray-900 dark:hover:bg-[#8790a4]" data-target="mute">
                     <h1>/mute</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <p id="toggenContent-mute" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+                <p id="toggenContent-mute" class="hidden p-4 border-b border-t border-gray-300 dark:border-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
             <div>
-                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="unmute">
+                <button class="buttonCommand dark:border-gray-600 border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7] dark:focus:ring-[#8790a4] dark:hover:text-gray-900 dark:hover:bg-[#8790a4]" data-target="unmute">
                     <h1>/unmute</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <p id="toggenContent-unmute" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+                <p id="toggenContent-unmute" class="hidden p-4 border-b border-t border-gray-300 dark:border-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
             <div>
-                <button class="buttonCommand border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="nolink">
+                <button class="buttonCommand dark:border-gray-600 border-b w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7] dark:focus:ring-[#8790a4] dark:hover:text-gray-900 dark:hover:bg-[#8790a4]" data-target="nolink">
                     <h1>/nolink</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <p id="toggenContent-nolink" class="hidden p-4 border-b border-t border-gray-300">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
+                <p id="toggenContent-nolink" class="hidden p-4 border-b border-t border-gray-300 dark:border-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis mollitia asperiores magnam sit optio ea illum tempora a necessitatibus impedit dignissimos dolor ipsam dolore provident exercitationem soluta dolorem, dolorum deserunt.</p>
             </div>
             <div>
-                <button class="buttonCommand w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7]" data-target="allowlink">
+                <button class="buttonCommand dark:border-gray-600 w-full p-4 hover:bg-[#d8e1f7] flex justify-between items-center focus:ring-4 focus:ring-[#d8e1f7] dark:focus:ring-[#8790a4] dark:hover:text-gray-900 dark:hover:bg-[#8790a4]" data-target="allowlink">
                     <h1>/allowlink</h1>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
@@ -132,6 +132,8 @@
         $('.buttonCommand').click(function() {
             const target = $(this).data('target');
             $(this).toggleClass('bg-[#d8e1f7]');
+            $(this).toggleClass('dark:text-gray-900');
+            $(this).toggleClass('dark:bg-[#8790a4]');
             $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
             $('#toggenContent-' + target).toggleClass('hidden');
         });

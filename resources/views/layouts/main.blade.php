@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" class="">
 
 <head>
     <meta charset="UTF-8" />
@@ -20,9 +20,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-ubuntu">
+<body class="font-ubuntu dark:bg-[#1a222d]">
     <div id="notification" class="hidden fixed left-[50%] -translate-x-[50%] z-20 top-10 rounded-md text-white py-1 px-5 w-fitmx-auto">
-        <p class="text-sm">phuong nam</p>
+        <p class="text-sm"></p>
     </div>
     <div class="" id="root">
         @if (Request::is('coin*'))
