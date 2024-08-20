@@ -78,50 +78,52 @@ if (!function_exists('determineVol')) {
 if (!function_exists('parseOrder')) {
     function parseOrder($text)
     {
-        // Chuyển đoạn văn bản về dạng chuẩn (lowercase, xóa các khoảng trắng thừa)
+        // Normalize the text (lowercase, remove excess whitespace)
         $normalizedText = strtolower(trim($text));
 
-        // Định nghĩa các mẫu Regular Expressions
-        $coinPattern = '/^([a-zA-Z0-9]+)([\s\-])/i'; // Lấy tên đồng coin từ đầu văn bản
-        $orderTypePattern = '/(short|long|buy|sell)\s*(limit)?/i'; // Kiểu lệnh và "limit"
-        $etPattern = '/et[\s:]*([\d\.\-\s]+)/i'; // Giá vào lệnh (có thể cách nhau bởi dấu " " hoặc "-")
-        $slPattern = '/stl[\s:]*([\d\.]+)|sl[\s:]*([\d\.]+)/i'; // Giá stop loss hoặc stop loss viết tắt
-        $tpPattern = '/tp[\s:]*([\d\.]+)/i'; // Giá take profit
-        $leveragePattern = '/(\d+)x|x(\d+)/i'; // Mẫu để tìm leverage
+        // Define Regular Expressions
+        $coinPattern = '/^([a-zA-Z0-9]+)([\s\-])/i'; // Extract coin name from the beginning of the text
+        $orderTypePattern = '/(short|long|buy|sell)/i'; // Order type (short, long, buy, sell)
+        $limitPattern = '/\blimit\b/i'; // Separate pattern to check for "limit"
+        $etPattern = '/et[\s:]*([\d\.,\- ]+)/i'; // Entry price (can be separated by " " or "-")
+        $slPattern = '/stl[\s:]*([\d\.,]+)|sl[\s:]*([\d\.,]+)/i'; // Stop loss or short stop loss
+        $tpPattern = '/tp[\s:]*([\d\.,]+)/i'; // Take profit price
+        $leveragePattern = '/(\d+)x|x(\d+)/i'; // Pattern to find leverage
 
-        // Kiểm tra các thông tin từ văn bản
+        // Extract information from the text
         $coinMatch = preg_match($coinPattern, $normalizedText, $coinMatches);
         $orderTypeMatch = preg_match($orderTypePattern, $normalizedText, $orderTypeMatches);
+        $limitMatch = preg_match($limitPattern, $normalizedText, $limitMatches);
         $etMatch = preg_match($etPattern, $normalizedText, $etMatches);
         $slMatch = preg_match($slPattern, $normalizedText, $slMatches);
         $tpMatch = preg_match($tpPattern, $normalizedText, $tpMatches);
         $leverageMatch = preg_match($leveragePattern, $normalizedText, $leverageMatches);
 
-        // Lấy các thông tin từ kết quả khớp
+        // Extract values from the matches
         $coin = $coinMatch ? $coinMatches[1] : null;
         $orderType = $orderTypeMatch ? $orderTypeMatches[1] : null;
-        $isLimit = isset($orderTypeMatches[2]) ? true : false;
+        $isLimit = $limitMatch ? true : false;
 
-        // Xử lý giá trị ET
+        // Process ET values (multiple ETs allowed, separated by space or hyphen)
         $et = [];
         if ($etMatch) {
             $etValues = preg_split('/[\s\-]+/', trim($etMatches[1]));
-            $et = array_filter($etValues, fn($value) => !empty($value));
+            $et = array_map(fn($value) => str_replace(',', '.', trim($value)), array_filter($etValues, fn($value) => !empty($value)));
         }
 
-        // Xử lý giá trị SL
-        $sl = $slMatch ? trim($slMatches[1] ?: $slMatches[2]) : null;
+        // Process SL value
+        $sl = $slMatch ? str_replace(',', '.', trim($slMatches[1] ?: $slMatches[2])) : null;
 
-        // Xử lý giá trị TP
-        $tp = $tpMatch ? trim($tpMatches[1]) : null;
+        // Process TP value
+        $tp = $tpMatch ? str_replace(',', '.', trim($tpMatches[1])) : null;
 
-        // Lấy giá trị leverage (đòn bẩy)
+        // Extract leverage value
         $leverage = null;
         if ($leverageMatch) {
             $leverage = $leverageMatches[1] ? $leverageMatches[1] : $leverageMatches[2];
         }
 
-        // Kiểm tra nếu các thông tin cần thiết có mặt
+        // Validate necessary information
         if (!$orderType || !$sl || !$tp || ($isLimit && empty($et)) || (count($et) > 3)) {
             return false;
         }
@@ -136,7 +138,7 @@ if (!function_exists('parseOrder')) {
             }
         }
 
-        // Chuyển đổi kiểu lệnh nếu cần
+        // Convert order type if needed
         if ($orderType == 'short') {
             $orderType = 'sell';
         } else if ($orderType == 'long') {
