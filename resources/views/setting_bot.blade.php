@@ -78,11 +78,11 @@
                                         <label for="commandInput" class="text-gray-700 font-mono text-sm dark:text-gray-300">
                                             Command
                                         </label>
-                                        <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:focus:border-gray-500 dark:focus:ring-gray-600 dark:text-gray-200" id="commandInput" name="commandInput" required placeholder="ex: /start" />
+                                        <input type="text" class="w-full rounded border-[1px] border-solid border-gray-300 bg-gray-100 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:focus:border-gray-500 dark:focus:ring-gray-600 dark:text-gray-200" id="commandInput" name="commandInput" required placeholder="eg: /start" />
                                     </div>
                                     <div class="mb-4">
                                         <select id="contentList" class="text-sm outline-none dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                                            <option value="">-----content----</option>
+                                            <option value="#" class="hidden">-----content----</option>
                                         </select>
                                     </div>
                                     <button type="submit" class="float-end rounded bg-gray-600 px-4 py-2 text-white dark:bg-gray-700 dark:hover:bg-gray-600">
@@ -160,20 +160,20 @@
                     <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5">
                         <div class="flex items-start">
                             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                                <h5 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-300" id="userModalLabel">
+                                <h5 class="text-lg font-bold font-sans text-gray-600 leading-6 dark:text-gray-300" id="userModalLabel">
                                     List Users
                                 </h5>
                                 <div class="mt-2">
                                     <!-- <form id="sendUsersForm"> -->
                                     <div class="mb-4">
-                                        <input type="hidden" name="content_id" id="contentId" />
-                                        <label class="flex items-center gap-1 text-sm dark:text-gray-400">
-                                            <input type="checkbox" id="selectAllUsers" />
-                                            Chọn tất cả
-                                        </label>
+                                        <input type="text" id="userSearch" class="form-control w-full rounded border outline-none border-gray-300 p-2 dark:border-gray-800 dark:text-gray-400 text-sm dark:bg-gray-900" placeholder="Search by ID" />
                                     </div>
-                                    <div class="mb-4">
-                                        <input type="text" id="userSearch" class="form-control w-full rounded border outline-none border-gray-300 p-2 dark:border-gray-800 dark:text-gray-400 text-sm dark:bg-gray-900" placeholder="Tìm kiếm Telegram ID" />
+                                    <div class="mb-2">
+                                        <input type="hidden" name="content_id" id="contentId" />
+                                        <label class="flex items-center gap-1 text-sm dark:text-gray-400 w-fit font-medium text-gray-500">
+                                            <input type="checkbox" id="selectAllUsers" />
+                                            Select all
+                                        </label>
                                     </div>
                                     <div id="userList" class="text-sm dark:text-gray-400 tracking-wide"></div>
                                     <!-- </form> -->
@@ -429,7 +429,7 @@
 
         async listContentName() {
             try {
-                $("#contentList").html('<option value="">-----content----</option>');
+                $("#contentList").html('<option value="" class="hidden">-----content----</option>');
 
                 const response = await fetchClient(`/api/admin/list?bot_id=${botId}`, {
                     method: "GET"
@@ -641,7 +641,7 @@
                 const response = await fetchClient(`/api/admin/users?bot_id=${botId}`);
 
                 response.data.forEach((user) => {
-                    userListHTML += `<label class="flex items-center gap-1"><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.username}</label>`;
+                    userListHTML += `<label class="flex font-medium text-gray-500 items-center gap-1"><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.username}</label>`;
                 });
 
                 document.getElementById('userList').innerHTML =
@@ -659,7 +659,7 @@
                 const response = await fetchClient(`/api/admin/group?bot_id=${botId}`);
 
                 response.data.forEach((user) => {
-                    userListHTML += `<label class="flex items-center gap-1"><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label>`;
+                    userListHTML += `<label class="flex items-center font-medium text-gray-500 gap-1"><input type="checkbox" class="user-checkbox" name="user_ids[]" value="${user.telegram_id}"> ${user.telegram_id} - ${user.name}</label>`;
                 });
 
                 document.getElementById('userList').innerHTML = userListHTML;
@@ -1188,7 +1188,7 @@
     $(document).ready(async () => {
 
         // Initial load
-        await scripts.showTab('user');
+        await scripts.showTab('command');
         await scripts.getDetailBot();
 
         //event listeners

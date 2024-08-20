@@ -41,19 +41,19 @@
                 <form id="updateUserForm">
                     <div class="mb-4">
                         <label for="riskTolerance" class="block mb-2 text-sm">Risk Tolerance</label> 
-                        <input type="text" id="riskTolerance" name="riskTolerance" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input placeholder="enter your risk level eg: 10" type="text" id="riskTolerance" name="riskTolerance" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
                         <label for="apiKey" class="block mb-2 text-sm">API key</label>
-                        <input type="text" id="apiKey" name="apiKey" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input placeholder="your api key eg: bg_e955d8b656ty56gyH97c5b4c4d283e83" type="text" id="apiKey" name="apiKey" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
                         <label for="secretKey" class="block mb-2 text-sm">Secret key</label>
-                        <input type="text" id="secretKey" name="secretKey" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input placeholder="your secret key eg: cec36ffa45990dfb50d853ee8faf18e8640f32f75af8ed2b0" type="text" id="secretKey" name="secretKey" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
                         <label for="passphrase" class="block mb-2 text-sm">Passphrase</label>
-                        <input type="text" id="passphrase" name="passphrase" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input placeholder="your passphrase eg: 12345678" type="text" id="passphrase" name="passphrase" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="flex justify-end space-x-2">
                         <button type="button" class="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700" onclick="closeUpdateUserModal()">Cancel</button>
@@ -76,7 +76,7 @@
                 <form id="activateUserForm">
                     <div class="mb-4">
                         <label for="activationMonths" class="block mb-2 text-sm">Number of Months</label>
-                        <input type="number" id="activationMonths" name="months" min="1" max="12" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input placeholder="enter the duration in months eg: 12" type="number" id="activationMonths" name="months" min="1" max="12" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="flex justify-end space-x-2">
                         <button type="button" class="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700" onclick="closeActivateUserModal()">Cancel</button>

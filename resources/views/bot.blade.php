@@ -31,10 +31,10 @@
                         <label for="botToken" class="text-sm font-mono text-gray-700 dark:text-gray-300">
                             Token
                         </label>
-                        <input type="text" id="botToken" name="token" required class="w-full rounded border-[1px] border-solid border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-2 py-1 outline-none focus:border-white focus:ring-1 focus:ring-[#6c799a] dark:focus:border-gray-100 dark:focus:ring-gray-600" />
+                        <input placeholder="bot token (e.g., 123456789:ABCdefGhIJKlmnOPQRSTuvwxYZ)" type="text" id="botToken" name="token" required class="text-sm w-full rounded border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 p-2 outline-none focus:border-white focus:ring-1 focus:ring-[#6c799a] dark:focus:border-gray-100 dark:focus:ring-gray-600" />
                     </div>
                     <button type="submit" class="rounded bg-[#6c799a] px-4 py-1 text-white dark:bg-[#4a536b]">
-                        Tạo
+                        Create
                     </button>
                 </form>
             </div>
