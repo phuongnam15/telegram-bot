@@ -1064,7 +1064,7 @@ class BotService extends BaseService
             } else {
                 $client->post('sendMessage', [
                     'json' => [
-                        'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
+                        'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
                         'chat_id' => $chatId
                     ]
                 ]);
