@@ -897,7 +897,7 @@ class BotService extends BaseService
                         if (!$data) {
                             $client->post('sendMessage', [
                                 'json' => [
-                                    'text' => "❗️ Cú pháp của bạn không đúng ❗️\n\nĐể đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000 (entry)\n- SL: 49000 (stoploss)\n- TP: 51000 (takeprofit)\n- x10 (đòn bẩy)\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
+                                    'text' => "❗️ Cú pháp của bạn không đúng ❗️\n\nĐể đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000\n- SL: 49000\n- TP: 51000\n- x10\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
                                     'chat_id' => $chatId
                                 ]
                             ]);
