@@ -705,24 +705,12 @@ class BotService extends BaseService
                     if ($chatId == $bot->admin->telegram_id) {
                         $users = $bot->users->where('telegram_id', '!=', $bot->admin->telegram_id);
                         foreach ($users as $user) {
-                            $client->post('sendMessage', [
-                                'json' => [
-                                    'text' => "<strong>👩‍🎤 From Admin</strong>" . "\n" . $text,
-                                    'chat_id' => $user->telegram_id,
-                                    'parse_mode' => 'HTML'
-                                ]
-                            ]);
+                            sendMessage($user->telegram_id, $bot->token, "<strong>👩‍🎤 From Admin</strong>" . "\n" . $text);
                         }
                     } else {
                         $user = User::where('telegram_id', $chatId)->first();
                         $username = $user->username === "" ? $user->firstname . $user->lastname : "@" . $user->username;
-                        $client->post('sendMessage', [
-                            'json' => [
-                                'text' => "<i>{$username}</i>" . "\n" . $text,
-                                'chat_id' => $bot->admin->telegram_id,
-                                'parse_mode' => 'HTML'
-                            ]
-                        ]);
+                        sendMessage($bot->admin->telegram_id, $bot->token, "<i>{$username}</i>" . "\n" . $text);
                     }
                 } else {
                     $this->checkUserStatus($message, $chatId, $bot);
@@ -776,6 +764,9 @@ class BotService extends BaseService
                 $botUser->status = 'start';
                 $botUser->save();
             }
+
+            $name = $firstname . " " . $lastname;
+            sendMessage($chatId, $botToken, "👋 <strong>$name</strong>");
         } catch (\Exception $error) {
             throw new AppServiceException($error->getMessage());
         }
@@ -1023,7 +1014,9 @@ class BotService extends BaseService
             $method = "POST";
             $api = "/api/v2/mix/order/place-order";
             $timestamp = round(microtime(true) * 1000);
-            $size = ($vol * $input['leverage']) / $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
+            $lastPrice = $this->getLatestPriceOfCoin(strtoupper($input['coin']) . "USDT");
+            $size = ($vol * $input['leverage']) / $lastPrice;
+
             $data = [
                 "symbol" => strtoupper($input['coin']) . "USDT",
                 "productType" => "usdt-futures",
@@ -1064,7 +1057,7 @@ class BotService extends BaseService
             if ($result['code'] === "00000") {
                 $client->post('sendMessage', [
                     'json' => [
-                        'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "") . "" . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
+                        'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "" . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
                         'chat_id' => $chatId
                     ]
                 ]);
@@ -1237,21 +1230,4 @@ class BotService extends BaseService
             return false;
         }
     }
-    // public function test() 
-    // {
-    //     $timestamp = round(microtime(true) * 1000);
-    //     $accessSign = $this->generateSignature($timestamp, "GET", "/api/mix/v1/market/contracts", "?productType=usdt-futures&symbol=RENDERUSDT", "", "cec36ffa450a5053a6791d01b990dfb50d853ee8faf18e8640f32f75af8ed2b0");
-        
-    //     $response = Http::withHeaders([
-    //         'ACCESS-KEY' => "bg_e955d8b6561ca7f2a97c5b4c4d283e83",
-    //         'ACCESS-SIGN' => $accessSign,
-    //         'ACCESS-PASSPHRASE' => "13572468",
-    //         'ACCESS-TIMESTAMP' => $timestamp,
-    //         'locale' => 'en-US',
-    //         'Content-Type' => 'application/json',
-
-    //     ])->get("https://api.bitget.com/api/v2/mix/market/contracts?productType=usdt-futures&symbol=RENDERUSDT");
-
-    //     return json_decode($response->body(), true);
-    // }
 }
