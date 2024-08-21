@@ -47,15 +47,15 @@ class BotService extends BaseService
 
             // logger($update);
 
-            $this->checkIsUserMessage($update);
-            $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
-            $this->checkCommandGroup($update, $botToken);
+            // $this->checkIsUserMessage($update);
+            // $this->checkJoinLeftGroup($update, $botId, $botToken, $adminId);
+            // $this->checkCommandGroup($update, $botToken);
 
             if (array_key_exists('message', $update) || array_key_exists('chat_member', $update)) {
                 $message = $update['chat_member'] ?? $update['message'];
                 $chatId = $message['chat']['id'];
 
-                $this->checkNewMemberToSayGreeting($message, $adminId, $chatId, $botToken);
+                // $this->checkNewMemberToSayGreeting($message, $adminId, $chatId, $botToken);
                 $this->checkMessageContent($message, $chatId, $bot);
             }
 
@@ -1029,7 +1029,7 @@ class BotService extends BaseService
                 "productType" => "usdt-futures",
                 "marginMode" => "crossed",
                 "marginCoin" => "USDT",
-                "size" => round($size, 2),
+                "size" => round($size, 4),
                 "side" => $input['orderType'],
                 "tradeSide" => "open",
                 "orderType" => $input['isLimit'] ? "limit" : "market",
@@ -1087,7 +1087,7 @@ class BotService extends BaseService
 
         return json_decode($response->body(), true)['data'][0]['lastPr'];
     }
-    public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase, $leverageLevels = [])
+    public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase, $leverageLevels)
     {
         $method = "POST";
         $api = "/api/v2/mix/account/set-leverage";
@@ -1237,4 +1237,21 @@ class BotService extends BaseService
             return false;
         }
     }
+    // public function test() 
+    // {
+    //     $timestamp = round(microtime(true) * 1000);
+    //     $accessSign = $this->generateSignature($timestamp, "GET", "/api/mix/v1/market/contracts", "?productType=usdt-futures&symbol=RENDERUSDT", "", "cec36ffa450a5053a6791d01b990dfb50d853ee8faf18e8640f32f75af8ed2b0");
+        
+    //     $response = Http::withHeaders([
+    //         'ACCESS-KEY' => "bg_e955d8b6561ca7f2a97c5b4c4d283e83",
+    //         'ACCESS-SIGN' => $accessSign,
+    //         'ACCESS-PASSPHRASE' => "13572468",
+    //         'ACCESS-TIMESTAMP' => $timestamp,
+    //         'locale' => 'en-US',
+    //         'Content-Type' => 'application/json',
+
+    //     ])->get("https://api.bitget.com/api/v2/mix/market/contracts?productType=usdt-futures&symbol=RENDERUSDT");
+
+    //     return json_decode($response->body(), true);
+    // }
 }
