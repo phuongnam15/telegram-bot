@@ -71,7 +71,7 @@ if (!function_exists('sanitizeHtml')) {
 if (!function_exists('determineVol')) {
     function determineVol($et, $sl, $leverage, $r)
     {
-        $result = $r / $leverage / (abs($et - $sl) / $et);
+        $result = floatval(str_replace(',', '.', $r)) / $leverage / (abs($et - $sl) / $et);
         return $result;
     }
 }
