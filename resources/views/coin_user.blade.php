@@ -112,6 +112,7 @@
     const renderUserList = (data, keyword = "") => {
         try {
             $('#listUserTable tbody').empty();
+            $('#pagination').empty();
 
             data.data.forEach((user, index) => {
                 $('#listUserTable tbody').append(`
