@@ -145,7 +145,8 @@
 
             if (data.last_page > 1) {
                 for (let i = 1; i <= data.last_page; i++) {
-                    paginationHTML += `<button class="bg-[#2a2d35] hover:bg-[#2d313a] text-gray-200 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
+                    const isActive = (i === data.current_page) ? 'bg-[#4a4f58]' : 'bg-[#2a2d35]';
+                    paginationHTML += `<button class="${isActive} hover:bg-[#2d313a] text-gray-200 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
                 }
                 document.getElementById('pagination').innerHTML = paginationHTML;
             }
