@@ -47,9 +47,9 @@ class UpdateAvatarTelegramEntities extends Command
             }
 
             foreach ($users as $user) {
-                $bot = $user->bots;
+                $bots = $user->bots;
 
-                if($bot->isEmpty()) {
+                if($bots->isEmpty()) {
                     continue;
                 }
 
