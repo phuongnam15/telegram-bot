@@ -109,7 +109,7 @@
         }
     }
 
-    const renderUserList = (data, keyword) => {
+    const renderUserList = (data, keyword = "") => {
         try {
             $('#listUserTable tbody').empty();
 
@@ -156,7 +156,7 @@
         }
     }
 
-    const fetchPage = async (page, keyword) => {
+    const fetchPage = async (page, keyword = "") => {
         try {
             const response = await fetchClient(
                 `/api/admin/bot/user?bot_id=${botId}&page=${page}&keyword=${keyword}`, {
