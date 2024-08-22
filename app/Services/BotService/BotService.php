@@ -327,7 +327,7 @@ class BotService extends BaseService
 
             $bot = Bot::where('id', request()->bot_id)->first();
 
-            $users = $bot->users;
+            $users = $bot->users()->paginate(DEFAULT_PAGINATE);
 
             return $users;
         });

@@ -1,4 +1,4 @@
-<aside class="h-screen w-64" aria-label="Sidebar">
+<aside class="min-h-screen w-64" aria-label="Sidebar">
     <div class="h-full px-5 py-4 overflow-y-auto border-r border-gray-700 flex flex-col gap-3">
         <ul class="space-y-2 font-medium">
             <li>

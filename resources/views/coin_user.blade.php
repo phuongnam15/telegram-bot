@@ -27,6 +27,7 @@
         <tbody>
         </tbody>
     </table>
+    <div id="pagination" class="mt-3"></div>
 </div>
 
 <input type="text" id="pivotId" class="hidden">
@@ -40,7 +41,7 @@
             <div class="px-6 py-4">
                 <form id="updateUserForm">
                     <div class="mb-4">
-                        <label for="riskTolerance" class="block mb-2 text-sm">Risk Tolerance</label> 
+                        <label for="riskTolerance" class="block mb-2 text-sm">Risk Tolerance</label>
                         <input placeholder="enter your risk level eg: 10" type="text" id="riskTolerance" name="riskTolerance" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
@@ -98,11 +99,20 @@
 
             const data = response.data;
 
-            // console.log(data);
+            // console.log(response);
 
+            renderUserList(data);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const renderUserList = (data) => {
+        try {
             $('#listUserTable tbody').empty();
 
-            data.forEach(user => {
+            data.data.forEach(user => {
                 $('#listUserTable tbody').append(`
                     <tr class="bg-[#1e2026] border-b border-gray-700 hover:bg-gray-900 text-gray-400">
                         <th scope="row" class="flex items-center px-6 py-4 whitespace-nowrap">
@@ -130,11 +140,31 @@
                     </tr>`)
             });
 
+            // Render pagination
+            let paginationHTML = '';
+
+            if (data.last_page > 1) {
+                for (let i = 1; i <= data.last_page; i++) {
+                    paginationHTML += `<button class="bg-[#2a2d35] hover:bg-[#2d313a] text-gray-200 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
+                }
+                document.getElementById('pagination').innerHTML = paginationHTML;
+            }
         } catch (error) {
             console.log(error);
         }
     }
 
+    const fetchPage = async (page) => {
+        try {
+            const response = await fetchClient(
+                `/api/admin/bot/user?bot_id=${botId}&page=${page}`,
+            );
+
+            renderUserList(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const openUpdateUserModal = (pivotId, riskTolerance, apiKey, secretKey, passphrase) => {
         $('#pivotId').val(pivotId);
@@ -168,7 +198,7 @@
         formData.append('passphrase', $('#passphrase').val());
         formData.append('id', $('#pivotId').val());
 
-        try{
+        try {
             const response = await fetchClient(`/api/admin/bot/user`, {
                 method: 'POST',
                 body: formData
@@ -189,7 +219,7 @@
         formData.append('id', $('#pivotId').val());
         formData.append('months', $('#activationMonths').val());
 
-        try{
+        try {
             const response = await fetchClient(`/api/admin/bot/user/active`, {
                 method: 'POST',
                 body: formData
