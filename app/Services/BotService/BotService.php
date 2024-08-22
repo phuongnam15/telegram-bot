@@ -327,7 +327,13 @@ class BotService extends BaseService
 
             $bot = Bot::where('id', request()->bot_id)->first();
 
-            $users = $bot->users()->paginate(DEFAULT_PAGINATE);
+            $users = $bot->users();
+
+            if(request()->has('keyword')) {
+                $users = $users->where('firstname', 'like', '%' . request()->keyword . '%');
+            }
+
+            $users = $users->paginate(DEFAULT_PAGINATE);
 
             return $users;
         });

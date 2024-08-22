@@ -4,6 +4,7 @@
 
 @section("content")
 <div class="container mt-4">
+    <input type="text" id="keyword" class="bg-[#1e2026] border border-gray-700 text-sm float-end mb-1 pl-2 py-1 outline-none text-gray-300 font-popi" placeholder="search name">
     <table class="w-full text-sm text-left rtl:text-right" id="listUserTable">
         <thead class="text-xs text-gray-300 uppercase bg-[#2a2d35]">
             <tr>
@@ -91,9 +92,9 @@
 @endsection
 @push("scripts")
 <script>
-    const getListUser = async () => {
+    const getListUser = async (keyword = "") => {
         try {
-            const response = await fetchClient(`/api/admin/bot/user?bot_id=${botId}`, {
+            const response = await fetchClient(`/api/admin/bot/user?bot_id=${botId}&keyword=${keyword}`, {
                 method: 'GET',
             });
 
@@ -101,20 +102,20 @@
 
             // console.log(response);
 
-            renderUserList(data);
+            renderUserList(data, keyword);
 
         } catch (error) {
             console.log(error);
         }
     }
 
-    const renderUserList = (data) => {
+    const renderUserList = (data, keyword) => {
         try {
             $('#listUserTable tbody').empty();
 
-            data.data.forEach(user => {
+            data.data.forEach((user, index) => {
                 $('#listUserTable tbody').append(`
-                    <tr class="bg-[#1e2026] border-b border-gray-700 hover:bg-gray-900 text-gray-400">
+                    <tr class="bg-[#1e2026] ${index === (data.data.length - 1) ? '' : 'border-b border-gray-700'} hover:bg-gray-900 text-gray-400">
                         <th scope="row" class="flex items-center px-6 py-4 whitespace-nowrap">
                             <img class="w-10 h-10 rounded-full" src="${user.avatar ?? "{{ asset('assets/images/profile-account.png') }}"}" alt="Jese image">
                             <div class="ps-3">
@@ -146,7 +147,7 @@
             if (data.last_page > 1) {
                 for (let i = 1; i <= data.last_page; i++) {
                     const isActive = (i === data.current_page) ? 'bg-[#4a4f58]' : 'bg-[#2a2d35]';
-                    paginationHTML += `<button class="${isActive} hover:bg-[#2d313a] text-gray-200 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i})">${i}</button>`;
+                    paginationHTML += `<button class="${isActive} hover:bg-[#2d313a] text-gray-200 text-sm py-1 px-3 rounded mr-1" onclick="fetchPage(${i}, ${keyword})">${i}</button>`;
                 }
                 document.getElementById('pagination').innerHTML = paginationHTML;
             }
@@ -155,10 +156,12 @@
         }
     }
 
-    const fetchPage = async (page) => {
+    const fetchPage = async (page, keyword) => {
         try {
             const response = await fetchClient(
-                `/api/admin/bot/user?bot_id=${botId}&page=${page}`,
+                `/api/admin/bot/user?bot_id=${botId}&page=${page}&keyword=${keyword}`, {
+                    method: 'GET',
+                }
             );
 
             renderUserList(response.data);
@@ -235,9 +238,18 @@
 
     });
 
-
     $(document).ready(async () => {
         await getListUser();
+
+        const debouncedGetListUser = debounce(
+            function() {
+                const keyword = $('#keyword').val();
+                getListUser(keyword);
+            },
+            500
+        );
+
+        $('#keyword').on('input', debouncedGetListUser);
     });
 </script>
 @endpush
