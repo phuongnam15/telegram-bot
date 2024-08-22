@@ -13,10 +13,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('app:auto-send')->everyMinute();
+        // $schedule->command('app:auto-send')->everyMinute();
         $schedule->command('bot:check-expire')->everyMinute();
         $schedule->command('tele:update-avatar')->daily();
-        $schedule->command('app:bank-check')->everyMinute();
+        // $schedule->command('app:bank-check')->everyMinute();
     }
 
     /**
