@@ -683,10 +683,6 @@ class BotService extends BaseService
     public function checkMessageContent($message, $chatId, $bot)
     {
         try {
-            $client = new Client([
-                'base_uri' => "https://api.telegram.org/bot{$bot->token}/",
-            ]);
-
             if (isset($message['text'])) {
                 $text = $message['text'];
 
@@ -972,6 +968,7 @@ class BotService extends BaseService
                     break;
             }
         } catch (\Exception $error) {
+            sendMessage($chatId, $botToken, "<i>Đã có lỗi xảy ra</i>");
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -1077,6 +1074,10 @@ class BotService extends BaseService
     public function getLatestPriceOfCoin($symbol)
     {
         $response = Http::get("https://api.bitget.com/api/v2/spot/market/tickers?symbol={$symbol}");
+
+        if(json_decode($response->body(), true)['code'] !== "00000") {
+            throw new AppServiceException("Error get latest price of coin");
+        }
 
         return json_decode($response->body(), true)['data'][0]['lastPr'];
     }
