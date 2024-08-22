@@ -848,7 +848,7 @@
                     method: 'GET',
                 });
 
-                const data = response.data;
+                const data = response.data.data;
 
                 data.forEach((user, index) => {
                     $('#userTable tbody').append(`
