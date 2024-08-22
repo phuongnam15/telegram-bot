@@ -1014,7 +1014,7 @@ class BotService extends BaseService
             $method = "POST";
             $api = "/api/v2/mix/order/place-order";
             $timestamp = round(microtime(true) * 1000);
-            $lastPrice = $this->getLatestPriceOfCoin(strtoupper(preg_replace('/^\d+[eE]?\d*\s*/', '', $input['coin'])) . "USDT");
+            $lastPrice = $this->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $input['coin'])) . "USDT");
             $size = ($vol * $input['leverage']) / $lastPrice;
 
             $data = [
