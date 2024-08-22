@@ -562,6 +562,7 @@ class BotService extends BaseService
                 }
             }
         } catch (\Exception $error) {
+            logger($error->getLine());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -643,6 +644,7 @@ class BotService extends BaseService
                 }
             }
         } catch (AppServiceException | \Exception $error) {
+            logger($error->getLine());
             throw new AppServiceException($error->getMessage());
         }
     }
@@ -1203,6 +1205,7 @@ class BotService extends BaseService
                 }
             }
         } catch (AppServiceException $error) {
+            logger($error->getLine());
             throw new AppServiceException($error->getMessage());
         }
     }
