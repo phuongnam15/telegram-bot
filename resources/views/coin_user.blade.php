@@ -15,6 +15,9 @@
                     Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-center">
+                    Platform
+                </th>
+                <th scope="col" class="px-6 py-3 text-center">
                     Risk Tolerance
                 </th>
                 <th scope="col" class="px-6 py-3 text-center">
@@ -129,6 +132,13 @@
                                 <div class="h-2.5 w-2.5 rounded-full ${user.pivot.is_actived ? "bg-green-500" : "bg-red-500"} me-2"></div> ${user.pivot.is_actived ? "Active" : "Inactive"}
                             </div>
                         </td>
+                        <td class="px-6 py-4 text-center">
+                            <select class="outline-none p-2 bg-gray-800 text-white rounded-lg platform-select" data-user-id="${user.id}" data-original-platform="${user.pivot.trading_platform}">
+                                <option value="bitget" ${user.pivot.trading_platform === "bitget" ? "selected" : ""}>BITGET</option>
+                                <option value="binance" ${user.pivot.trading_platform === "binance" ? "selected" : ""}>BINANCE</option>
+                                <option value="bibyt" ${user.pivot.trading_platform === "bibyt" ? "selected" : ""}>BIBYT</option>
+                            </select>
+                        </td>
                         <td class="px-6 py-4 text-center">${user.pivot.risk_tolerance ?? ""}</td>
                         <td class="px-6 py-4 text-center">${user.pivot.expired_at ? formatDate(user.pivot.expired_at) : ""}</td>
                         <td class="px-6 py-4 space-x-2 text-center">
@@ -238,6 +248,41 @@
         }
 
     });
+
+    $(document).on('change', '.platform-select', async function() {
+        const selectElement = $(this);
+        const userId = selectElement.data('user-id');
+        const originalPlatform = selectElement.data('original-platform');
+        const newPlatform = selectElement.val();
+
+        const confirm = window.confirm('Are you sure you want to change the trading platform?');
+
+        if (!confirm) {
+            selectElement.val(originalPlatform);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('trading_platform', newPlatform);
+        formData.append('bot_id', botId);
+
+        try {
+            await fetchClient(`/api/admin/bot/user/update-platform`, {
+                method: 'POST',
+                body: formData
+            });
+
+            selectElement.data('original-platform', newPlatform);
+
+            showNotification('Platform updated successfully', 'success');
+        } catch (error) {
+            selectElement.val(originalPlatform);
+            console.error(error);
+            showNotification('Failed to update platform', 'error');
+        }
+    });
+
 
     $(document).ready(async () => {
         await getListUser();

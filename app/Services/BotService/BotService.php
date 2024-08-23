@@ -292,19 +292,19 @@ class BotService extends BaseService
             return $bot;
         });
     }
-    public function updatePlatform($id, $request)
+    public function updateUserTradingPlatform($request)
     {
-        return DbTransactions()->addCallbackJson(function () use ($id, $request) {
-            $bot = Bot::find($id);
-
-            if (!$bot) {
-                throw new AppServiceException('Bot not found');
+        return DbTransactions()->addCallbackJson(function () use ($request) {
+            $botUser = BotUser::where(['bot_id' => $request->bot_id, 'user_id' => $request->user_id])->first();
+            
+            if (!$botUser) {
+                throw new AppServiceException('Bot user not found');
             }
 
-            $bot->trading_platform = $request->trading_platform;
-            $bot->save();
+            $botUser->trading_platform = $request->trading_platform;
+            $botUser->save();
 
-            return $bot;
+            return $botUser;
         });
     }
     public function delete($id)
@@ -780,7 +780,6 @@ class BotService extends BaseService
         try {
             $botId = $bot->id;
             $botToken = $bot->token;
-            $platform = $bot->trading_platform;
 
             $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
                 $query->where('telegram_id', $chatId);
@@ -797,7 +796,7 @@ class BotService extends BaseService
 
             $client->post('sendMessage', [
                 'json' => [
-                    'text' => "🔄 Bạn vừa chuyển sang chế độ bot nhận đặt lệnh.\n📞 Vui lòng liên hệ admin để kích hoạt đặt lệnh.\n🪙 Platform: " . strtoupper($platform) . "\n\n/start để về lại chế độ ban đầu.",
+                    'text' => "🔄 Bạn vừa chuyển sang chế độ bot nhận đặt lệnh.\n📞 Vui lòng liên hệ admin để kích hoạt đặt lệnh.\n\n/start để về lại chế độ ban đầu.",
                     'chat_id' => $chatId
                 ]
             ]);
@@ -834,7 +833,6 @@ class BotService extends BaseService
     {
         try {
             $botId = $bot->id;
-            $platform = $bot->trading_platform;
             $botToken = $bot->token;
 
             $text = $message['text'];
@@ -850,6 +848,7 @@ class BotService extends BaseService
                 return;
             }
 
+            $platform = $botUser->trading_platform;
             $status = $botUser->status;
 
             switch ($status) {

@@ -46,7 +46,7 @@ class BotController extends Controller
   public function update($id) {
     return $this->botService->updateBot($id);
   }
-  public function updatePlatform($id, Request $request) {
-    return $this->botService->updatePlatform($id, $request);
+  public function updateUserTradingPlatform(Request $request) {
+    return $this->botService->updateUserTradingPlatform($request);
   }
 }

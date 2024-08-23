@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bots', function (Blueprint $table) {
+        Schema::table('bot_users', function (Blueprint $table) {
             $table->string('trading_platform')->default('bitget');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bots', function (Blueprint $table) {
+        Schema::table('bot_users', function (Blueprint $table) {
             $table->dropColumn('trading_platform');
         });
     }

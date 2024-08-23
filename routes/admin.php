@@ -79,10 +79,10 @@ Route::middleware('auth:admin')->group(function () {
             Route::get('/', [BotController::class, 'listUser']);
             Route::post('/', [UserController::class, 'update']);
             Route::post('/active', [UserController::class, 'active']);
+            Route::post('/update-platform', [BotController::class, 'updateUserTradingPlatform']);
         });
         Route::get('/', [BotController::class, 'list']);
         Route::get('/{id}', [BotController::class, 'detail']);
-        Route::post('/update-platform/{id}', [BotController::class, 'updatePlatform']);
         Route::post('/{id}', [BotController::class, 'activeBot']);
         Route::post('/', [BotController::class, 'saveBot']);
         Route::put('/{id}', [BotController::class, 'update']);
