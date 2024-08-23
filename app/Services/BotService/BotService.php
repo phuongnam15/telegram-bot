@@ -754,15 +754,9 @@ class BotService extends BaseService
             $botId = $bot->id;
             $botToken = $bot->token;
 
-            if (isset($message['from']['first_name'])) {
-                $firstname = $message['from']['first_name'] ?? null;
-            }
-            if (isset($message['from']['last_name'])) {
-                $lastname = $message['from']['last_name'] ?? null;
-            }
-            if (isset($message['from']['username'])) {
-                $username = $message['from']['username'] ?? null;
-            }
+            $firstname = $message['from']['first_name'] ?? "";
+            $lastname = $message['from']['last_name'] ?? "";
+            $username = $message['from']['username'] ?? "";
 
             $avatar = $this->getUserOrBotImage($botToken, $chatId);
 
