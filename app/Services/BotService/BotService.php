@@ -55,7 +55,7 @@ class BotService extends BaseService
                 $message = $update['chat_member'] ?? $update['message'];
                 $chatId = $message['chat']['id'];
 
-                // $this->checkNewMemberToSayGreeting($message, $adminId, $chatId, $botToken);
+                // $this->checkNewMemberToSendGreeting($message, $adminId, $chatId, $botToken);
                 $this->checkMessageContent($message, $chatId, $bot);
             }
 
@@ -654,7 +654,7 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
-    public function checkNewMemberToSayGreeting($message, $adminId, $chatId, $botToken)
+    public function checkNewMemberToSendGreeting($message, $adminId, $chatId, $botToken)
     {
         try {
             if (isset($message['new_chat_member'])) {
@@ -979,6 +979,122 @@ class BotService extends BaseService
             throw new AppServiceException($error->getMessage());
         }
     }
+    public function checkCommandGroup($update, $botToken)
+    {
+        try {
+            if (isset($update['message'])) {
+                $message = $update['message'];
+
+                if (isset($message['chat'])) {
+                    $type = $message['chat']['type'];
+
+                    if ($type === 'supergroup' || $type === 'group') {
+
+                        if (!isset($message['text'])) {
+                            return;
+                        }
+
+                        if (in_array(explode(' ', $message['text'])[0], TelegramGroup::DEFAULT_COMMAND)) {
+
+                            $arrayCommandValue = explode(' ', $message['text']);
+
+                            if (count($arrayCommandValue) != 2) {
+                                return;
+                            }
+
+                            $commandType = $arrayCommandValue[0];
+                            $chatId = $message['chat']['id'];
+
+                            $adminIds = $this->getChatAdministrators($botToken, $chatId);
+
+                            if (!$adminIds) {
+                                return;
+                            }
+
+                            if (!in_array($message['from']['id'], $adminIds)) {
+                                return;
+                            }
+
+                            $expiredAt = convertBanExpireTime($arrayCommandValue[2]);
+
+                            switch ($commandType) {
+                                case '/ban':
+                                    $result = banChatMember($chatId, $arrayCommandValue[1], $expiredAt, $botToken);
+                                    break;
+                                case '/unban':
+                                    $result = unbanChatMember($chatId, $arrayCommandValue[1], $botToken);
+                                    break;
+                                case '/mute':
+                                    $result = restrictChatMember([
+                                        'can_send_messages' => false,
+                                        'can_send_media_messages' => false,
+                                        'can_send_polls' => false,
+                                        'can_send_other_messages' => false,
+                                        'can_add_web_page_previews' => false,
+                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
+                                    break;
+                                case '/unmute':
+                                    $result = restrictChatMember([
+                                        'can_send_messages' => true,
+                                        'can_send_media_messages' => true,
+                                        'can_send_polls' => true,
+                                        'can_send_other_messages' => true,
+                                        'can_add_web_page_previews' => true,
+                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
+                                    break;
+                                case '/nolink':
+                                    $result = restrictChatMember([
+                                        'can_add_web_page_previews' => false,
+                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
+                                    break;
+                                case '/allowlink':
+                                    $result = restrictChatMember([
+                                        'can_add_web_page_previews' => true,
+                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
+                                    break;
+                            }
+
+                            $type = substr($commandType, 1);
+                            if ($result) {
+                                sendMessage($chatId, "<strong>$type</strong> <i>$arrayCommandValue[1]</i> success", $botToken);
+                            } else {
+                                sendMessage($chatId, "<strong>$type</strong> <i>$arrayCommandValue[1]</i> failed", $botToken);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (AppServiceException $error) {
+            logger($error->getLine());
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function getChatAdministrators($botToken, $chatId)
+    {
+        $client = new Client();
+        try {
+            $response = $client->get("https://api.telegram.org/bot{$botToken}/getChatAdministrators", [
+                'query' => [
+                    'chat_id' => $chatId
+                ]
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            if ($data['ok']) {
+                return array_map(function ($item) {
+                    return $item['user']['id'];
+                }, array_filter($data['result'], function ($item) {
+                    return in_array($item['status'], ['administrator', 'creator']);
+                }));
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function generateSignature($timestamp, $method, $requestPath, $queryString, $body, $secretKey)
     {
         if (!empty($queryString)) {
@@ -1123,120 +1239,5 @@ class BotService extends BaseService
         }
 
         return "20";
-    }
-    public function checkCommandGroup($update, $botToken)
-    {
-        try {
-            if (isset($update['message'])) {
-                $message = $update['message'];
-
-                if (isset($message['chat'])) {
-                    $type = $message['chat']['type'];
-
-                    if ($type === 'supergroup' || $type === 'group') {
-
-                        if (!isset($message['text'])) {
-                            return;
-                        }
-
-                        if (in_array(explode(' ', $message['text'])[0], TelegramGroup::DEFAULT_COMMAND)) {
-
-                            $arrayCommandValue = explode(' ', $message['text']);
-
-                            if (count($arrayCommandValue) != 2) {
-                                return;
-                            }
-
-                            $commandType = $arrayCommandValue[0];
-                            $chatId = $message['chat']['id'];
-
-                            $adminIds = $this->getChatAdministrators($botToken, $chatId);
-
-                            if (!$adminIds) {
-                                return;
-                            }
-
-                            if (!in_array($message['from']['id'], $adminIds)) {
-                                return;
-                            }
-
-                            $expiredAt = convertBanExpireTime($arrayCommandValue[2]);
-
-                            switch ($commandType) {
-                                case '/ban':
-                                    $result = banChatMember($chatId, $arrayCommandValue[1], $expiredAt, $botToken);
-                                    break;
-                                case '/unban':
-                                    $result = unbanChatMember($chatId, $arrayCommandValue[1], $botToken);
-                                    break;
-                                case '/mute':
-                                    $result = restrictChatMember([
-                                        'can_send_messages' => false,
-                                        'can_send_media_messages' => false,
-                                        'can_send_polls' => false,
-                                        'can_send_other_messages' => false,
-                                        'can_add_web_page_previews' => false,
-                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
-                                    break;
-                                case '/unmute':
-                                    $result = restrictChatMember([
-                                        'can_send_messages' => true,
-                                        'can_send_media_messages' => true,
-                                        'can_send_polls' => true,
-                                        'can_send_other_messages' => true,
-                                        'can_add_web_page_previews' => true,
-                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
-                                    break;
-                                case '/nolink':
-                                    $result = restrictChatMember([
-                                        'can_add_web_page_previews' => false,
-                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
-                                    break;
-                                case '/allowlink':
-                                    $result = restrictChatMember([
-                                        'can_add_web_page_previews' => true,
-                                    ], $chatId, $arrayCommandValue[1], $expiredAt, $botToken);
-                                    break;
-                            }
-
-                            $type = substr($commandType, 1);
-                            if ($result) {
-                                sendMessage($chatId, "<strong>$type</strong> <i>$arrayCommandValue[1]</i> success", $botToken);
-                            } else {
-                                sendMessage($chatId, "<strong>$type</strong> <i>$arrayCommandValue[1]</i> failed", $botToken);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (AppServiceException $error) {
-            logger($error->getLine());
-            throw new AppServiceException($error->getMessage());
-        }
-    }
-    public function getChatAdministrators($botToken, $chatId)
-    {
-        $client = new Client();
-        try {
-            $response = $client->get("https://api.telegram.org/bot{$botToken}/getChatAdministrators", [
-                'query' => [
-                    'chat_id' => $chatId
-                ]
-            ]);
-
-            $data = json_decode($response->getBody(), true);
-
-            if ($data['ok']) {
-                return array_map(function ($item) {
-                    return $item['user']['id'];
-                }, array_filter($data['result'], function ($item) {
-                    return in_array($item['status'], ['administrator', 'creator']);
-                }));
-            } else {
-                return false;
-            }
-        } catch (\Exception $e) {
-            return false;
-        }
     }
 }
