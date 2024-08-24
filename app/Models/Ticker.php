@@ -9,5 +9,8 @@ class Ticker extends Model
 {
     use HasFactory;
     protected $table = 'tickers';
-    protected $fillable = ['name', 'usdt', 'usd', 'perp'];
+    protected $fillable = ['name', 'usdt', 'platform'];
+
+    const BITGET = 'bitget';
+    const BINGX = 'bingx';
 }

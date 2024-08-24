@@ -21,6 +21,8 @@ use App\Models\User;
 use App\Models\UserPassword;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
+use App\Services\BingxService\BingxService;
+use App\Services\BitgetService\BitgetService;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -30,7 +32,13 @@ use Illuminate\Support\Facades\Http;
 
 class BotService extends BaseService
 {
-    public function __construct() {}
+    protected $bitgetService;
+    protected $bingxService;
+    public function __construct(BitgetService $bitgetService, BingxService $bingxService)
+    {
+        $this->bitgetService = $bitgetService;
+        $this->bingxService = $bingxService;
+    }
 
     public function webhook($request, $botId)
     {
@@ -296,7 +304,7 @@ class BotService extends BaseService
     {
         return DbTransactions()->addCallbackJson(function () use ($request) {
             $botUser = BotUser::where(['bot_id' => $request->bot_id, 'user_id' => $request->user_id])->first();
-            
+
             if (!$botUser) {
                 throw new AppServiceException('Bot user not found');
             }
@@ -329,7 +337,7 @@ class BotService extends BaseService
 
             $users = $bot->users();
 
-            if(request()->has('keyword')) {
+            if (request()->has('keyword')) {
                 $users = $users->where('firstname', 'like', '%' . request()->keyword . '%');
             }
 
@@ -893,7 +901,7 @@ class BotService extends BaseService
                             break;
                         }
 
-                        $data = parseOrder($text);
+                        $data = parseOrder($text, $platform);
 
                         // logger($data);
 
@@ -906,10 +914,39 @@ class BotService extends BaseService
                             ]);
                         } else {
 
-                            if (!$data['leverage']) {
-                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, LEVERAGE_LEVELS);
-                            } else {
-                                $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage'], "20"]);
+                            $apiKey = $botUser->api_key;
+                            $secretKey = $botUser->secret_key;
+                            $passphrase = $botUser->passphrase;
+
+                            switch ($platform) {
+                                case 'bitget':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, LEVERAGE_LEVELS);
+                                    } else {
+                                        $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, [$data['leverage'], "20"]);
+                                    }
+                                    break;
+                                case 'bingx':
+                                    if (!$data['leverage']) {
+                                        $maxLeverage = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                        $data['leverage'] = $this->bingxService->setMaxLeverage(
+                                            strtoupper($data['coin']) . "-USDT" ,
+                                            $maxLeverage,
+                                            $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
+                                            $apiKey, 
+                                            $secretKey
+                                        );
+                                        break;
+                                    }else {
+                                        $this->bingxService->setMaxLeverage(
+                                            strtoupper($data['coin']) . "-USDT" , 
+                                            $data['leverage'], 
+                                            $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
+                                            $apiKey, 
+                                            $secretKey
+                                        );
+                                    }
+                                    break;
                             }
 
                             if ($data['isLimit']) {
@@ -941,7 +978,16 @@ class BotService extends BaseService
                                         break;
                                 }
                             } else {
-                                $currentPrice = $this->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
+
+                                switch ($platform) {
+                                    case 'bitget':
+                                        $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
+                                        break;
+                                    case 'bingx':
+                                        $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                        break;
+                                }
+
                                 $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
                                 $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
                             }
@@ -1094,19 +1140,6 @@ class BotService extends BaseService
             return false;
         }
     }
-
-    public function generateSignature($timestamp, $method, $requestPath, $queryString, $body, $secretKey)
-    {
-        if (!empty($queryString)) {
-            $stringToSign = $timestamp . strtoupper($method) . $requestPath . "?" . $queryString . $body;
-        } else {
-            $stringToSign = $timestamp . strtoupper($method) . $requestPath . $body;
-        }
-
-        return base64_encode(
-            hash_hmac('sha256', $stringToSign, $secretKey, true)
-        );
-    }
     public function createOrder($vol, $input, $client, $chatId, $botUser, $platform)
     {
         try {
@@ -1116,10 +1149,10 @@ class BotService extends BaseService
 
             switch ($platform) {
                 case 'bitget':
-                    $this->createOrderBitget($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase);
+                    $this->bitgetService->createOrderBitget($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase);
                     break;
-                case 'binance':
-                    $this->createOrderBinance($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase);
+                case 'bingx':
+                    $this->bingxService->createOrderBingx($vol, $input, $client, $chatId, $apiKey, $secretKey);
                     break;
                 default:
                     break;
@@ -1127,117 +1160,5 @@ class BotService extends BaseService
         } catch (\Exception $error) {
             throw new AppServiceException($error->getMessage());
         }
-    }
-    public function createOrderBitget($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase)
-    {
-        try {
-            $method = "POST";
-            $api = "/api/v2/mix/order/place-order";
-            $timestamp = round(microtime(true) * 1000);
-            $lastPrice = $this->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $input['coin'])) . "USDT");
-            $size = ($vol * $input['leverage']) / $lastPrice;
-
-            $data = [
-                "symbol" => strtoupper($input['coin']) . "USDT",
-                "productType" => "usdt-futures",
-                "marginMode" => "crossed",
-                "marginCoin" => "USDT",
-                "size" => round($size, 4),
-                "side" => $input['orderType'],
-                "tradeSide" => "open",
-                "orderType" => $input['isLimit'] ? "limit" : "market",
-                "force" => "gtc",
-                "clientOid" => uniqid(),
-                "presetStopSurplusPrice" => $input['TP'],
-                "presetStopLossPrice" => $input['SL'],
-            ];
-
-            if ($input['isLimit']) {
-                $data['price'] = $input['ET'];
-            }
-
-            // logger($data);
-
-            $body = json_encode($data);
-
-            $accessSign = $this->generateSignature($timestamp, $method, $api, "", $body, $secretKey);
-
-            $response = Http::withHeaders([
-                'ACCESS-KEY' => $apiKey,
-                'ACCESS-SIGN' => $accessSign,
-                'ACCESS-PASSPHRASE' => $passphrase,
-                'ACCESS-TIMESTAMP' => $timestamp,
-                'locale' => 'en-US',
-                'Content-Type' => 'application/json',
-
-            ])->post("https://api.bitget.com{$api}", $data);
-
-            $result = json_decode($response->body(), true);
-
-            if ($result['code'] === "00000") {
-                $client->post('sendMessage', [
-                    'json' => [
-                        'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "" . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
-                        'chat_id' => $chatId
-                    ]
-                ]);
-            } else {
-                $client->post('sendMessage', [
-                    'json' => [
-                        'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}",
-                        'chat_id' => $chatId
-                    ]
-                ]);
-            }
-        } catch (AppServiceException | \Exception $error) {
-            throw new AppServiceException($error->getMessage());
-        }
-    }
-    public function createOrderBinance($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase) {}
-    public function getLatestPriceOfCoin($symbol)
-    {
-        $response = Http::get("https://api.bitget.com/api/v2/spot/market/tickers?symbol={$symbol}");
-
-        if(json_decode($response->body(), true)['code'] !== "00000") {
-            throw new AppServiceException("Error get latest price of coin");
-        }
-
-        return json_decode($response->body(), true)['data'][0]['lastPr'];
-    }
-    public function setMaxLeverage($symbol, $apiKey, $secretKey, $passphrase, $leverageLevels)
-    {
-        $method = "POST";
-        $api = "/api/v2/mix/account/set-leverage";
-        foreach ($leverageLevels as $value) {
-            $timestamp = round(microtime(true) * 1000);
-            $data = [
-                "symbol" => $symbol,
-                "productType" => "USDT-FUTURES",
-                "marginCoin" => "usdt",
-                "leverage" => $value,
-                "holdSide" => "long"
-            ];
-            $body = json_encode($data);
-
-            $accessSign = $this->generateSignature($timestamp, $method, $api, "", $body, $secretKey);
-
-            $response = Http::withHeaders([
-                'ACCESS-KEY' => $apiKey,
-                'ACCESS-SIGN' => $accessSign,
-                'ACCESS-PASSPHRASE' => $passphrase,
-                'ACCESS-TIMESTAMP' => $timestamp,
-                'locale' => 'en-US',
-                'Content-Type' => 'application/json',
-
-            ])->post("https://api.bitget.com{$api}", $data);
-
-            $result = json_decode($response->body(), true);
-
-            if ($result['code'] === "00000") {
-                return $result['data']['longLeverage'];
-            }
-        }
-
-        return "20";
     }
 }

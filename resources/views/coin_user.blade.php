@@ -135,8 +135,7 @@
                         <td class="px-6 py-4 text-center">
                             <select class="outline-none p-2 bg-gray-800 text-white rounded-lg platform-select" data-user-id="${user.id}" data-original-platform="${user.pivot.trading_platform}">
                                 <option value="bitget" ${user.pivot.trading_platform === "bitget" ? "selected" : ""}>BITGET</option>
-                                <option value="binance" ${user.pivot.trading_platform === "binance" ? "selected" : ""}>BINANCE</option>
-                                <option value="bibyt" ${user.pivot.trading_platform === "bibyt" ? "selected" : ""}>BIBYT</option>
+                                <option value="bingx" ${user.pivot.trading_platform === "bingx" ? "selected" : ""}>BINGX</option>
                             </select>
                         </td>
                         <td class="px-6 py-4 text-center">${user.pivot.risk_tolerance ?? ""}</td>

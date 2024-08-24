@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tickers', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('usdt');
-            $table->string('platform');
-            $table->timestamps();
+        Schema::table('tickers', function (Blueprint $table) {
+            $table->index(['name', 'platform']);
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tickers');
+        Schema::table('tickers', function (Blueprint $table) {
+            $table->dropIndex("tickers_name_platform_index");
+        });
     }
 };

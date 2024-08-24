@@ -76,7 +76,7 @@ if (!function_exists('determineVol')) {
     }
 }
 if (!function_exists('parseOrder')) {
-    function parseOrder($text)
+    function parseOrder($text, $platform)
     {
         // Normalize the text (lowercase, remove excess whitespace)
         $normalizedText = strtolower(trim($text));
@@ -128,12 +128,7 @@ if (!function_exists('parseOrder')) {
             return false;
         }
         if ($coin !== null) {
-            if (
-                Ticker::where('name', strtoupper($coin))->count() == 0 &&
-                Ticker::where('usdt', strtoupper($coin) . 'USDT')->count() == 0 &&
-                Ticker::where('usd', strtoupper($coin) . 'USD')->count() == 0 &&
-                Ticker::where('perp', strtoupper($coin) . 'PERP')->count() == 0
-            ) {
+            if (Ticker::where(['name' => strtoupper($coin), 'platform' => $platform])->count() == 0) {
                 return false;
             }
         }
@@ -272,6 +267,26 @@ if (!function_exists('convertBanExpireTime')) {
             throw new AppServiceException('Invalid time format');
         } catch (AppServiceException $e) {
             throw new AppServiceException($e->getMessage());
+        }
+    }
+}
+if (!function_exists('sendResponseTrading')) {
+    function sendResponseTrading($client, $chatId, $input, $result, $lastPrice, $platform)
+    {
+        if ($result['code'] == "00000" || $result['code'] == 0) {
+            $client->post('sendMessage', [
+                'json' => [
+                    'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "" . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}\n\n{$platform}",
+                    'chat_id' => $chatId
+                ]
+            ]);
+        } else {
+            $client->post('sendMessage', [
+                'json' => [
+                    'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}\n\n{$platform}",
+                    'chat_id' => $chatId
+                ]
+            ]);
         }
     }
 }
