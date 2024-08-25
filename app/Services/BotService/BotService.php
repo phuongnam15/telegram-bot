@@ -935,7 +935,7 @@ class BotService extends BaseService
                                         break;
                                 }
                             } else {
-                                $currentPrice = $this->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
+                                $currentPrice = $this->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
                                 $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
                                 $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
                             }
