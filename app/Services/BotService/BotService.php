@@ -42,13 +42,12 @@ class BotService extends BaseService
     protected $bybitService;
     protected $okxService;
     public function __construct(
-        BitgetService $bitgetService, 
-        BingxService $bingxService, 
-        BinanceService $binanceService, 
+        BitgetService $bitgetService,
+        BingxService $bingxService,
+        BinanceService $binanceService,
         BybitService $bybitService,
         OkxService $okxService
-    )
-    {
+    ) {
         $this->bitgetService = $bitgetService;
         $this->bingxService = $bingxService;
         $this->binanceService = $binanceService;
@@ -957,7 +956,7 @@ class BotService extends BaseService
                                         $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
                                     }
 
-                                    if($currentLeverage != $data['leverage']) {
+                                    if ($currentLeverage != $data['leverage']) {
                                         $this->bybitService->setLeverage(
                                             strtoupper($data['coin']) . "USDT",
                                             $data['leverage'],
@@ -965,7 +964,7 @@ class BotService extends BaseService
                                             $secretKey
                                         );
                                     }
-                                    
+
                                     break;
                                 case 'okx':
                                     if (!$data['leverage']) {
@@ -1011,7 +1010,7 @@ class BotService extends BaseService
                                         break;
                                 }
                             } else {
-
+                                
                                 switch ($platform) {
                                     case 'bitget':
                                         $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
