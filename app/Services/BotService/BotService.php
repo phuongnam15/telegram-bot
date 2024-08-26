@@ -12,6 +12,7 @@ use App\Models\BotUser;
 use App\Models\Command;
 use App\Models\ContentConfig;
 use App\Models\GroupUser;
+use App\Models\Key;
 use App\Models\Password;
 use App\Models\PhoneNumber;
 use App\Models\ScheduleDeleteMessage;
@@ -335,7 +336,7 @@ class BotService extends BaseService
 
             $bot = Bot::where('id', request()->bot_id)->first();
 
-            $users = $bot->users();
+            $users = $bot->users()->with('keys');
 
             if (request()->has('keyword')) {
                 $users = $users->where('firstname', 'like', '%' . request()->keyword . '%');
@@ -873,28 +874,16 @@ class BotService extends BaseService
                             ]);
                             break;
                         }
-                        if (!$botUser->api_key) {
+
+                        $key = Key::where([
+                            'user_id' => $botUser->user_id,
+                            'platform' => $platform
+                        ])->first();
+
+                        if (!$key) {
                             $client->post('sendMessage', [
                                 'json' => [
-                                    'text' => "Bạn chưa cung cấp API Key cho admin",
-                                    'chat_id' => $chatId
-                                ]
-                            ]);
-                            break;
-                        }
-                        if (!$botUser->secret_key) {
-                            $client->post('sendMessage', [
-                                'json' => [
-                                    'text' => "Bạn chưa cung cấp Secret Key cho admin",
-                                    'chat_id' => $chatId
-                                ]
-                            ]);
-                            break;
-                        }
-                        if (!$botUser->passphrase) {
-                            $client->post('sendMessage', [
-                                'json' => [
-                                    'text' => "Bạn chưa cung cấp Passphrase cho admin",
+                                    'text' => "Bạn chưa có API Key của sàn này, vui lòng cung cấp nó cho Admin\n@tienthanh247",
                                     'chat_id' => $chatId
                                 ]
                             ]);
@@ -914,9 +903,9 @@ class BotService extends BaseService
                             ]);
                         } else {
 
-                            $apiKey = $botUser->api_key;
-                            $secretKey = $botUser->secret_key;
-                            $passphrase = $botUser->passphrase;
+                            $apiKey = $key->api_key;
+                            $secretKey = $key->secret_key;
+                            $passphrase = $key->passphrase;
 
                             switch ($platform) {
                                 case 'bitget':
@@ -958,21 +947,21 @@ class BotService extends BaseService
                                 switch ($etLength) {
                                     case 1:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
+                                        $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
                                         break;
                                     case 2:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
                                         $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
                                         break;
                                     case 3:
                                         $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser, $platform);
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
                                         $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId, $botUser, $platform);
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
                                         $data['ET'] = $ets[2];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
                                         break;
                                     default:
                                         break;
@@ -981,7 +970,7 @@ class BotService extends BaseService
 
                                 switch ($platform) {
                                     case 'bitget':
-                                        $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT");
+                                        $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
                                         break;
                                     case 'bingx':
                                         $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
@@ -989,7 +978,7 @@ class BotService extends BaseService
                                 }
 
                                 $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-                                $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
+                                $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
                             }
                         }
                     } else {
@@ -1140,12 +1129,12 @@ class BotService extends BaseService
             return false;
         }
     }
-    public function createOrder($vol, $input, $client, $chatId, $botUser, $platform)
+    public function createOrder($vol, $input, $client, $chatId, $key, $platform)
     {
         try {
-            $apiKey = $botUser->api_key;
-            $secretKey = $botUser->secret_key;
-            $passphrase = $botUser->passphrase;
+            $apiKey = $key->api_key;
+            $secretKey = $key->secret_key;
+            $passphrase = $key->passphrase;
 
             switch ($platform) {
                 case 'bitget':

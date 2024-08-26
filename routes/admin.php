@@ -78,6 +78,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::prefix('user')->group(function () {
             Route::get('/', [BotController::class, 'listUser']);
             Route::post('/', [UserController::class, 'update']);
+            Route::post('/keys', [UserController::class, 'updateKeys']);
             Route::post('/active', [UserController::class, 'active']);
             Route::post('/update-platform', [BotController::class, 'updateUserTradingPlatform']);
         });

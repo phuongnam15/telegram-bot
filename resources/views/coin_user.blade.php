@@ -35,12 +35,13 @@
 </div>
 
 <input type="text" id="pivotId" class="hidden">
-<!-- Update User Modal -->
+<input type="text" id="userId" class="hidden">
+<!-- Update User Risk Modal -->
 <div id="updateUserModal" tabindex="-1" class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75">
     <div class="relative w-full max-w-md mx-auto mt-20">
         <div class="bg-[#2a2d35] text-white rounded-lg shadow-lg">
             <div class="px-6 py-4 border-b border-gray-700">
-                <h3 class="text-xl font-medium">Update User Information</h3>
+                <h3 class="text-xl font-medium">Update User Risk Tolerance</h3>
             </div>
             <div class="px-6 py-4">
                 <form id="updateUserForm">
@@ -48,6 +49,25 @@
                         <label for="riskTolerance" class="block mb-2 text-sm">Risk Tolerance</label>
                         <input placeholder="enter your risk level eg: 10" type="text" id="riskTolerance" name="riskTolerance" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" class="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700" onclick="closeUpdateUserModal()">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update User Key Modal -->
+<div id="updateUserKeyModal" tabindex="-1" class="fixed hidden inset-0 z-50 overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75">
+    <div class="relative w-full max-w-md mx-auto mt-20">
+        <div class="bg-[#2a2d35] text-white rounded-lg shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-700">
+                <h3 class="text-xl font-medium">Update User Key</h3>
+            </div>
+            <div class="px-6 py-4">
+                <form id="updateUserKeyForm">
                     <div class="mb-4">
                         <label for="apiKey" class="block mb-2 text-sm">API key</label>
                         <input placeholder="your api key eg: bg_e955d8b656ty56gyH97c5b4c4d283e83" type="text" id="apiKey" name="apiKey" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
@@ -56,12 +76,19 @@
                         <label for="secretKey" class="block mb-2 text-sm">Secret key</label>
                         <input placeholder="your secret key eg: cec36ffa45990dfb50d853ee8faf18e8640f32f75af8ed2b0" type="text" id="secretKey" name="secretKey" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-4 hidden" id="passphraseField">
                         <label for="passphrase" class="block mb-2 text-sm">Passphrase</label>
                         <input placeholder="your passphrase eg: 12345678" type="text" id="passphrase" name="passphrase" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
+                    <div class="mb-4">
+                        <label for="platform" class="block mb-2 text-sm">Platform</label>
+                        <select name="platform" id="platform" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="bitget">BITGET</option>
+                            <option value="bingx">BINGX</option>
+                        </select>
+                    </div>
                     <div class="flex justify-end space-x-2">
-                        <button type="button" class="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700" onclick="closeUpdateUserModal()">Cancel</button>
+                        <button type="button" class="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700" onclick="closeUpdateUserKeyModal()">Cancel</button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700">Update</button>
                     </div>
                 </form>
@@ -118,6 +145,20 @@
             $('#pagination').empty();
 
             data.data.forEach((user, index) => {
+                let apiKey = "";
+                let secretKey = "";
+                let passphrase = "";
+                let keys = JSON.stringify(user.keys).replace(/"/g, '&quot;');
+                if (user.keys.length > 0) {
+                    var matchingKey = user.keys.find(function(key) {
+                        return key.platform === user.pivot.trading_platform;
+                    });
+                    if (matchingKey) {
+                        apiKey = matchingKey.api_key;
+                        secretKey = matchingKey.secret_key;
+                        passphrase = matchingKey.passphrase;
+                    }
+                }
                 $('#listUserTable tbody').append(`
                     <tr class="bg-[#1e2026] ${index === (data.data.length - 1) ? '' : 'border-b border-gray-700'} hover:bg-gray-900 text-gray-400">
                         <th scope="row" class="flex items-center px-6 py-4 whitespace-nowrap">
@@ -141,11 +182,12 @@
                         <td class="px-6 py-4 text-center">${user.pivot.risk_tolerance ?? ""}</td>
                         <td class="px-6 py-4 text-center">${user.pivot.expired_at ? formatDate(user.pivot.expired_at) : ""}</td>
                         <td class="px-6 py-4 space-x-2 text-center">
-                            <a href="#" class="font-medium text-blue-600 hover:underline" onclick="openUpdateUserModal('${user.pivot.id}', '${user.pivot.risk_tolerance ?? ""}', '${user.pivot.api_key ?? ""}', '${user.pivot.secret_key ?? ""}', '${user.pivot.passphrase ?? ""}')">Edit</a>
-                            ${user.pivot.is_actived === "0" ? 
+                            <a href="#" class="font-medium text-yellow-600 hover:underline" onclick="openUpdateUserModal('${user.pivot.id}', '${user.pivot.risk_tolerance ?? ""}')">Risk</a>
+                            <a href="#" class="font-medium text-blue-600 hover:underline" onclick="openUpdateUserKeyModal('${user.id}', '${apiKey}', '${secretKey}', '${passphrase}', '${user.pivot.trading_platform}', '${keys}')">Key</a>
+                            ${user.pivot.is_actived === "0" ?
                                 `<a href="#" class="font-medium text-green-600 hover:underline" onclick="openActivateUserModal('${user.pivot.id}')">Active</a>`
                             : 
-                                "" 
+                                ""
                             }
                         </td>
                     </tr>`)
@@ -183,14 +225,63 @@
     const openUpdateUserModal = (pivotId, riskTolerance, apiKey, secretKey, passphrase) => {
         $('#pivotId').val(pivotId);
         $('#updateUserModal #riskTolerance').val(riskTolerance);
-        $('#updateUserModal #apiKey').val(apiKey);
-        $('#updateUserModal #secretKey').val(secretKey);
-        $('#updateUserModal #passphrase').val(passphrase);
         $('#updateUserModal').removeClass('hidden');
     };
 
     const closeUpdateUserModal = () => {
         $('#updateUserModal').addClass('hidden');
+    };
+
+    let currentUserKeys = [];
+    const openUpdateUserKeyModal = (userId, apiKey, secretKey, passphrase, platform, keys) => {
+        if (platform === 'bitget') {
+            if ($('#passphraseField').hasClass('hidden')) {
+                $('#passphraseField').removeClass('hidden');
+            }
+        } else {
+            if (!$('#passphraseField').hasClass('hidden')) {
+                $('#passphraseField').addClass('hidden');
+            }
+        }
+
+        currentUserKeys = JSON.parse(keys);
+
+        $('#userId').val(userId);
+        $('#updateUserKeyModal #apiKey').val(apiKey);
+        $('#updateUserKeyModal #secretKey').val(secretKey);
+        $('#updateUserKeyModal #passphrase').val(passphrase);
+        $('#updateUserKeyModal #platform').val(platform);
+        $('#updateUserKeyModal').removeClass('hidden');
+
+        $('#platform').on('change', function() {
+            const selectedPlatform = $(this).val();
+
+            if (selectedPlatform === 'bitget') {
+                if ($('#passphraseField').hasClass('hidden')) {
+                    $('#passphraseField').removeClass('hidden');
+                }
+            } else {
+                if (!$('#passphraseField').hasClass('hidden')) {
+                    $('#passphraseField').addClass('hidden');
+                }
+            }
+
+            const matchingKey = currentUserKeys.find(key => key.platform === selectedPlatform);
+
+            if (matchingKey) {
+                $('#apiKey').val(matchingKey.api_key);
+                $('#secretKey').val(matchingKey.secret_key);
+                $('#passphrase').val(matchingKey.passphrase);
+            } else {
+                $('#apiKey').val('');
+                $('#secretKey').val('');
+                $('#passphrase').val('');
+            }
+        });
+    };
+
+    const closeUpdateUserKeyModal = () => {
+        $('#updateUserKeyModal').addClass('hidden');
     };
 
     const openActivateUserModal = (pivotId) => {
@@ -207,9 +298,6 @@
 
         const formData = new FormData();
         formData.append('risk_tolerance', $('#riskTolerance').val());
-        formData.append('api_key', $('#apiKey').val());
-        formData.append('secret_key', $('#secretKey').val());
-        formData.append('passphrase', $('#passphrase').val());
         formData.append('id', $('#pivotId').val());
 
         try {
@@ -225,6 +313,31 @@
             console.log(error);
         }
     });
+
+    $('#updateUserKeyForm').on('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('api_key', $('#apiKey').val());
+        formData.append('secret_key', $('#secretKey').val());
+        formData.append('passphrase', $('#passphrase').val());
+        formData.append('platform', $('#platform').val());
+        formData.append('user_id', $('#userId').val());
+
+        try {
+            const response = await fetchClient(`/api/admin/bot/user/keys`, {
+                method: 'POST',
+                body: formData
+            });
+
+            closeUpdateUserKeyModal();
+            showNotification('Update user keys successfully', 'success');
+            await getListUser();
+        } catch (error) {
+            console.log(error);
+        }
+    });
+
 
     $('#activateUserForm').on('submit', async (e) => {
         e.preventDefault();
@@ -275,6 +388,7 @@
             selectElement.data('original-platform', newPlatform);
 
             showNotification('Platform updated successfully', 'success');
+            await getListUser();
         } catch (error) {
             selectElement.val(originalPlatform);
             console.error(error);

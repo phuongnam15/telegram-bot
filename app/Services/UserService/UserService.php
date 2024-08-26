@@ -4,6 +4,7 @@ namespace App\Services\UserService;
 
 use App\Models\Bot;
 use App\Models\BotUser;
+use App\Models\Key;
 use App\Models\User;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
@@ -44,7 +45,7 @@ class UserService extends BaseService
             return $botUser;
         });
     }
-    public function update() 
+    public function update()
     {
         return DbTransactions()->addCallBackJson(function () {
             $botUser = BotUser::where('id', request()->id)->first();
@@ -56,6 +57,23 @@ class UserService extends BaseService
             $botUser->update(request()->all());
 
             return $botUser;
+        });
+    }
+    public function updateKeys()
+    {
+        return DbTransactions()->addCallBackJson(function () {
+            $key = Key::where([
+                'platform' => request()->platform,
+                'user_id' => request()->user_id
+            ])->first();
+
+            if ($key) {
+                $key->update(request()->all());
+            } else {
+                $key = Key::create(request()->all());
+            }
+
+            return $key;
         });
     }
 }

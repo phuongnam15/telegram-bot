@@ -27,4 +27,8 @@ class UserController extends Controller
   {
     return $this->service->update();
   } 
+  public function updateKeys()
+  {
+    return $this->service->updateKeys();
+  } 
 }

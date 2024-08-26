@@ -14,9 +14,6 @@ class BotUser extends Model
         'user_id',
         'status',
         'is_actived',
-        'api_key',
-        'secret_key',
-        'passphrase',
         'expired_at',
         'risk_tolerance',
     ];

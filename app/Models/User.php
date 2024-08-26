@@ -25,4 +25,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Bot::class, 'bot_users', 'user_id', 'bot_id');
     }
+    public function keys()
+    {
+        return $this->hasMany(Key::class, 'user_id');
+    }
 }

@@ -18,9 +18,6 @@ return new class extends Migration
 
             $table->string('status');
             $table->string('is_actived')->default(0);
-            $table->string('api_key')->nullable();
-            $table->string('secret_key')->nullable();
-            $table->string('passphrase')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->string('risk_tolerance')->nullable();
             
