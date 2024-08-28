@@ -22,6 +22,7 @@ use App\Models\User;
 use App\Models\UserPassword;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
+use App\Services\BinanceService\BinanceService;
 use App\Services\BingxService\BingxService;
 use App\Services\BitgetService\BitgetService;
 use GuzzleHttp\Client;
@@ -35,10 +36,12 @@ class BotService extends BaseService
 {
     protected $bitgetService;
     protected $bingxService;
-    public function __construct(BitgetService $bitgetService, BingxService $bingxService)
+    protected $binanceService;
+    public function __construct(BitgetService $bitgetService, BingxService $bingxService, BinanceService $binanceService)
     {
         $this->bitgetService = $bitgetService;
         $this->bingxService = $bingxService;
+        $this->binanceService = $binanceService;
     }
 
     public function webhook($request, $botId)
@@ -918,20 +921,39 @@ class BotService extends BaseService
                                 case 'bingx':
                                     if (!$data['leverage']) {
                                         $maxLeverage = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
-                                        $data['leverage'] = $this->bingxService->setMaxLeverage(
-                                            strtoupper($data['coin']) . "-USDT" ,
+                                        $data['leverage'] = $this->bingxService->setLeverage(
+                                            strtoupper($data['coin']) . "-USDT",
                                             $maxLeverage,
                                             $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
-                                            $apiKey, 
+                                            $apiKey,
                                             $secretKey
                                         );
                                         break;
-                                    }else {
-                                        $this->bingxService->setMaxLeverage(
-                                            strtoupper($data['coin']) . "-USDT" , 
-                                            $data['leverage'], 
+                                    } else {
+                                        $this->bingxService->setLeverage(
+                                            strtoupper($data['coin']) . "-USDT",
+                                            $data['leverage'],
                                             $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
-                                            $apiKey, 
+                                            $apiKey,
+                                            $secretKey
+                                        );
+                                    }
+                                    break;
+                                case 'binance':
+                                    if (!$data['leverage']) {
+                                        $maxLeverage = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        $data['leverage'] = $this->binanceService->setLeverage(
+                                            strtoupper($data['coin']) . "USDT",
+                                            $maxLeverage,
+                                            $apiKey,
+                                            $secretKey
+                                        );
+                                        break;
+                                    } else {
+                                        $this->binanceService->setLeverage(
+                                            strtoupper($data['coin']) . "USDT",
+                                            $data['leverage'],
+                                            $apiKey,
                                             $secretKey
                                         );
                                     }
@@ -974,6 +996,9 @@ class BotService extends BaseService
                                         break;
                                     case 'bingx':
                                         $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                        break;
+                                    case 'binance':
+                                        $currentPrice = $this->binanceService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT", $secretKey);
                                         break;
                                 }
 
@@ -1142,6 +1167,9 @@ class BotService extends BaseService
                     break;
                 case 'bingx':
                     $this->bingxService->createOrderBingx($vol, $input, $client, $chatId, $apiKey, $secretKey);
+                    break;
+                case 'binance':
+                    $this->binanceService->createOrderBinance($vol, $input, $client, $chatId, $apiKey, $secretKey);
                     break;
                 default:
                     break;

@@ -32,7 +32,7 @@ class BingxService extends BaseService
         return $this->doRequest($dataGet["uri"], $dataGet["method"], $dataGet["payload"], $apiKey, $secretKey)['data']['maxLongLeverage'];
         
     }
-    public function setMaxLeverage($symbol, $leverage, $side, $apiKey, $secretKey)
+    public function setLeverage($symbol, $leverage, $side, $apiKey, $secretKey)
     {
         $dataSet = [
             "uri" => "/openApi/swap/v2/trade/leverage",

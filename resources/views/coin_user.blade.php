@@ -78,13 +78,17 @@
                     </div>
                     <div class="mb-4 hidden" id="passphraseField">
                         <label for="passphrase" class="block mb-2 text-sm">Passphrase</label>
-                        <input placeholder="your passphrase eg: 12345678" type="text" id="passphrase" name="passphrase" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <input placeholder="your passphrase eg: 12345678" type="text" id="passphrase" name="passphrase" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="mb-4">
                         <label for="platform" class="block mb-2 text-sm">Platform</label>
                         <select name="platform" id="platform" class="text-sm font-popi w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="bitget">BITGET</option>
                             <option value="bingx">BINGX</option>
+                            <option value="binance">BINANCE</option>
+                            <option value="bybit">BYBIT</option>
+                            <option value="okx">OKX</option>
+                            <option value="mexc">MEXC</option>
                         </select>
                     </div>
                     <div class="flex justify-end space-x-2">
@@ -177,6 +181,10 @@
                             <select class="outline-none p-2 bg-gray-800 text-white rounded-lg platform-select" data-user-id="${user.id}" data-original-platform="${user.pivot.trading_platform}">
                                 <option value="bitget" ${user.pivot.trading_platform === "bitget" ? "selected" : ""}>BITGET</option>
                                 <option value="bingx" ${user.pivot.trading_platform === "bingx" ? "selected" : ""}>BINGX</option>
+                                <option value="binance" ${user.pivot.trading_platform === "binance" ? "selected" : ""}>BINANCE</option>
+                                <option value="bybit" ${user.pivot.trading_platform === "bybit" ? "selected" : ""}>BYBIT</option>
+                                <option value="okx" ${user.pivot.trading_platform === "okx" ? "selected" : ""}>OKX</option>
+                                <option value="mexc" ${user.pivot.trading_platform === "mexc" ? "selected" : ""}>MEXC</option>
                             </select>
                         </td>
                         <td class="px-6 py-4 text-center">${user.pivot.risk_tolerance ?? ""}</td>

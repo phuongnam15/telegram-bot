@@ -13,4 +13,8 @@ class Ticker extends Model
 
     const BITGET = 'bitget';
     const BINGX = 'bingx';
+    const BINANCE = 'binance';
+    const BYBIT = 'bybit';
+    const OKEX = 'okex';
+    const MEXC = 'mexc';
 }
