@@ -4,8 +4,6 @@ namespace App\Services\BybitService;
 
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Client\RequestException as Http_RequestException;
 use Illuminate\Support\Facades\Http;
 
