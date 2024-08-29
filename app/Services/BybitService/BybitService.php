@@ -21,10 +21,11 @@ class BybitService extends BaseService
             $uri = "/v5/order/create";
             $method = "POST";
             $payload = [
+                "category" => "linear",
                 "symbol" => strtoupper($input['coin']) . "USDT",
                 "side" => $input['orderType'] == 'buy' ? 'Buy' : 'Sell',
                 "orderType" => $input['isLimit'] ? 'Limit' : 'Market',
-                "qty" => $quantity,
+                "qty" => strval($quantity),
                 "takeProfit" => $input['TP'],
                 "stopLoss" => $input['SL'],
             ];
