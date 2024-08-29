@@ -25,6 +25,7 @@ use App\Services\_Exception\AppServiceException;
 use App\Services\BinanceService\BinanceService;
 use App\Services\BingxService\BingxService;
 use App\Services\BitgetService\BitgetService;
+use App\Services\BybitService\BybitService;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -37,11 +38,17 @@ class BotService extends BaseService
     protected $bitgetService;
     protected $bingxService;
     protected $binanceService;
-    public function __construct(BitgetService $bitgetService, BingxService $bingxService, BinanceService $binanceService)
+    protected $bybitService;
+    public function __construct(
+        BitgetService $bitgetService, 
+        BingxService $bingxService, 
+        BinanceService $binanceService, 
+        BybitService $bybitService)
     {
         $this->bitgetService = $bitgetService;
         $this->bingxService = $bingxService;
         $this->binanceService = $binanceService;
+        $this->bybitService = $bybitService;
     }
 
     public function webhook($request, $botId)
@@ -941,16 +948,35 @@ class BotService extends BaseService
                                     break;
                                 case 'binance':
                                     if (!$data['leverage']) {
-                                        $maxLeverage = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
-                                        $data['leverage'] = $this->binanceService->setLeverage(
+                                        $data['leverage'] = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        $this->binanceService->setLeverage(
                                             strtoupper($data['coin']) . "USDT",
-                                            $maxLeverage,
+                                            $data['leverage'],
                                             $apiKey,
                                             $secretKey
                                         );
                                         break;
                                     } else {
                                         $this->binanceService->setLeverage(
+                                            strtoupper($data['coin']) . "USDT",
+                                            $data['leverage'],
+                                            $apiKey,
+                                            $secretKey
+                                        );
+                                    }
+                                    break;
+                                case 'bybit':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
+                                        $this->bybitService->setLeverage(
+                                            strtoupper($data['coin']) . "USDT",
+                                            $data['leverage'],
+                                            $apiKey,
+                                            $secretKey
+                                        );
+                                        break;
+                                    } else {
+                                        $this->bybitService->setLeverage(
                                             strtoupper($data['coin']) . "USDT",
                                             $data['leverage'],
                                             $apiKey,
@@ -999,6 +1025,9 @@ class BotService extends BaseService
                                         break;
                                     case 'binance':
                                         $currentPrice = $this->binanceService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT", $secretKey);
+                                        break;
+                                    case 'bybit':
+                                        $currentPrice = $this->bybitService->getLatestPrice(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
                                         break;
                                 }
 
@@ -1170,6 +1199,9 @@ class BotService extends BaseService
                     break;
                 case 'binance':
                     $this->binanceService->createOrderBinance($vol, $input, $client, $chatId, $apiKey, $secretKey);
+                    break;
+                case 'bybit':
+                    $this->bybitService->createOrderBybit($vol, $input, $client, $chatId, $apiKey, $secretKey);
                     break;
                 default:
                     break;

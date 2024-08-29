@@ -52,6 +52,17 @@ class TickerSeeder extends Seeder
         }, array_column(json_decode($responseBinance->body(), true), 'symbol'));
 
 
+        // Bybit
+        $responseBybit = Http::get("https://api.bybit.com/v5/market/tickers?category=linear");
+        $dataBybit = array_map(function($symbol) {
+            $a = str_replace('USDT', '', $symbol);
+            return [
+                "name" => $a,
+                "usdt" => $symbol,
+                "platform" => Ticker::BYBIT,
+            ];
+        }, array_column(json_decode($responseBybit->body(), true)['result']['list'], 'symbol'));
+
 
         Schema::disableForeignKeyConstraints();
         DB::table('tickers')->truncate();
@@ -59,6 +70,7 @@ class TickerSeeder extends Seeder
         Ticker::insert($dataBitget);
         Ticker::insert($dataBingx);
         Ticker::insert($dataBinance);
+        Ticker::insert($dataBybit);
 
         Schema::enableForeignKeyConstraints();
     }

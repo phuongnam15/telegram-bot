@@ -79,19 +79,11 @@ class BinanceService extends BaseService
     }
     public function getLatestPriceOfCoin($symbol, $secretKey)
     {
-        try {
-            $uri = "/fapi/v1/ticker/price?symbol=$symbol";
-            $method = 'GET';
-    
-            return $this->doRequest($uri, $method, [], "", $secretKey)['price'];
-        } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                $errorResponse = $e->getResponse();
-                $errorData = json_decode($errorResponse->getBody()->getContents(), true);
+        $uri = "/fapi/v1/ticker/price?symbol=$symbol";
+        $method = 'GET';
 
-                return $errorData;
-            }
-        }
+        return $this->doRequest($uri, $method, [], "", $secretKey)['price'];
+        
     }
     public function setLeverage($symbol, $leverage, $apiKey, $secretKey)
     {
