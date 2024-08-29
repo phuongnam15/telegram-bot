@@ -58,7 +58,11 @@ class BybitService extends BaseService
             $timestamp = round(microtime(true) * 1000);
             $recvWindow = '5000';
 
-            $plainText = $timestamp . $apiKey . $recvWindow . json_encode($payload);
+            if ($method == 'GET') {
+                $plainText = $timestamp . $apiKey . $recvWindow . http_build_query($payload, '', '&');
+            } else {
+                $plainText = $timestamp . $apiKey . $recvWindow . json_encode($payload);
+            }
 
             $signature = strtolower(hash_hmac('sha256', $plainText, $secretKey));
 
@@ -133,5 +137,62 @@ class BybitService extends BaseService
         ];
 
         return $this->doRequest($uri, $method, $payload, $apiKey, $secretKey);
+    }
+    public function getCurrentLeverage($symbol, $apiKey, $secretKey)
+    {
+        $uri = "/v5/position/list";
+        $method = 'GET';
+        $payload = [
+            'category' => 'linear',
+            'symbol' => $symbol,
+        ];
+
+        return $this->doRequest($uri, $method, $payload, $apiKey, $secretKey)['result']['list'][0]['leverage'];
+    }
+    public function test()
+    {
+        try {
+            $uri = "/v5/order/create";
+            $method = "POST";
+            // $payload = [
+            //     "category" => 'linear',
+            //     "symbol" => "NEOUSDT",
+            //     "side" => 'Buy',
+            //     "orderType" => 'Market',
+            //     "qty" => 0.2,
+            //     "takeProfit" => 11,
+            //     "stopLoss" => 9.7,
+            // ];
+
+            $payload = [
+                "category" => "linear",
+                "symbol" => "NEOUSDT",
+                "side" => "Buy",
+                "orderType" => "Market",
+                "qty" => "0.5",
+                // "price" => "25000",
+                "timeInForce" => "GTC",
+                // "positionIdx" => 0,
+                // "orderLinkId" => "usdt-test-01",
+                // "reduceOnly" => false,
+                "takeProfit" => "11",
+                "stopLoss" => "9.6",
+                // "tpslMode" => "Partial",
+                // "tpOrderType" => "Limit",
+                // "slOrderType" => "Limit",
+                // "tpLimitPrice" => "27500",
+                // "slLimitPrice" => "20500"
+            ];
+
+            return $this->doRequest(
+                $uri,
+                $method,
+                $payload,
+                'ERouWyafsDvOIFzKsK',
+                't8qpqgswpVNLHJ4zwu5wz2nHZels28MarvKd'
+            );
+        } catch (AppServiceException $e) {
+            return $e->getMessage();
+        }
     }
 }

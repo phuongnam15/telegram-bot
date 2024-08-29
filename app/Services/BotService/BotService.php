@@ -927,55 +927,38 @@ class BotService extends BaseService
                                     break;
                                 case 'bingx':
                                     if (!$data['leverage']) {
-                                        $maxLeverage = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
-                                        $data['leverage'] = $this->bingxService->setLeverage(
-                                            strtoupper($data['coin']) . "-USDT",
-                                            $maxLeverage,
-                                            $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
-                                            $apiKey,
-                                            $secretKey
-                                        );
-                                        break;
-                                    } else {
-                                        $this->bingxService->setLeverage(
-                                            strtoupper($data['coin']) . "-USDT",
-                                            $data['leverage'],
-                                            $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
-                                            $apiKey,
-                                            $secretKey
-                                        );
+                                        $data['leverage'] = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
                                     }
+
+                                    $this->bingxService->setLeverage(
+                                        strtoupper($data['coin']) . "-USDT",
+                                        $data['leverage'],
+                                        $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
+                                        $apiKey,
+                                        $secretKey
+                                    );
+
                                     break;
                                 case 'binance':
                                     if (!$data['leverage']) {
                                         $data['leverage'] = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
-                                        $this->binanceService->setLeverage(
-                                            strtoupper($data['coin']) . "USDT",
-                                            $data['leverage'],
-                                            $apiKey,
-                                            $secretKey
-                                        );
-                                        break;
-                                    } else {
-                                        $this->binanceService->setLeverage(
-                                            strtoupper($data['coin']) . "USDT",
-                                            $data['leverage'],
-                                            $apiKey,
-                                            $secretKey
-                                        );
                                     }
+
+                                    $this->binanceService->setLeverage(
+                                        strtoupper($data['coin']) . "USDT",
+                                        $data['leverage'],
+                                        $apiKey,
+                                        $secretKey
+                                    );
+
                                     break;
                                 case 'bybit':
+                                    $currentLeverage = $this->bybitService->getCurrentLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
                                     if (!$data['leverage']) {
                                         $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
-                                        $this->bybitService->setLeverage(
-                                            strtoupper($data['coin']) . "USDT",
-                                            $data['leverage'],
-                                            $apiKey,
-                                            $secretKey
-                                        );
-                                        break;
-                                    } else {
+                                    }
+
+                                    if($currentLeverage != $data['leverage']) {
                                         $this->bybitService->setLeverage(
                                             strtoupper($data['coin']) . "USDT",
                                             $data['leverage'],
@@ -983,6 +966,7 @@ class BotService extends BaseService
                                             $secretKey
                                         );
                                     }
+                                    
                                     break;
                             }
 
