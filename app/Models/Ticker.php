@@ -15,6 +15,6 @@ class Ticker extends Model
     const BINGX = 'bingx';
     const BINANCE = 'binance';
     const BYBIT = 'bybit';
-    const OKEX = 'okex';
+    const OKX = 'okx';
     const MEXC = 'mexc';
 }

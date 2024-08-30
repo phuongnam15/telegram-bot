@@ -64,6 +64,18 @@ class TickerSeeder extends Seeder
         }, array_column(json_decode($responseBybit->body(), true)['result']['list'], 'symbol'));
 
 
+        // Okx
+        $responseOkx = Http::get("https://www.okx.com/api/v5/market/tickers?instType=SWAP");
+        $dataOkx = array_map(function($symbol) {
+            $a = str_replace('-USDT-SWAP', '', $symbol);
+            return [
+                "name" => $a,
+                "usdt" => $symbol,
+                "platform" => Ticker::OKX,
+            ];
+        }, array_column(json_decode($responseOkx->body(), true)['data'], 'instId'));
+
+
         Schema::disableForeignKeyConstraints();
         DB::table('tickers')->truncate();
         
@@ -71,6 +83,7 @@ class TickerSeeder extends Seeder
         Ticker::insert($dataBingx);
         Ticker::insert($dataBinance);
         Ticker::insert($dataBybit);
+        Ticker::insert($dataOkx);
 
         Schema::enableForeignKeyConstraints();
     }

@@ -26,6 +26,7 @@ use App\Services\BinanceService\BinanceService;
 use App\Services\BingxService\BingxService;
 use App\Services\BitgetService\BitgetService;
 use App\Services\BybitService\BybitService;
+use App\Services\OkxService\OkxService;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -39,16 +40,20 @@ class BotService extends BaseService
     protected $bingxService;
     protected $binanceService;
     protected $bybitService;
+    protected $okxService;
     public function __construct(
         BitgetService $bitgetService, 
         BingxService $bingxService, 
         BinanceService $binanceService, 
-        BybitService $bybitService)
+        BybitService $bybitService,
+        OkxService $okxService
+    )
     {
         $this->bitgetService = $bitgetService;
         $this->bingxService = $bingxService;
         $this->binanceService = $binanceService;
         $this->bybitService = $bybitService;
+        $this->okxService = $okxService;
     }
 
     public function webhook($request, $botId)
@@ -968,6 +973,19 @@ class BotService extends BaseService
                                     }
                                     
                                     break;
+                                case 'okx':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->okxService->getInstrumentsInfo(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase)['maxLeverage'];
+                                    }
+
+                                    $this->okxService->setLeverage(
+                                        strtoupper($data['coin']) . "-USDT-SWAP",
+                                        $data['leverage'],
+                                        $apiKey,
+                                        $secretKey,
+                                        $passphrase
+                                    );
+                                    break;
                             }
 
                             if ($data['isLimit']) {
@@ -1012,6 +1030,9 @@ class BotService extends BaseService
                                         break;
                                     case 'bybit':
                                         $currentPrice = $this->bybitService->getLatestPrice(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        break;
+                                    case 'okx':
+                                        $currentPrice = $this->okxService->getLatestPrice(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
                                         break;
                                 }
 
@@ -1186,6 +1207,9 @@ class BotService extends BaseService
                     break;
                 case 'bybit':
                     $this->bybitService->createOrderBybit($vol, $input, $client, $chatId, $apiKey, $secretKey);
+                    break;
+                case 'okx':
+                    $this->okxService->createOrderOkx($vol, $input, $client, $chatId, $apiKey, $secretKey, $passphrase);
                     break;
                 default:
                     break;

@@ -242,7 +242,7 @@
 
     let currentUserKeys = [];
     const openUpdateUserKeyModal = (userId, apiKey, secretKey, passphrase, platform, keys) => {
-        if (platform === 'bitget') {
+        if (['bitget', 'okx'].includes(platform)) {
             if ($('#passphraseField').hasClass('hidden')) {
                 $('#passphraseField').removeClass('hidden');
             }
@@ -264,7 +264,7 @@
         $('#platform').on('change', function() {
             const selectedPlatform = $(this).val();
 
-            if (selectedPlatform === 'bitget') {
+            if (['bitget', 'okx'].includes(selectedPlatform)) {
                 if ($('#passphraseField').hasClass('hidden')) {
                     $('#passphraseField').removeClass('hidden');
                 }

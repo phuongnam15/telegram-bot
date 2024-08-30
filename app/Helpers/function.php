@@ -273,7 +273,7 @@ if (!function_exists('convertBanExpireTime')) {
 if (!function_exists('sendResponseTrading')) {
     function sendResponseTrading($client, $chatId, $input, $result, $lastPrice, $platform)
     {
-        if ($result['code'] == "00000" || $result['code'] == 0) {
+        if (in_array($result['code'], ["00000", 0, "0"])) {
             $client->post('sendMessage', [
                 'json' => [
                     'text' => ($input['orderType'] === 'buy' ? "🟢 " : "🔴 ") . "[Đã vào lệnh]\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "" . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}\n\n{$platform}",
@@ -281,9 +281,15 @@ if (!function_exists('sendResponseTrading')) {
                 ]
             ]);
         } else {
+            if($platform == 'OKX') {
+                $errorMessage = $result['data'][0]['sMsg'];
+            }else{
+                $errorMessage = $result['msg'];
+            }
+
             $client->post('sendMessage', [
                 'json' => [
-                    'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$result['msg']}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}\n\n{$platform}",
+                    'text' => "❌ [Tạo lệnh thất bại] ❌\n\n{$errorMessage}\n\n" . strtoupper($input['coin']) . " - " . strtoupper($input['orderType']) . " " . ($input['isLimit'] ? " limit\n- ET: {$input['ET']}" : "\n- ET xấp xỉ {$lastPrice}") . "\n- SL: {$input['SL']}\n- TP: {$input['TP']}\n- x{$input['leverage']}\n\n{$platform}",
                     'chat_id' => $chatId
                 ]
             ]);
