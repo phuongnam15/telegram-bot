@@ -15,14 +15,18 @@ class OkxService extends BaseService
         try{
             $lastPrice = $this->getLatestPrice(strtoupper($input['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
             $size = ($vol * $input['leverage']) / $lastPrice;
-            $stepSize = $this->getInstrumentsInfo(strtoupper($input['coin']) . "-USDT", $apiKey, $secretKey, $passphrase)['stepSize'];
-            $decimalPlaces = strlen(substr(strrchr(rtrim($stepSize, '0'), '.'), 1));
-            $quantity = round($size, $decimalPlaces);
-    
+
+            $instrumentsInfo = $this->getInstrumentsInfo(strtoupper($input['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
+            $lotSize = $instrumentsInfo['lotSize'];
+            $contractValue = $instrumentsInfo['contractValue'];
+            
+            $decimalPlaces = strlen(substr(strrchr(rtrim($lotSize, '0'), '.'), 1));
+            $quantity = round($size / $contractValue, $decimalPlaces);
+
             $uri = "/api/v5/trade/order";
             $method = "POST";
             $payload = [
-                "instId" => strtoupper($input['coin']) . "-USDT",
+                "instId" => strtoupper($input['coin']) . "-USDT-SWAP",
                 "tdMode" => "isolated",
                 "side" => $input['orderType'],
                 "ordType" => $input['isLimit'] ? 'limit' : 'market',
@@ -31,6 +35,7 @@ class OkxService extends BaseService
                 "tpOrdPx" => "-1",
                 "slTriggerPx" => $input['SL'],
                 "slOrdPx" => "-1",
+                "reduceOnly" => false
             ];
 
             if ($input['isLimit']) {
@@ -96,7 +101,8 @@ class OkxService extends BaseService
 
         return [
             'maxLeverage' => $result['lever'],
-            'stepSize' => $result['tickSz'],
+            'lotSize' => $result['lotSz'],
+            'contractValue' => $result['ctVal'],
         ];
     }
     public function setLeverage($symbol, $leverage, $apiKey, $secretKey, $passphrase)
