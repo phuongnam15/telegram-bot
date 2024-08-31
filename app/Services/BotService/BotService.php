@@ -1010,7 +1010,7 @@ class BotService extends BaseService
                                         break;
                                 }
                             } else {
-                                
+
                                 switch ($platform) {
                                     case 'bitget':
                                         $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
