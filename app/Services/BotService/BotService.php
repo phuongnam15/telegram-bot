@@ -1077,6 +1077,7 @@ class BotService extends BaseService
         $response = Http::get("https://api.bitget.com/api/v2/spot/market/tickers?symbol={$symbol}");
 
         if(json_decode($response->body(), true)['code'] !== "00000") {
+            logger($response->body());
             throw new AppServiceException("Error get latest price of coin");
         }
 
