@@ -78,6 +78,7 @@
     $(document).ready(async () => {
         const botId = window.location.pathname.split('/').pop();
         document.getElementById('botUserLink').href = `/coin/${botId}`;
+        document.getElementById('tradingMetricdLink').href = `/coin/trading-slats/${botId}`;
 
         await getInfoBot();
     });

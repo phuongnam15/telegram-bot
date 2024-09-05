@@ -327,7 +327,7 @@ class BotService extends BaseService
 
             $users = $bot->users();
 
-            if(request()->has('keyword')) {
+            if (request()->has('keyword')) {
                 $users = $users->where('firstname', 'like', '%' . request()->keyword . '%');
             }
 
@@ -845,7 +845,7 @@ class BotService extends BaseService
 
             switch ($status) {
                 case 'trade':
-                    try{
+                    try {
                         $botTradingSlat = $this->updateSlatBotTrading($botId);
 
                         if ($botUser->is_actived) {
@@ -887,7 +887,7 @@ class BotService extends BaseService
                                 ]);
                                 break;
                             }
-                            
+
                             $data = parseOrder($text);
     
                             // logger($data);
@@ -900,18 +900,18 @@ class BotService extends BaseService
                                     ]
                                 ]);
                             } else {
-    
+            
                                 if (!$data['leverage']) {
                                     $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, LEVERAGE_LEVELS);
                                 } else {
                                     $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage'], "20"]);
                                 }
-    
+
                                 if ($data['isLimit']) {
                                     $ets = $data['ET'];
-    
+
                                     $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-    
+
                                     $etLength = count($ets);
                                     switch ($etLength) {
                                         case 1:
@@ -949,7 +949,7 @@ class BotService extends BaseService
                                 ]
                             ]);
                         }
-                    }catch(AppServiceException $error){
+                    } catch (AppServiceException $error) {
                         $botTradingSlat->total_trading_failed += 1;
                         $botTradingSlat->save();
                         throw new AppServiceException($error->getMessage());
@@ -1259,6 +1259,23 @@ class BotService extends BaseService
             $botTradingStat->save();
 
             return $botTradingStat;
+        } catch (AppServiceException $error) {
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function botTradeCommandSlats($request)
+    {
+        try {
+            $records = BotTradingSlat::where('bot_id', $request->bot_id)->whereBetween('created_at', [
+                Carbon::parse($request->start_at),
+                Carbon::parse($request->end_at)
+            ])->get();
+
+            if (!$records) {
+                throw new AppServiceException('Bot not found');
+            }
+
+            return $records;
         } catch (AppServiceException $error) {
             throw new AppServiceException($error->getMessage());
         }
