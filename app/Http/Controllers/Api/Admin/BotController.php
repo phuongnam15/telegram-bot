@@ -49,4 +49,7 @@ class BotController extends Controller
   public function updateUserTradingPlatform(Request $request) {
     return $this->botService->updateUserTradingPlatform($request);
   }
+  public function botTradeCommandSlats(Request $request) {
+    return $this->botService->botTradeCommandSlats($request);
+  }
 }

@@ -51,6 +51,9 @@ Route::prefix('coin')->group((function() {
     Route::get('/{id}', function () {
         return view('coin_user');
     });
+    Route::get('/trading-slats/{id}', function () {
+        return view('trading-slats');
+    });
 }));
 Route::get('profile', function () {
     return view('profile');

@@ -75,6 +75,7 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/send', [BotController::class, 'send']);
 
     Route::prefix('bot')->group(function () {
+        Route::get('/trade-command-slats', [BotController::class, 'botTradeCommandSlats']);
         Route::prefix('user')->group(function () {
             Route::get('/', [BotController::class, 'listUser']);
             Route::post('/', [UserController::class, 'update']);

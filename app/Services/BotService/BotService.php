@@ -8,15 +8,18 @@ use App\Models\AnalyticGroupUser;
 use App\Models\Bot;
 use App\Models\BotCommandContent;
 use App\Models\BotGroup;
-use App\Models\BotTradingSlat;
 use App\Models\BotUser;
 use App\Models\Command;
 use App\Models\ContentConfig;
 use App\Models\GroupUser;
+use App\Models\Key;
+use App\Models\Password;
+use App\Models\PhoneNumber;
 use App\Models\ScheduleDeleteMessage;
 use App\Models\TelegramGroup;
 use App\Models\TelegramMessage;
 use App\Models\User;
+use App\Models\UserPassword;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use App\Services\BinanceService\BinanceService;
@@ -39,12 +42,13 @@ class BotService extends BaseService
     protected $bybitService;
     protected $okxService;
     public function __construct(
-        BitgetService $bitgetService,
-        BingxService $bingxService,
-        BinanceService $binanceService,
+        BitgetService $bitgetService, 
+        BingxService $bingxService, 
+        BinanceService $binanceService, 
         BybitService $bybitService,
         OkxService $okxService
-    ) {
+    )
+    {
         $this->bitgetService = $bitgetService;
         $this->bingxService = $bingxService;
         $this->binanceService = $binanceService;
@@ -750,9 +754,15 @@ class BotService extends BaseService
             $botId = $bot->id;
             $botToken = $bot->token;
 
-            $firstname = $message['from']['first_name'] ?? "";
-            $lastname = $message['from']['last_name'] ?? "";
-            $username = $message['from']['username'] ?? "";
+            if (isset($message['from']['first_name'])) {
+                $firstname = $message['from']['first_name'] ?? null;
+            }
+            if (isset($message['from']['last_name'])) {
+                $lastname = $message['from']['last_name'] ?? null;
+            }
+            if (isset($message['from']['username'])) {
+                $username = $message['from']['username'] ?? null;
+            }
 
             $avatar = $this->getUserOrBotImage($botToken, $chatId);
 
@@ -844,162 +854,6 @@ class BotService extends BaseService
         }
     }
     public function checkUserStatus($message, $chatId, $bot)
-    {
-        try {
-            $botId = $bot->id;
-            $botToken = $bot->token;
-
-            $text = $message['text'];
-            $client = new Client([
-                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
-            ]);
-
-            $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
-                $query->where('telegram_id', $chatId);
-            })->first();
-
-            if (!$botUser) {
-                return;
-            }
-
-            $platform = $botUser->trading_platform;
-            $status = $botUser->status;
-
-            switch ($status) {
-                case 'trade':
-                    try {
-                        $botTradingSlat = $this->updateSlatBotTrading($botId);
-
-                        if ($botUser->is_actived) {
-                            $text = strtolower($text);
-
-                            if (!$botUser->risk_tolerance) {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "Liên hệ admin để thiết lập số tiền chấp nhận rủi ro (thường từ 3-5% vốn)\n  ",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                                break;
-                            }
-                            if (!$botUser->api_key) {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "Bạn chưa cung cấp API Key cho admin",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                                break;
-                            }
-                            if (!$botUser->secret_key) {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "Bạn chưa cung cấp Secret Key cho admin",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                                break;
-                            }
-                            if (!$botUser->passphrase) {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "Bạn chưa cung cấp Passphrase cho admin",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                                break;
-                            }
-
-                            $data = parseOrder($text);
-
-                            // logger($data);
-
-                            if (!$data) {
-                                $client->post('sendMessage', [
-                                    'json' => [
-                                        'text' => "❗️ Cú pháp của bạn không đúng ❗️\n\nĐể đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000\n- SL: 49000\n- TP: 51000\n- x10\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
-                                        'chat_id' => $chatId
-                                    ]
-                                ]);
-                            } else {
-
-                                if (!$data['leverage']) {
-                                    $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, LEVERAGE_LEVELS);
-                                } else {
-                                    $data['leverage'] = $this->setMaxLeverage($data['coin'] . "usdt", $botUser->api_key, $botUser->secret_key, $botUser->passphrase, [$data['leverage'], "20"]);
-                                }
-
-                                if ($data['isLimit']) {
-                                    $ets = $data['ET'];
-
-                                    $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-
-                                    $etLength = count($ets);
-                                    switch ($etLength) {
-                                        case 1:
-                                            $data['ET'] = $ets[0];
-                                            $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
-                                            break;
-                                        case 2:
-                                            $data['ET'] = $ets[0];
-                                            $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
-                                            $data['ET'] = $ets[1];
-                                            $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
-                                            break;
-                                        case 3:
-                                            $data['ET'] = $ets[0];
-                                            $this->createOrder($vol / 4, $data, $client, $chatId, $botUser, $platform);
-                                            $data['ET'] = $ets[1];
-                                            $this->createOrder($vol / 4, $data, $client, $chatId, $botUser, $platform);
-                                            $data['ET'] = $ets[2];
-                                            $this->createOrder($vol / 2, $data, $client, $chatId, $botUser, $platform);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                } else {
-                                    $currentPrice = $this->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
-                                    $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-                                    $this->createOrder($vol, $data, $client, $chatId, $botUser, $platform);
-                                }
-                            }
-                        } else {
-                            $client->post('sendMessage', [
-                                'json' => [
-                                    'text' => "Vui lòng liên hệ admin để kích hoạt đặt lệnh",
-                                    'chat_id' => $chatId
-                                ]
-                            ]);
-                        }
-                    } catch (AppServiceException $error) {
-                        $botTradingSlat->total_trading_failed += 1;
-                        $botTradingSlat->save();
-                        throw new AppServiceException($error->getMessage());
-                    }
-                    break;
-                case 'start':
-                    //check command to resend config content
-                    if (Command::where('command', $message['text'])->exists()) {
-
-                        $command = Command::where('command', $message['text'])->first();
-
-                        $bCC = BotCommandContent::where([
-                            'bot_id' => $botId,
-                            'command_id' => $command->id
-                        ])->first();
-
-                        if ($bCC) {
-                            $content = ContentConfig::where('id', $bCC->content_id)->first();
-                            $this->send([$chatId], $content->id, $botToken);
-                        }
-                    }
-                default:
-                    break;
-            }
-        } catch (\Exception $error) {
-            sendMessage($chatId, $botToken, "<i>Đã có lỗi xảy ra</i>");
-            throw new AppServiceException($error->getMessage());
-        }
     }
     public function checkCommandGroup($update, $botToken)
     {
@@ -1143,29 +997,6 @@ class BotService extends BaseService
                     break;
             }
         } catch (\Exception $error) {
-            throw new AppServiceException($error->getMessage());
-        }
-    }
-    public function updateSlatBotTrading($botId)
-    {
-        try {
-            $today = Carbon::today();
-
-            $botTradingStat = BotTradingSlat::where('bot_id', $botId)
-                ->whereDate('created_at', $today)
-                ->first();
-
-            if (!$botTradingStat) {
-                $botTradingStat = BotTradingSlat::create([
-                    'bot_id' => $botId,
-                ]);
-            }
-
-            $botTradingStat->total_trading_command += 1;
-            $botTradingStat->save();
-
-            return $botTradingStat;
-        } catch (AppServiceException $error) {
             throw new AppServiceException($error->getMessage());
         }
     }
