@@ -191,13 +191,6 @@ class BinanceService extends BaseService
 
         return collect($data['symbols'])->firstWhere('symbol', $symbol)['filters'][2]['stepSize'];
     }
-    public function testOrder($payload, $apiKey, $secretKey)
-    {
-        $uri = "/fapi/v1/order/test";
-        $method = "POST";
-
-        return $this->doRequest($uri, $method, $payload, $apiKey, $secretKey);
-    }
     function createUniqueId()
     {
         $microTime = microtime(true);
