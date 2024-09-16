@@ -984,7 +984,7 @@
                             `);
                 } else {
                     $('#botDetails').append(`
-                            <div class="bg-[#f8f9fa] dark:bg-[#2d2f34] border-[1px] border-solid border-[#e5e7eb] dark:border-gray-600 rounded py-1 pl-7 space-x-5 text-gray-700 dark:text-gray-300 flex items-center hover:bg-[#ced3dc] dark:hover:bg-[#3a3d42] cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
+                            <div class="bg-[#f8f9fa] dark:bg-gray-800 border-[1px] border-solid border-[#e5e7eb] dark:border-gray-600 rounded py-1 pl-7 space-x-5 text-gray-700 dark:text-gray-300 flex items-center hover:bg-[#ced3dc] dark:hover:bg-gray-700 cursor-pointer" onclick="openScheduleModal('delete_message', ${botId})">
                                 <i class="fa-solid fa-plus text-[12px]"></i>
                                 <span class="text-[12px] font-medium">Create schedule auto delete message</span>
                             </div>
