@@ -3,7 +3,7 @@
 @section("title", "Bot Coin - Trading Stats")
 
 @section("content")
-<div class="w-full h-full bg-red-50 p-4">
+<div class="w-full h-full p-4">
     <div id="analytic" class="">
         <input type="text" readonly id="litepicker" class="border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 border outline-none rounded text-center text-[0.8rem] mb-10  focus:border-blue-300 py-1 font-bold font-popi text-gray-600 w-[10rem]">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-10">

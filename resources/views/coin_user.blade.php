@@ -174,7 +174,7 @@
                         </th>
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-center">
-                                <div class="h-2.5 w-2.5 rounded-full ${user.pivot.is_actived ? "bg-green-500" : "bg-red-500"} me-2"></div> ${user.pivot.is_actived ? "Active" : "Inactive"}
+                                <div class="h-2.5 w-2.5 rounded-full ${user.pivot.is_actived == "1" ? "bg-green-500" : "bg-red-500"} me-2"></div> ${user.pivot.is_actived == "1" ? "Active" : "Inactive"}
                             </div>
                         </td>
                         <td class="px-6 py-4 text-center">
