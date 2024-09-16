@@ -918,8 +918,8 @@
                                     <strong>Token:</strong> 
                                     ${data.token}
                                     ${data.status === '1' ? 
-                                        `<button class="bg-gray-700 dark:bg-gray-600 px-2 -skew-x-[20deg]" onClick="showCoinMode(${data.id})">
-                                            <span class="text-[#fbc31c] text-md hover:underline">bitcoin</span>
+                                        `<button class="px-2 -skew-x-[20deg]" onClick="showCoinMode(${data.id})">
+                                            <span class="text-[#fbc31c] text-md hover:underline tracking-wide">bitcoin</span>
                                         </button>`
                                     :
                                         ""
@@ -927,7 +927,7 @@
                                 </p>
                                 <p class="block text-sm font-medium text-gray-600 dark:text-gray-300"><strong>Username:</strong> @${data.username}</p>
                                 <p class="block text-sm font-medium text-gray-600 dark:text-gray-300"><strong>Firstname:</strong> ${data.firstname}</p>
-                                <p class="block text-sm font-medium text-gray-600 dark:text-gray-300">
+                                <p class="block text-sm text-gray-600 dark:text-gray-300">
                                     <strong>Status:</strong> 
                                     ${data.status === '1' ? '<i class="text-green-500">activated</i>' : '<i class="text-red-500">not activated</i>'}
                                 </p>
@@ -939,7 +939,7 @@
                                     : 
                                         ""
                                     }
-                                    <button class="text-lime-600 dark:text-lime-500 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify (${data.is_notify_mode === "1" ? "on" : "off"})</button>
+                                    <button class="text-blue-500 dark:text-blue-400 text-sm italic hover:underline" onClick="toggleNotifyMode(${data.id})">notify (${data.is_notify_mode === "1" ? "on" : "off"})</button>
                                     <span class="dark:text-gray-300">/</span>
                                     <button class="text-red-500 dark:text-red-400 text-sm italic hover:underline" id="deleteBotButton">delete</button>
                                 </div>
