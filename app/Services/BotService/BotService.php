@@ -8,6 +8,7 @@ use App\Models\AnalyticGroupUser;
 use App\Models\Bot;
 use App\Models\BotCommandContent;
 use App\Models\BotGroup;
+use App\Models\BotTradingSlat;
 use App\Models\BotUser;
 use App\Models\Command;
 use App\Models\ContentConfig;
@@ -19,7 +20,6 @@ use App\Models\ScheduleDeleteMessage;
 use App\Models\TelegramGroup;
 use App\Models\TelegramMessage;
 use App\Models\User;
-use App\Models\UserPassword;
 use App\Services\_Abstract\BaseService;
 use App\Services\_Exception\AppServiceException;
 use App\Services\BinanceService\BinanceService;
@@ -32,8 +32,6 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
-use App\Models\BotTradingSlat;
-
 
 class BotService extends BaseService
 {
@@ -321,6 +319,7 @@ class BotService extends BaseService
         return DbTransactions()->addCallbackJson(function () use ($request) {
             $botUser = BotUser::where(['bot_id' => $request->bot_id, 'user_id' => $request->user_id])->first();
 
+
             if (!$botUser) {
                 throw new AppServiceException('Bot user not found');
             }
@@ -354,7 +353,9 @@ class BotService extends BaseService
             $users = $bot->users()->with('keys');
 
             if (request()->has('keyword')) {
-                $users = $users->where('firstname', 'like', '%' . request()->keyword . '%');
+                if (request()->has('keyword')) {
+                    $users = $users->where('firstname', 'like', '%' . request()->keyword . '%');
+                }
             }
 
             $users = $users->paginate(DEFAULT_PAGINATE);
@@ -754,15 +755,9 @@ class BotService extends BaseService
             $botId = $bot->id;
             $botToken = $bot->token;
 
-            if (isset($message['from']['first_name'])) {
-                $firstname = $message['from']['first_name'] ?? null;
-            }
-            if (isset($message['from']['last_name'])) {
-                $lastname = $message['from']['last_name'] ?? null;
-            }
-            if (isset($message['from']['username'])) {
-                $username = $message['from']['username'] ?? null;
-            }
+            $firstname = $message['from']['first_name'] ?? "";
+            $lastname = $message['from']['last_name'] ?? "";
+            $username = $message['from']['username'] ?? "";
 
             $avatar = $this->getUserOrBotImage($botToken, $chatId);
 
