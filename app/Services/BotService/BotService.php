@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use App\Models\BotTradingSlat;
 
 
 class BotService extends BaseService
@@ -42,13 +43,12 @@ class BotService extends BaseService
     protected $bybitService;
     protected $okxService;
     public function __construct(
-        BitgetService $bitgetService, 
-        BingxService $bingxService, 
-        BinanceService $binanceService, 
+        BitgetService $bitgetService,
+        BingxService $bingxService,
+        BinanceService $binanceService,
         BybitService $bybitService,
         OkxService $okxService
-    )
-    {
+    ) {
         $this->bitgetService = $bitgetService;
         $this->bingxService = $bingxService;
         $this->binanceService = $binanceService;
@@ -854,6 +854,230 @@ class BotService extends BaseService
         }
     }
     public function checkUserStatus($message, $chatId, $bot)
+    {
+        try {
+            $botId = $bot->id;
+            $botToken = $bot->token;
+
+            $text = $message['text'];
+            $client = new Client([
+                'base_uri' => "https://api.telegram.org/bot{$botToken}/",
+            ]);
+
+            $botUser = BotUser::where('bot_id', $botId)->whereHas('user', function ($query) use ($chatId) {
+                $query->where('telegram_id', $chatId);
+            })->first();
+
+            if (!$botUser) {
+                return;
+            }
+
+            $platform = $botUser->trading_platform;
+            $status = $botUser->status;
+
+            switch ($status) {
+                case 'trade':
+
+                    $botTradingSlat = $this->updateSlatBotTrading($botId);
+
+                    if ($botUser->is_actived) {
+                        $text = strtolower($text);
+
+                        if (!$botUser->risk_tolerance) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Liên hệ admin để thiết lập số tiền chấp nhận rủi ro (thường từ 3-5% vốn)\n  ",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                            break;
+                        }
+
+                        $key = Key::where([
+                            'user_id' => $botUser->user_id,
+                            'platform' => $platform
+                        ])->first();
+
+                        if (!$key) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "Bạn chưa có API Key của sàn này, vui lòng cung cấp nó cho Admin\n@tienthanh247",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                            break;
+                        }
+
+                        $data = parseOrder($text, $platform);
+
+                        // logger($data);
+
+                        if (!$data) {
+                            $client->post('sendMessage', [
+                                'json' => [
+                                    'text' => "❗️ Cú pháp của bạn không đúng ❗️\n\nĐể đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000\n- SL: 49000\n- TP: 51000\n- x10\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
+                                    'chat_id' => $chatId
+                                ]
+                            ]);
+                        } else {
+
+                            $apiKey = $key->api_key;
+                            $secretKey = $key->secret_key;
+                            $passphrase = $key->passphrase;
+
+                            switch ($platform) {
+                                case 'bitget':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, LEVERAGE_LEVELS);
+                                    } else {
+                                        $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, [$data['leverage'], "20"]);
+                                    }
+                                    break;
+                                case 'bingx':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                    }
+
+                                    $this->bingxService->setLeverage(
+                                        strtoupper($data['coin']) . "-USDT",
+                                        $data['leverage'],
+                                        $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
+                                        $apiKey,
+                                        $secretKey
+                                    );
+
+                                    break;
+                                case 'binance':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                    }
+
+                                    $this->binanceService->setLeverage(
+                                        strtoupper($data['coin']) . "USDT",
+                                        $data['leverage'],
+                                        $apiKey,
+                                        $secretKey
+                                    );
+
+                                    break;
+                                case 'bybit':
+                                    $currentLeverage = $this->bybitService->getCurrentLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
+                                    }
+
+                                    if ($currentLeverage != $data['leverage']) {
+                                        $this->bybitService->setLeverage(
+                                            strtoupper($data['coin']) . "USDT",
+                                            $data['leverage'],
+                                            $apiKey,
+                                            $secretKey
+                                        );
+                                    }
+
+                                    break;
+                                case 'okx':
+                                    if (!$data['leverage']) {
+                                        $data['leverage'] = $this->okxService->getInstrumentsInfo(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase)['maxLeverage'];
+                                    }
+
+                                    $this->okxService->setLeverage(
+                                        strtoupper($data['coin']) . "-USDT-SWAP",
+                                        $data['leverage'],
+                                        $apiKey,
+                                        $secretKey,
+                                        $passphrase
+                                    );
+                                    break;
+                            }
+
+                            if ($data['isLimit']) {
+                                $ets = $data['ET'];
+
+                                $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+
+                                $etLength = count($ets);
+                                switch ($etLength) {
+                                    case 1:
+                                        $data['ET'] = $ets[0];
+                                        $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
+                                        break;
+                                    case 2:
+                                        $data['ET'] = $ets[0];
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
+                                        $data['ET'] = $ets[1];
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
+                                        break;
+                                    case 3:
+                                        $data['ET'] = $ets[0];
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
+                                        $data['ET'] = $ets[1];
+                                        $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
+                                        $data['ET'] = $ets[2];
+                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else {
+
+                                switch ($platform) {
+                                    case 'bitget':
+                                        $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
+                                        break;
+                                    case 'bingx':
+                                        $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                        break;
+                                    case 'binance':
+                                        $currentPrice = $this->binanceService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT", $secretKey);
+                                        break;
+                                    case 'bybit':
+                                        $currentPrice = $this->bybitService->getLatestPrice(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        break;
+                                    case 'okx':
+                                        $currentPrice = $this->okxService->getLatestPrice(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
+                                        break;
+                                }
+
+                                $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
+                            }
+                        }
+                    } else {
+                        $botTradingSlat->total_trading_failed += 1;
+                        $botTradingSlat->save();
+
+                        $client->post('sendMessage', [
+                            'json' => [
+                                'text' => "Vui lòng liên hệ admin để kích hoạt đặt lệnh",
+                                'chat_id' => $chatId
+                            ]
+                        ]);
+                    }
+                    break;
+                case 'start':
+                    //check command to resend config content
+                    if (Command::where('command', $message['text'])->exists()) {
+
+                        $command = Command::where('command', $message['text'])->first();
+
+                        $bCC = BotCommandContent::where([
+                            'bot_id' => $botId,
+                            'command_id' => $command->id
+                        ])->first();
+
+                        if ($bCC) {
+                            $content = ContentConfig::where('id', $bCC->content_id)->first();
+                            $this->send([$chatId], $content->id, $botToken);
+                        }
+                    }
+                default:
+                    break;
+            }
+        } catch (\Exception $error) {
+            sendMessage($chatId, $botToken, "<i>Đã có lỗi xảy ra</i>");
+            throw new AppServiceException($error->getMessage());
+        }
     }
     public function checkCommandGroup($update, $botToken)
     {
@@ -997,6 +1221,46 @@ class BotService extends BaseService
                     break;
             }
         } catch (\Exception $error) {
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function updateSlatBotTrading($botId)
+    {
+        try {
+            $today = Carbon::today();
+
+            $botTradingStat = BotTradingSlat::where('bot_id', $botId)
+                ->whereDate('created_at', $today)
+                ->first();
+
+            if (!$botTradingStat) {
+                $botTradingStat = BotTradingSlat::create([
+                    'bot_id' => $botId,
+                ]);
+            }
+
+            $botTradingStat->total_trading_command += 1;
+            $botTradingStat->save();
+
+            return $botTradingStat;
+        } catch (AppServiceException $error) {
+            throw new AppServiceException($error->getMessage());
+        }
+    }
+    public function botTradeCommandSlats($request)
+    {
+        try {
+            $records = BotTradingSlat::where('bot_id', $request->bot_id)->whereBetween('created_at', [
+                Carbon::parse($request->start_at),
+                Carbon::parse($request->end_at)
+            ])->get();
+
+            if (!$records) {
+                throw new AppServiceException('Bot not found');
+            }
+
+            return $records;
+        } catch (AppServiceException $error) {
             throw new AppServiceException($error->getMessage());
         }
     }
