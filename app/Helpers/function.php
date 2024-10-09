@@ -85,7 +85,7 @@ if (!function_exists('parseOrder')) {
         $coinPattern = '/^([a-zA-Z0-9]+)([\s\-])/i'; // Extract coin name from the beginning of the text
         $orderTypePattern = '/(short|long|buy|sell)/i'; // Order type (short, long, buy, sell)
         $limitPattern = '/\blimit\b/i'; // Separate pattern to check for "limit"
-        $etPattern = '/et[\s:]*([\d\.,\- ]+)/i'; // Entry price (can be separated by " " or "-")
+        $etPattern = '/(?<![a-zA-Z])et[\s:]*([\d\.,\- ]+)/i'; // Entry price (can be separated by " " or "-")
         $slPattern = '/stl[\s:]*([\d\.,]+)|sl[\s:]*([\d\.,]+)/i'; // Stop loss or short stop loss
         $tpPattern = '/tp[\s:]*([\d\.,]+)/i'; // Take profit price
         $leveragePattern = '/(\d+)x|x(\d+)/i'; // Pattern to find leverage
