@@ -903,140 +903,313 @@ class BotService extends BaseService
                             break;
                         }
 
-                        $data = parseOrder($text, $platform);
+                        $apiKey = $key->api_key;
+                        $secretKey = $key->secret_key;
+                        $passphrase = $key->passphrase;
+                        $vol = null;
 
-                        // logger($data);
+                        switch ($text) {
+                            case "/yes":
+                                if (!$botUser->pending_order) {
+                                    $client->post('sendMessage', [
+                                        'json' => [
+                                            'text' => "Bạn đang không có lệnh chờ nào, vui lòng nhập lệnh của bạn",
+                                            'chat_id' => $chatId
+                                        ]
+                                    ]);
 
-                        if (!$data) {
-                            $client->post('sendMessage', [
-                                'json' => [
-                                    'text' => "❗️ Cú pháp của bạn không đúng ❗️\n\nĐể đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000\n- SL: 49000\n- TP: 51000\n- x10\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
-                                    'chat_id' => $chatId
-                                ]
-                            ]);
-                        } else {
+                                    return;
+                                }
 
-                            $apiKey = $key->api_key;
-                            $secretKey = $key->secret_key;
-                            $passphrase = $key->passphrase;
+                                $data = json_decode($botUser->pending_order, true);
 
-                            switch ($platform) {
-                                case 'bitget':
-                                    if (!$data['leverage']) {
-                                        $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, LEVERAGE_LEVELS);
-                                    } else {
-                                        $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, [$data['leverage'], "20"]);
-                                    }
-                                    break;
-                                case 'bingx':
-                                    if (!$data['leverage']) {
-                                        $data['leverage'] = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
-                                    }
+                                //tính vol
+                                if ($data['isLimit']) {
+                                    $ets = $data['ET'];
 
-                                    $this->bingxService->setLeverage(
-                                        strtoupper($data['coin']) . "-USDT",
-                                        $data['leverage'],
-                                        $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
-                                        $apiKey,
-                                        $secretKey
-                                    );
-
-                                    break;
-                                case 'binance':
-                                    if (!$data['leverage']) {
-                                        $data['leverage'] = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
-                                    }
-
-                                    $this->binanceService->setLeverage(
-                                        strtoupper($data['coin']) . "USDT",
-                                        $data['leverage'],
-                                        $apiKey,
-                                        $secretKey
-                                    );
-
-                                    break;
-                                case 'bybit':
-                                    $currentLeverage = $this->bybitService->getCurrentLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
-                                    if (!$data['leverage']) {
-                                        $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
+                                    $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                } else {
+                                    switch ($platform) {
+                                        case 'bitget':
+                                            $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
+                                            break;
+                                        case 'bingx':
+                                            $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                            break;
+                                        case 'binance':
+                                            $currentPrice = $this->binanceService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT", $secretKey);
+                                            break;
+                                        case 'bybit':
+                                            $currentPrice = $this->bybitService->getLatestPrice(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                            break;
+                                        case 'okx':
+                                            $currentPrice = $this->okxService->getLatestPrice(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
+                                            break;
                                     }
 
-                                    if ($currentLeverage != $data['leverage']) {
-                                        $this->bybitService->setLeverage(
+                                    $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                }
+
+                                //check đòn bẩy
+                                switch ($platform) {
+                                    case 'bitget':
+                                        if (!$data['leverage']) {
+                                            $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, LEVERAGE_LEVELS);
+                                        } else {
+                                            $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, [$data['leverage'], "20"]);
+                                        }
+                                        break;
+                                    case 'bingx':
+                                        if (!$data['leverage']) {
+                                            $data['leverage'] = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                        }
+
+                                        $this->bingxService->setLeverage(
+                                            strtoupper($data['coin']) . "-USDT",
+                                            $data['leverage'],
+                                            $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
+                                            $apiKey,
+                                            $secretKey
+                                        );
+
+                                        break;
+                                    case 'binance':
+                                        if (!$data['leverage']) {
+                                            $data['leverage'] = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        }
+
+                                        $this->binanceService->setLeverage(
                                             strtoupper($data['coin']) . "USDT",
                                             $data['leverage'],
                                             $apiKey,
                                             $secretKey
                                         );
-                                    }
 
-                                    break;
-                                case 'okx':
-                                    if (!$data['leverage']) {
-                                        $data['leverage'] = $this->okxService->getInstrumentsInfo(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase)['maxLeverage'];
-                                    }
-
-                                    $this->okxService->setLeverage(
-                                        strtoupper($data['coin']) . "-USDT-SWAP",
-                                        $data['leverage'],
-                                        $apiKey,
-                                        $secretKey,
-                                        $passphrase
-                                    );
-                                    break;
-                            }
-
-                            if ($data['isLimit']) {
-                                $ets = $data['ET'];
-
-                                $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-
-                                $etLength = count($ets);
-                                switch ($etLength) {
-                                    case 1:
-                                        $data['ET'] = $ets[0];
-                                        $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
-                                        break;
-                                    case 2:
-                                        $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
-                                        $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
-                                        break;
-                                    case 3:
-                                        $data['ET'] = $ets[0];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
-                                        $data['ET'] = $ets[1];
-                                        $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
-                                        $data['ET'] = $ets[2];
-                                        $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            } else {
-
-                                switch ($platform) {
-                                    case 'bitget':
-                                        $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
-                                        break;
-                                    case 'bingx':
-                                        $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
-                                        break;
-                                    case 'binance':
-                                        $currentPrice = $this->binanceService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT", $secretKey);
                                         break;
                                     case 'bybit':
-                                        $currentPrice = $this->bybitService->getLatestPrice(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        $currentLeverage = $this->bybitService->getCurrentLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                        if (!$data['leverage']) {
+                                            $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
+                                        }
+
+                                        if ($currentLeverage != $data['leverage']) {
+                                            $this->bybitService->setLeverage(
+                                                strtoupper($data['coin']) . "USDT",
+                                                $data['leverage'],
+                                                $apiKey,
+                                                $secretKey
+                                            );
+                                        }
+
                                         break;
                                     case 'okx':
-                                        $currentPrice = $this->okxService->getLatestPrice(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
+                                        if (!$data['leverage']) {
+                                            $data['leverage'] = $this->okxService->getInstrumentsInfo(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase)['maxLeverage'];
+                                        }
+
+                                        $this->okxService->setLeverage(
+                                            strtoupper($data['coin']) . "-USDT-SWAP",
+                                            $data['leverage'],
+                                            $apiKey,
+                                            $secretKey,
+                                            $passphrase
+                                        );
                                         break;
                                 }
 
-                                $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
-                                $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
-                            }
+                                //vào lệnh
+                                if ($data['isLimit']) {
+                                    $etLength = count($ets);
+                                    switch ($etLength) {
+                                        case 1:
+                                            $data['ET'] = $ets[0];
+                                            $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
+                                            break;
+                                        case 2:
+                                            $data['ET'] = $ets[0];
+                                            $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
+                                            $data['ET'] = $ets[1];
+                                            $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
+                                            break;
+                                        case 3:
+                                            $data['ET'] = $ets[0];
+                                            $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
+                                            $data['ET'] = $ets[1];
+                                            $this->createOrder($vol / 4, $data, $client, $chatId, $key, $platform);
+                                            $data['ET'] = $ets[2];
+                                            $this->createOrder($vol / 2, $data, $client, $chatId, $key, $platform);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else {
+                                    $this->createOrder($vol, $data, $client, $chatId, $key, $platform);
+                                }
+                                return;
+                            case "/no":
+                                $botUser->pending_order = null;
+                                $botUser->save();
+
+                                $client->post('sendMessage', [
+                                    'json' => [
+                                        'text' => "Đã huỷ lệnh chờ, hãy nhập lệnh mới",
+                                        'chat_id' => $chatId
+                                    ]
+                                ]);
+                                return;
+                            default:
+
+                                $data = parseOrder($text, $platform);
+
+                                // logger($data);
+
+                                if (!$data) {
+                                    $client->post('sendMessage', [
+                                        'json' => [
+                                            'text' => "❗️ Cú pháp của bạn không đúng ❗️\n\nĐể đặt lệnh bạn vui lòng thực hiện 1 trong 2 cách sau:\n- Sao chép tin nhắn và gửi đến bot\n- Forward tin nhắn đến bot\n\n Nếu chưa được vui lòng kiểm tra đúng cú pháp như sau:\n\nBTC - LONG LIMIT\n- ET: 50000\n- SL: 49000\n- TP: 51000\n- x10\n\n Lưu ý:\n- limit nếu có, để trống sẽ vào market\n- TP, SL chỉ nhập 1 giá\n- ET có thể nhập tối đa 3 giá",
+                                            'chat_id' => $chatId
+                                        ]
+                                    ]);
+                                } else {
+
+                                    //check đòn bẩy
+                                    switch ($platform) {
+                                        case 'bitget':
+                                            if (!$data['leverage']) {
+                                                $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, LEVERAGE_LEVELS);
+                                            } else {
+                                                $data['leverage'] = $this->bitgetService->setMaxLeverage($data['coin'] . "usdt", $apiKey, $secretKey, $passphrase, [$data['leverage'], "20"]);
+                                            }
+                                            break;
+                                        case 'bingx':
+                                            if (!$data['leverage']) {
+                                                $data['leverage'] = $this->bingxService->getMaxLeverage(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                            }
+
+                                            $this->bingxService->setLeverage(
+                                                strtoupper($data['coin']) . "-USDT",
+                                                $data['leverage'],
+                                                $data['orderType'] == 'buy' ? 'LONG' : 'SHORT',
+                                                $apiKey,
+                                                $secretKey
+                                            );
+
+                                            break;
+                                        case 'binance':
+                                            if (!$data['leverage']) {
+                                                $data['leverage'] = $this->binanceService->getMaxLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                            }
+
+                                            $this->binanceService->setLeverage(
+                                                strtoupper($data['coin']) . "USDT",
+                                                $data['leverage'],
+                                                $apiKey,
+                                                $secretKey
+                                            );
+
+                                            break;
+                                        case 'bybit':
+                                            $currentLeverage = $this->bybitService->getCurrentLeverage(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                            if (!$data['leverage']) {
+                                                $data['leverage'] = $this->bybitService->getInstrumentsInfo(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey)['maxLeverage'];
+                                            }
+
+                                            if ($currentLeverage != $data['leverage']) {
+                                                $this->bybitService->setLeverage(
+                                                    strtoupper($data['coin']) . "USDT",
+                                                    $data['leverage'],
+                                                    $apiKey,
+                                                    $secretKey
+                                                );
+                                            }
+
+                                            break;
+                                        case 'okx':
+                                            if (!$data['leverage']) {
+                                                $data['leverage'] = $this->okxService->getInstrumentsInfo(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase)['maxLeverage'];
+                                            }
+
+                                            $this->okxService->setLeverage(
+                                                strtoupper($data['coin']) . "-USDT-SWAP",
+                                                $data['leverage'],
+                                                $apiKey,
+                                                $secretKey,
+                                                $passphrase
+                                            );
+                                            break;
+                                    }
+
+                                    // tính vols
+                                    if ($data['isLimit']) {
+                                        $ets = $data['ET'];
+
+                                        $vol = determineVol($ets[0], $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                    } else {
+                                        switch ($platform) {
+                                            case 'bitget':
+                                                $currentPrice = $this->bitgetService->getLatestPriceOfCoin(strtoupper(preg_replace('/^(10+)\s*/', '', $data['coin'])) . "USDT");
+                                                break;
+                                            case 'bingx':
+                                                $currentPrice = $this->bingxService->getLatestPriceOfCoin(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey);
+                                                break;
+                                            case 'binance':
+                                                $currentPrice = $this->binanceService->getLatestPriceOfCoin(strtoupper($data['coin']) . "USDT", $secretKey);
+                                                break;
+                                            case 'bybit':
+                                                $currentPrice = $this->bybitService->getLatestPrice(strtoupper($data['coin']) . "USDT", $apiKey, $secretKey);
+                                                break;
+                                            case 'okx':
+                                                $currentPrice = $this->okxService->getLatestPrice(strtoupper($data['coin']) . "-USDT", $apiKey, $secretKey, $passphrase);
+                                                break;
+                                        }
+
+                                        $vol = determineVol($currentPrice, $data['SL'], $data['leverage'], $botUser->risk_tolerance);
+                                    }
+
+                                    //check lệnh chờ
+                                    if ($botUser->pending_order) {
+                                        $pendingOrder = json_decode($botUser->pending_order, true);
+                                        $client->post('sendMessage', [
+                                            'json' => [
+                                                'text' => "Bạn có một lệnh chờ: \n\n" .
+                                                    $pendingOrder['coin'] . " " .
+                                                    $pendingOrder['orderType'] . " " .
+                                                    ($pendingOrder['isLimit'] ? "LIMIT" : "") . "\n" .
+                                                    "ET: " . json_encode($pendingOrder['ET']) . "\n" .
+                                                    "SL: {$pendingOrder['SL']}" . "\n" .
+                                                    "TP: {$pendingOrder['TP']}" . "\n\n" .
+                                                    "Bạn có muốn vào lệnh này không ?" .
+                                                    "\n" . "/yes để vào" . "\n" . "/no để bỏ",
+                                                'chat_id' => $chatId,
+                                            ]
+                                        ]);
+
+                                        return;
+                                    } else {
+
+                                        $botUser->pending_order = json_encode($data);
+                                        $botUser->save();
+                                        $client->post('sendMessage', [
+                                            'json' => [
+                                                'text' => "Lệnh của bạn: \n\n" .
+                                                    $data["coin"] . " " .
+                                                    $data["orderType"] . " " .
+                                                    ($data["isLimit"] ? "LIMIT" : "") . "\n" .
+                                                    "ET: " . json_encode($data['ET']) . "\n" .
+                                                    "SL: {$data['SL']}" . "\n" .
+                                                    "TP: {$data['TP']}" . "\n\n" .
+                                                    "Với lượng vào là " . "<strong>" . round($vol, 2) . "</strong>" . " vol\n" .
+                                                    "Bạn có muốn vào nó ngay không ?" .
+                                                    "\n" . "/yes để vào" . "\n" . "/no để bỏ",
+                                                'chat_id' => $chatId,
+                                                'parse_mode' => 'HTML'
+                                            ]
+                                        ]);
+
+                                        return;
+                                    }
+                                }
+                                return;
                         }
                     } else {
                         $botTradingSlat->total_trading_failed += 1;

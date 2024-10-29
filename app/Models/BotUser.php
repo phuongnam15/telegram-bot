@@ -16,6 +16,7 @@ class BotUser extends Model
         'is_actived',
         'expired_at',
         'risk_tolerance',
+        'pending_order'
     ];
 
     const ACTIVE = 1;
